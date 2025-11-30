@@ -1,5 +1,25 @@
 # Por que Testes de Integração são Críticos 🎯
 
+## ⚙️ Configuração: Test Client para Jest
+
+Os testes de integração usam um cliente Supabase especial que **não depende de cookies do Next.js**:
+
+```typescript
+// ❌ NÃO funciona no Jest
+import { createClient } from '@/lib/supabase/server';
+// TypeError: cookieStore.getAll is not a function
+
+// ✅ Funciona no Jest
+import { createTestClient } from '@/lib/supabase/test-client';
+const supabase = createTestClient(); // Cliente simples sem cookies
+```
+
+### Por que precisamos de um Test Client?
+
+1. **Jest não suporta `cookies()` do Next.js**
+2. **Testes não precisam de autenticação com cookies**
+3. **É mais rápido e simples**
+
 ## 🐛 O Problema que Você Encontrou
 
 ### Erro Real em Produção:

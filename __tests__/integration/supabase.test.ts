@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server';
+import { createTestClient } from '@/lib/supabase/test-client';
 
 /**
  * TESTES DE INTEGRAÇÃO - Usam Supabase REAL
@@ -13,7 +13,7 @@ describe('Integration: Projects API', () => {
   // Skip por padrão - rode com: pnpm test:integration
   describe.skip('GET /api/projects - REAL DATABASE', () => {
     it('should fetch real projects from Supabase', async () => {
-      const supabase = await createClient();
+      const supabase = createTestClient();
       
       const { data, error } = await supabase
         .from('projects')
@@ -28,7 +28,7 @@ describe('Integration: Projects API', () => {
     });
 
     it('should validate project schema', async () => {
-      const supabase = await createClient();
+      const supabase = createTestClient();
       
       const { data, error } = await supabase
         .from('projects')
@@ -55,7 +55,7 @@ describe('Integration: Projects API', () => {
 describe('Integration: Tasks API', () => {
   describe.skip('GET /api/tasks - REAL DATABASE', () => {
     it('should fetch real tasks from Supabase', async () => {
-      const supabase = await createClient();
+      const supabase = createTestClient();
       
       const { data, error } = await supabase
         .from('tasks')

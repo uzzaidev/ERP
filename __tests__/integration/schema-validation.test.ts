@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server';
+import { createTestClient } from '@/lib/supabase/test-client';
 
 /**
  * TESTE DE INTEGRAÇÃO CRÍTICO
@@ -16,7 +16,7 @@ import { createClient } from '@/lib/supabase/server';
 describe('Integration: API Schema Validation', () => {
   describe('Tasks API - Schema Consistency', () => {
     it('should validate that tasks foreign keys exist', async () => {
-      const supabase = await createClient();
+      const supabase = createTestClient();
       
       // Tenta fazer a mesma query que a API faz
       const { data, error } = await supabase
@@ -52,7 +52,7 @@ describe('Integration: API Schema Validation', () => {
     });
 
     it('should validate assignee_id column exists', async () => {
-      const supabase = await createClient();
+      const supabase = createTestClient();
       
       // Tenta filtrar por assignee_id (como a API faz)
       const { data, error } = await supabase
@@ -70,7 +70,7 @@ describe('Integration: API Schema Validation', () => {
     });
 
     it('should validate update with assignee_id works', async () => {
-      const supabase = await createClient();
+      const supabase = createTestClient();
       
       // Busca uma task para atualizar
       const { data: tasks } = await supabase
@@ -101,7 +101,7 @@ describe('Integration: API Schema Validation', () => {
     });
 
     it('should validate update returns assignee data correctly', async () => {
-      const supabase = await createClient();
+      const supabase = createTestClient();
       
       // Busca uma task para atualizar
       const { data: tasks } = await supabase
@@ -151,7 +151,7 @@ describe('Integration: API Schema Validation', () => {
 
   describe('Projects API - Schema Consistency', () => {
     it('should validate projects foreign key hint', async () => {
-      const supabase = await createClient();
+      const supabase = createTestClient();
       
       const { data, error } = await supabase
         .from('projects')
@@ -181,7 +181,7 @@ describe('Integration: API Schema Validation', () => {
     });
 
     it('should validate full_name column exists', async () => {
-      const supabase = await createClient();
+      const supabase = createTestClient();
       
       const { data, error } = await supabase
         .from('users')
@@ -201,7 +201,7 @@ describe('Integration: API Schema Validation', () => {
 
   describe('Users API - Schema Consistency', () => {
     it('should validate users.full_name is used', async () => {
-      const supabase = await createClient();
+      const supabase = createTestClient();
       
       const { data, error } = await supabase
         .from('users')

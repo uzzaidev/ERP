@@ -172,7 +172,7 @@ export default function KanbanPage() {
       const response = await fetch('/api/tasks', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: card.dbId, assigned_to: userId }),
+        body: JSON.stringify({ id: card.dbId, assignee_id: userId }),
       });
 
       if (!response.ok) {
@@ -185,11 +185,11 @@ export default function KanbanPage() {
       if (result.data) {
         const updatedCard: KanbanCard = {
           ...card,
-          assignee: result.data.assigned_to_user ? {
-            id: result.data.assigned_to_user.id,
-            full_name: result.data.assigned_to_user.full_name,
-            email: result.data.assigned_to_user.email,
-            avatar: result.data.assigned_to_user.avatar_url
+          assignee: result.data.assignee ? {
+            id: result.data.assignee.id,
+            full_name: result.data.assignee.full_name,
+            email: result.data.assignee.email,
+            avatar: result.data.assignee.avatar_url
           } : null,
         };
         

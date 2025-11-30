@@ -51,8 +51,8 @@ export default function LoginPage() {
           <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 p-4">
             <Smartphone className="h-5 w-5 text-blue-300" />
             <div>
-              <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Capacitor</p>
-              <p>Helper de API pronto para direcionar mobile -> producao.</p>
+              <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Capacitor</p>       
+              <p>Helper de API pronto para direcionar mobile para producao.</p>
             </div>
           </div>
         </div>

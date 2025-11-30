@@ -216,7 +216,7 @@ export default function Home() {
             <div className="mt-6 space-y-4 text-sm text-slate-300">
               <p>1. Conectar Supabase Auth real + Doppler.</p>
               <p>2. Substituir mock API pelo helper com fetch real.</p>
-              <p>3. Exportar build Next -> Capacitor e testar mobile.</p>
+              <p>3. Exportar build Next para Capacitor e testar mobile.</p>
             </div>
           </div>
         </section>

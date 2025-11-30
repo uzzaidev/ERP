@@ -1,10 +1,34 @@
 "use client";
 
-import { Search, Filter, Calendar, User } from "lucide-react";
+import { Search, Filter, Calendar, User, FolderKanban } from "lucide-react";
 import { useKanbanStore } from "@/lib/stores";
+import { useEffect, useState } from "react";
+
+interface Project {
+  id: string;
+  name: string;
+  code: string;
+}
 
 export function KanbanFilters() {
-  const { filter, setFilter, resetFilter, sprints } = useKanbanStore();
+  const { filter, setFilter, resetFilter, sprints, users } = useKanbanStore();
+  const [projects, setProjects] = useState<Project[]>([]);
+
+  useEffect(() => {
+    // Fetch projects for filter
+    async function fetchProjects() {
+      try {
+        const response = await fetch('/api/projects');
+        const data = await response.json();
+        if (data.data) {
+          setProjects(data.data);
+        }
+      } catch (error) {
+        console.error('Error fetching projects:', error);
+      }
+    }
+    fetchProjects();
+  }, []);
 
   return (
     <div className="flex flex-wrap items-center gap-3">
@@ -18,6 +42,23 @@ export function KanbanFilters() {
           onChange={(e) => setFilter({ search: e.target.value })}
           className="w-full rounded-lg border border-slate-700 bg-slate-800 py-2 pl-10 pr-4 text-sm text-white placeholder:text-slate-500 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
         />
+      </div>
+
+      {/* Project Filter */}
+      <div className="flex items-center gap-2">
+        <FolderKanban className="h-4 w-4 text-slate-400" />
+        <select
+          value={filter.project || ""}
+          onChange={(e) => setFilter({ project: e.target.value || null })}
+          className="rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+        >
+          <option value="">Todos os projetos</option>
+          {projects.map((project) => (
+            <option key={project.id} value={project.id}>
+              {project.code} - {project.name}
+            </option>
+          ))}
+        </select>
       </div>
 
       {/* Sprint Filter */}
@@ -46,9 +87,11 @@ export function KanbanFilters() {
           className="rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
         >
           <option value="">Todas as pessoas</option>
-          <option value="user-1">Luis Boff</option>
-          <option value="user-2">Maria Silva</option>
-          <option value="user-3">João Santos</option>
+          {users.map((user) => (
+            <option key={user.id} value={user.id}>
+              {user.full_name}
+            </option>
+          ))}
         </select>
       </div>
 
@@ -67,7 +110,7 @@ export function KanbanFilters() {
       </select>
 
       {/* Reset Button */}
-      {(filter.search || filter.sprint || filter.assignee || filter.status) && (
+      {(filter.search || filter.sprint || filter.assignee || filter.status || filter.project) && (
         <button
           onClick={resetFilter}
           className="rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-sm text-slate-300 transition-colors hover:bg-slate-700"

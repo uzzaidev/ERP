@@ -5,7 +5,8 @@ export interface KanbanCard {
   status: "backlog" | "todo" | "in-progress" | "review" | "done";
   assignee: {
     id: string;
-    name: string;
+    full_name: string;
+    email?: string;
     avatar?: string;
   } | null;
   sprint: string | null;
@@ -16,13 +17,15 @@ export interface KanbanCard {
   comments: KanbanComment[];
   createdAt: string;
   updatedAt: string;
+  dbId?: string; // Database UUID for API updates
+  projectId?: string; // Project UUID for filtering
 }
 
 export interface KanbanComment {
   id: string;
   author: {
     id: string;
-    name: string;
+    full_name: string;
     avatar?: string;
   };
   content: string;
@@ -42,5 +45,6 @@ export interface KanbanFilter {
   sprint: string | null;
   assignee: string | null;
   status: string | null;
+  project: string | null;
   search: string;
 }

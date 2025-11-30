@@ -97,30 +97,21 @@ O sistema utiliza **13 agentes especializados** organizados em **3 tiers**:
 
 ## 🛠️ Stack Tecnológico
 
-### Backend
+### Stack Principal
 | Tecnologia | Versão | Uso |
 |------------|--------|-----|
-| Python | 3.11+ | Linguagem principal |
-| FastAPI | 0.104+ | Framework API REST |
-| SQLAlchemy | 2.0+ | ORM |
-| Pydantic | 2.0+ | Validação de dados |
-| OpenAI API | gpt-4o-mini | LLM para extração |
-| Qdrant | 1.7+ | Vector Database (RAG) |
-| PostgreSQL | 15+ | Banco de dados principal |
-| Redis | 7+ | Cache |
-| Alembic | 1.12+ | Migrations |
-
-### Frontend
-| Tecnologia | Versão | Uso |
-|------------|--------|-----|
-| Next.js | 15+ | Framework React |
+| Next.js | 15.0.3 | Framework React com App Router |
 | React | 19+ | UI Library |
-| Shadcn/ui | latest | Componentes UI |
+| TypeScript | 5.6+ | Type Safety |
 | Tailwind CSS | 3.4+ | Estilização |
-| TypeScript | 5.3+ | Type Safety |
-| Chart.js | 4.4+ | Gráficos |
-| Zod | 3.22+ | Validação |
-| Zustand | 4+ | State Management |
+| Shadcn/ui | latest | Componentes UI |
+| Supabase | latest | Backend (PostgreSQL + Auth + Storage) |
+| PostgreSQL | 15+ | Banco de dados relacional |
+| Zustand | 5.0+ | State Management |
+| @dnd-kit | 6.3+ | Drag and Drop (Kanban) |
+| Zod | 3.23+ | Validação de schemas |
+| React Hook Form | 7.53+ | Formulários |
+| Lucide React | 0.460+ | Ícones |
 
 ### Infraestrutura
 | Tecnologia | Uso |
@@ -166,22 +157,29 @@ docker-compose up -d
 
 ### Configuração Manual (Desenvolvimento)
 
-#### Backend
 ```bash
-cd backend
-python -m venv venv
-source venv/bin/activate  # Linux/Mac
-# ou venv\Scripts\activate  # Windows
-pip install -r requirements.txt
-alembic upgrade head
-uvicorn src.interfaces.api.main:app --reload
-```
+# Instalar dependências
+pnpm install
 
-#### Frontend
-```bash
-cd frontend
-npm install
-npm run dev
+# Configurar variáveis de ambiente
+cp .env.example .env.local
+# Edite .env.local com suas credenciais do Supabase
+
+# Executar banco de dados (scripts SQL em /db)
+# Aplicar os arquivos SQL no Supabase SQL Editor na ordem:
+# 1. 01_core_tables.sql
+# 2. 02_project_management.sql
+# 3. 03_finance.sql
+# 4. 04_auxiliary_tables.sql
+
+# Iniciar servidor de desenvolvimento
+pnpm dev
+
+# Rodar testes
+pnpm test
+
+# Build para produção
+pnpm build
 ```
 
 ---
@@ -190,25 +188,34 @@ npm run dev
 
 ```
 erp-uzzai/
-├── backend/
-│   ├── src/
-│   │   ├── domain/           # Entidades e regras de negócio
-│   │   ├── application/      # Casos de uso
-│   │   ├── infrastructure/   # Implementações (DB, RAG, LLM, Agentes)
-│   │   └── interfaces/       # API e CLI
-│   ├── migrations/           # Migrações do banco
-│   └── tests/                # Testes
+├── src/
+│   ├── app/                  # Páginas Next.js (App Router)
+│   │   ├── (auth)/           # Rotas autenticadas
+│   │   ├── (public)/         # Rotas públicas
+│   │   └── api/              # API Routes
+│   ├── components/           # Componentes React
+│   │   ├── layout/           # Sidebar, Topbar
+│   │   └── kanban/           # Componentes do Kanban
+│   ├── lib/                  # Utilitários e configurações
+│   │   ├── api/              # Cliente API
+│   │   ├── hooks/            # React Hooks customizados
+│   │   ├── stores/           # Zustand stores
+│   │   └── supabase/         # Cliente Supabase
+│   └── types/                # TypeScript types
 │
-├── frontend/
-│   ├── src/
-│   │   ├── app/              # Páginas Next.js
-│   │   ├── components/       # Componentes React
-│   │   ├── lib/              # Utilitários
-│   │   └── types/            # TypeScript types
-│   └── public/               # Assets estáticos
+├── db/                       # Scripts SQL do banco de dados
+│   ├── 01_core_tables.sql
+│   ├── 02_project_management.sql
+│   ├── 03_finance.sql
+│   └── 04_auxiliary_tables.sql
 │
-├── docs/                     # Documentação
-├── docker-compose.yml
+├── __tests__/                # Testes automatizados
+│   └── api/                  # Testes das API routes
+│
+├── .github/
+│   └── workflows/            # GitHub Actions CI/CD
+│
+├── public/                   # Assets estáticos
 └── README.md
 ```
 
@@ -216,56 +223,46 @@ erp-uzzai/
 
 ## 🔌 API Endpoints
 
-### Principais Endpoints
+### API Routes (Next.js)
 
 | Método | Endpoint | Descrição |
 |--------|----------|-----------|
-| `POST` | `/api/v1/meetings/ingest` | Processa nova reunião |
-| `GET` | `/api/v1/projects` | Lista projetos |
-| `GET` | `/api/v1/actions` | Lista ações |
-| `POST` | `/api/v1/sales` | Cria venda + baixa estoque |
-| `GET` | `/api/v1/financial/cashflow` | Fluxo de caixa |
-| `GET` | `/api/v1/decisions/similar` | Busca decisões similares (RAG) |
+| `GET` | `/api/projects` | Lista todos os projetos com membros |
+| `GET` | `/api/tasks` | Lista tarefas (filtros: project_id, sprint_id, status, assigned_to) |
+| `PATCH` | `/api/tasks` | Atualiza status ou assignee de uma tarefa |
+| `GET` | `/api/sprints` | Lista sprints (filtro opcional: project_id) |
+| `GET` | `/api/users` | Lista usuários ativos |
+| `GET` | `/api/tags` | Lista todas as tags |
 
-### Exemplo: Ingestão de Reunião
+### Exemplo: Buscar Tarefas de um Projeto
 
 ```bash
-curl -X POST "http://localhost:8000/api/v1/meetings/ingest" \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <token>" \
-  -d '{
-    "transcript": {
-      "raw_text": "Reunião de alinhamento...",
-      "source": "fathom",
-      "language": "pt-BR"
-    },
-    "metadata": {
-      "title": "Reunião Chatbot - Sprint 48",
-      "project_code": "CHATBOT"
-    },
-    "options": {
-      "auto_extract": true,
-      "generate_minutes": true
-    }
-  }'
+curl "http://localhost:3000/api/tasks?project_id=22222222-0001-0001-0001-000000000001"
 ```
 
 **Resposta:**
 ```json
 {
-  "meeting": {
-    "id": "...",
-    "code": "MTG-2025-11-24-CHATBOT"
-  },
-  "extracted": {
-    "decisions": 3,
-    "actions": 7,
-    "risks": 2,
-    "kaizens": 1
-  },
-  "files_generated": {
-    "ata": "40-Reunioes/2025-11-24-Reuniao-Chatbot.md"
-  }
+  "success": true,
+  "data": [
+    {
+      "id": "44444444-0001-0001-0001-000000000001",
+      "code": "TASK-001",
+      "title": "Implementar autenticação",
+      "status": "in-progress",
+      "priority": "high",
+      "assigned_to_user": {
+        "id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+        "name": "João Silva",
+        "email": "joao@uzzai.dev"
+      },
+      "project": {
+        "id": "22222222-0001-0001-0001-000000000001",
+        "code": "PROJ-001",
+        "name": "Sistema ERP"
+      }
+    }
+  ]
 }
 ```
 

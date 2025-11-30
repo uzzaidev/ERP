@@ -215,7 +215,7 @@ INSERT INTO notifications (user_id, type, title, message, link_url, is_read) VAL
     'mention',
     'Você foi mencionado em TASK-003',
     'João Santos mencionou você em um comentário',
-    '/projetos?task=task-003',
+    '/projetos?task=44444444-0001-0001-0001-000000000003',
     FALSE
 ),
 (
@@ -223,7 +223,7 @@ INSERT INTO notifications (user_id, type, title, message, link_url, is_read) VAL
     'comment',
     'Novo comentário em TASK-002',
     'Luis Boff comentou: "Componentes concluídos e testados"',
-    '/projetos?task=task-002',
+    '/projetos?task=44444444-0001-0001-0001-000000000002',
     TRUE
 ),
 (
@@ -231,7 +231,7 @@ INSERT INTO notifications (user_id, type, title, message, link_url, is_read) VAL
     'approval',
     'Aprovação pendente: Salários Novembro',
     'Transação TRX-002 aguarda aprovação',
-    '/financeiro?transaction=trx-002',
+    '/financeiro?transaction=88888888-0001-0001-0001-000000000002',
     FALSE
 ),
 (
@@ -239,7 +239,7 @@ INSERT INTO notifications (user_id, type, title, message, link_url, is_read) VAL
     'assignment',
     'Nova tarefa atribuída: PORTAL-003',
     'Você foi atribuído à tarefa "Criar API de listagem de projetos"',
-    '/projetos?task=task-010',
+    '/projetos?task=44444444-0001-0001-0001-000000000010',
     FALSE
 );
 
@@ -251,7 +251,7 @@ INSERT INTO activity_feed (user_id, action, entity_type, entity_id, entity_name,
     'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
     'completed',
     'task',
-    'task-002',
+    '44444444-0001-0001-0001-000000000002',
     'Criar componentes do Kanban Board',
     'completou a tarefa'
 ),
@@ -259,7 +259,7 @@ INSERT INTO activity_feed (user_id, action, entity_type, entity_id, entity_name,
     'cccccccc-cccc-cccc-cccc-cccccccccccc',
     'commented',
     'task',
-    'task-003',
+    '44444444-0001-0001-0001-000000000003',
     'Configurar Capacitor para mobile',
     'comentou na tarefa'
 ),
@@ -267,7 +267,7 @@ INSERT INTO activity_feed (user_id, action, entity_type, entity_id, entity_name,
     'dddddddd-dddd-dddd-dddd-dddddddddddd',
     'created',
     'transaction',
-    'trx-008',
+    '88888888-0001-0001-0001-000000000008',
     'Impostos - ISS Novembro',
     'criou uma transação'
 ),
@@ -275,7 +275,7 @@ INSERT INTO activity_feed (user_id, action, entity_type, entity_id, entity_name,
     'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
     'updated',
     'project',
-    'proj-002',
+    '22222222-0001-0001-0001-000000000002',
     'Portal Web Cliente',
     'atualizou o projeto'
 ),
@@ -283,7 +283,7 @@ INSERT INTO activity_feed (user_id, action, entity_type, entity_id, entity_name,
     'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
     'created',
     'task',
-    'task-007',
+    '44444444-0001-0001-0001-000000000007',
     'Corrigir bug no filtro de sprints',
     'criou uma tarefa'
 );
@@ -292,10 +292,10 @@ INSERT INTO activity_feed (user_id, action, entity_type, entity_id, entity_name,
 -- MOCK DATA - FAVORITES
 -- ============================================
 INSERT INTO favorites (user_id, entity_type, entity_id) VALUES
-('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'project', 'proj-001'),
-('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'task', 'task-001'),
-('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'project', 'proj-002'),
-('cccccccc-cccc-cccc-cccc-cccccccccccc', 'task', 'task-009');
+('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'project', '22222222-0001-0001-0001-000000000001'),
+('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'task', '44444444-0001-0001-0001-000000000001'),
+('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'project', '22222222-0001-0001-0001-000000000002'),
+('cccccccc-cccc-cccc-cccc-cccccccccccc', 'task', '44444444-0001-0001-0001-000000000009');
 
 -- ============================================
 -- MOCK DATA - EMAIL TEMPLATES
@@ -340,9 +340,9 @@ INSERT INTO recurring_transactions (name, transaction_type, category, descriptio
     1,
     '2025-01-30',
     '2025-12-30',
-    'bank-001',
-    'acc-e-002',
-    'cc-003',
+    '55555555-0001-0001-0001-000000000001',
+    '66666666-0001-0001-0001-000000000005',
+    '77777777-0001-0001-0001-000000000003',
     TRUE,
     'dddddddd-dddd-dddd-dddd-dddddddddddd'
 ),
@@ -356,9 +356,9 @@ INSERT INTO recurring_transactions (name, transaction_type, category, descriptio
     1,
     '2025-01-05',
     '2025-12-05',
-    'bank-001',
-    'acc-e-005',
-    'cc-003',
+    '55555555-0001-0001-0001-000000000001',
+    '66666666-0001-0001-0001-000000000008',
+    '77777777-0001-0001-0001-000000000003',
     TRUE,
     'dddddddd-dddd-dddd-dddd-dddddddddddd'
 ),
@@ -372,9 +372,9 @@ INSERT INTO recurring_transactions (name, transaction_type, category, descriptio
     1,
     '2025-01-05',
     '2025-12-05',
-    'bank-001',
-    'acc-e-004',
-    'cc-001',
+    '55555555-0001-0001-0001-000000000001',
+    '66666666-0001-0001-0001-000000000007',
+    '77777777-0001-0001-0001-000000000001',
     TRUE,
     'dddddddd-dddd-dddd-dddd-dddddddddddd'
 ),
@@ -388,9 +388,9 @@ INSERT INTO recurring_transactions (name, transaction_type, category, descriptio
     1,
     '2025-01-10',
     '2025-12-10',
-    'bank-001',
-    'acc-e-004',
-    'cc-003',
+    '55555555-0001-0001-0001-000000000001',
+    '66666666-0001-0001-0001-000000000007',
+    '77777777-0001-0001-0001-000000000003',
     TRUE,
     'dddddddd-dddd-dddd-dddd-dddddddddddd'
 );

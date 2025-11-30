@@ -188,48 +188,48 @@ CREATE INDEX idx_budgets_cost_center_id ON budgets(cost_center_id);
 -- MOCK DATA - BANK ACCOUNTS
 -- ============================================
 INSERT INTO bank_accounts (id, name, bank_name, account_number, agency, account_type, initial_balance, current_balance) VALUES
-('bank-001', 'Conta Corrente Principal', 'Banco do Brasil', '12345-6', '0001', 'checking', 100000.00, 185000.00),
-('bank-002', 'Conta Poupança', 'Caixa Econômica', '98765-4', '0123', 'savings', 50000.00, 52000.00),
-('bank-003', 'Conta Investimentos', 'Nubank', '55555-5', '0001', 'investment', 200000.00, 210000.00);
+('55555555-0001-0001-0001-000000000001', 'Conta Corrente Principal', 'Banco do Brasil', '12345-6', '0001', 'checking', 100000.00, 185000.00),
+('55555555-0001-0001-0001-000000000002', 'Conta Poupança', 'Caixa Econômica', '98765-4', '0123', 'savings', 50000.00, 52000.00),
+('55555555-0001-0001-0001-000000000003', 'Conta Investimentos', 'Nubank', '55555-5', '0001', 'investment', 200000.00, 210000.00);
 
 -- ============================================
 -- MOCK DATA - CHART OF ACCOUNTS
 -- ============================================
 INSERT INTO chart_of_accounts (id, code, name, account_type, category, parent_id) VALUES
 -- RECEITAS
-('acc-r-001', '3.1', 'Receitas Operacionais', 'revenue', NULL, NULL),
-('acc-r-002', '3.1.01', 'Receita de Serviços', 'revenue', 'Serviços', 'acc-r-001'),
-('acc-r-003', '3.1.02', 'Receita de Produtos', 'revenue', 'Produtos', 'acc-r-001'),
+('66666666-0001-0001-0001-000000000001', '3.1', 'Receitas Operacionais', 'revenue', NULL, NULL),
+('66666666-0001-0001-0001-000000000002', '3.1.01', 'Receita de Serviços', 'revenue', 'Serviços', '66666666-0001-0001-0001-000000000001'),
+('66666666-0001-0001-0001-000000000003', '3.1.02', 'Receita de Produtos', 'revenue', 'Produtos', '66666666-0001-0001-0001-000000000001'),
 
 -- DESPESAS
-('acc-e-001', '4.1', 'Despesas Operacionais', 'expense', NULL, NULL),
-('acc-e-002', '4.1.01', 'Salários e Encargos', 'expense', 'Pessoal', 'acc-e-001'),
-('acc-e-003', '4.1.02', 'Marketing', 'expense', 'Marketing', 'acc-e-001'),
-('acc-e-004', '4.1.03', 'Infraestrutura', 'expense', 'TI', 'acc-e-001'),
-('acc-e-005', '4.1.04', 'Escritório', 'expense', 'Administrativo', 'acc-e-001'),
-('acc-e-006', '4.1.05', 'Impostos', 'expense', 'Fiscal', 'acc-e-001'),
+('66666666-0001-0001-0001-000000000004', '4.1', 'Despesas Operacionais', 'expense', NULL, NULL),
+('66666666-0001-0001-0001-000000000005', '4.1.01', 'Salários e Encargos', 'expense', 'Pessoal', '66666666-0001-0001-0001-000000000004'),
+('66666666-0001-0001-0001-000000000006', '4.1.02', 'Marketing', 'expense', 'Marketing', '66666666-0001-0001-0001-000000000004'),
+('66666666-0001-0001-0001-000000000007', '4.1.03', 'Infraestrutura', 'expense', 'TI', '66666666-0001-0001-0001-000000000004'),
+('66666666-0001-0001-0001-000000000008', '4.1.04', 'Escritório', 'expense', 'Administrativo', '66666666-0001-0001-0001-000000000004'),
+('66666666-0001-0001-0001-000000000009', '4.1.05', 'Impostos', 'expense', 'Fiscal', '66666666-0001-0001-0001-000000000004'),
 
 -- ATIVOS
-('acc-a-001', '1.1', 'Ativo Circulante', 'asset', NULL, NULL),
-('acc-a-002', '1.1.01', 'Caixa e Bancos', 'asset', 'Caixa', 'acc-a-001'),
-('acc-a-003', '1.2', 'Ativo Não Circulante', 'asset', NULL, NULL),
-('acc-a-004', '1.2.01', 'Imobilizado', 'asset', 'Equipamentos', 'acc-a-003');
+('66666666-0001-0001-0001-000000000010', '1.1', 'Ativo Circulante', 'asset', NULL, NULL),
+('66666666-0001-0001-0001-000000000011', '1.1.01', 'Caixa e Bancos', 'asset', 'Caixa', '66666666-0001-0001-0001-000000000010'),
+('66666666-0001-0001-0001-000000000012', '1.2', 'Ativo Não Circulante', 'asset', NULL, NULL),
+('66666666-0001-0001-0001-000000000013', '1.2.01', 'Imobilizado', 'asset', 'Equipamentos', '66666666-0001-0001-0001-000000000012');
 
 -- ============================================
 -- MOCK DATA - COST CENTERS
 -- ============================================
 INSERT INTO cost_centers (id, code, name, description, manager_id) VALUES
-('cc-001', 'CC-001', 'Desenvolvimento', 'Centro de custo para equipe de desenvolvimento', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'),
-('cc-002', 'CC-002', 'Marketing', 'Centro de custo para marketing e vendas', 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb'),
-('cc-003', 'CC-003', 'Administrativo', 'Centro de custo para administrativo e financeiro', 'dddddddd-dddd-dddd-dddd-dddddddddddd'),
-('cc-004', 'CC-004', 'Jurídico', 'Centro de custo para departamento jurídico', 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee');
+('77777777-0001-0001-0001-000000000001', 'CC-001', 'Desenvolvimento', 'Centro de custo para equipe de desenvolvimento', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'),
+('77777777-0001-0001-0001-000000000002', 'CC-002', 'Marketing', 'Centro de custo para marketing e vendas', 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb'),
+('77777777-0001-0001-0001-000000000003', 'CC-003', 'Administrativo', 'Centro de custo para administrativo e financeiro', 'dddddddd-dddd-dddd-dddd-dddddddddddd'),
+('77777777-0001-0001-0001-000000000004', 'CC-004', 'Jurídico', 'Centro de custo para departamento jurídico', 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee');
 
 -- ============================================
 -- MOCK DATA - TRANSACTIONS
 -- ============================================
 INSERT INTO transactions (id, code, transaction_type, category, description, amount, transaction_date, due_date, payment_date, status, payment_method, bank_account_id, account_id, cost_center_id, project_id, contact_name, contact_document, created_by) VALUES
 (
-    'trx-001',
+    '88888888-0001-0001-0001-000000000001',
     'TRX-001',
     'income',
     'invoice',
@@ -240,16 +240,16 @@ INSERT INTO transactions (id, code, transaction_type, category, description, amo
     '2025-11-15',
     'paid',
     'bank_transfer',
-    'bank-001',
-    'acc-r-002',
-    'cc-001',
-    'proj-002',
+    '55555555-0001-0001-0001-000000000001',
+    '66666666-0001-0001-0001-000000000002',
+    '77777777-0001-0001-0001-000000000001',
+    '22222222-0001-0001-0001-000000000002',
     'Cliente Externo LTDA',
     '12.345.678/0001-90',
     'dddddddd-dddd-dddd-dddd-dddddddddddd'
 ),
 (
-    'trx-002',
+    '88888888-0001-0001-0001-000000000002',
     'TRX-002',
     'expense',
     'salary',
@@ -260,16 +260,16 @@ INSERT INTO transactions (id, code, transaction_type, category, description, amo
     NULL,
     'pending',
     'bank_transfer',
-    'bank-001',
-    'acc-e-002',
-    'cc-003',
+    '55555555-0001-0001-0001-000000000001',
+    '66666666-0001-0001-0001-000000000005',
+    '77777777-0001-0001-0001-000000000003',
     NULL,
     'Folha de Pagamento',
     NULL,
     'dddddddd-dddd-dddd-dddd-dddddddddddd'
 ),
 (
-    'trx-003',
+    '88888888-0001-0001-0001-000000000003',
     'TRX-003',
     'expense',
     'payment',
@@ -280,16 +280,16 @@ INSERT INTO transactions (id, code, transaction_type, category, description, amo
     '2025-11-05',
     'paid',
     'credit_card',
-    'bank-001',
-    'acc-e-004',
-    'cc-001',
-    'proj-001',
+    '55555555-0001-0001-0001-000000000001',
+    '66666666-0001-0001-0001-000000000007',
+    '77777777-0001-0001-0001-000000000001',
+    '22222222-0001-0001-0001-000000000001',
     'Amazon Web Services',
     '15.436.940/0001-03',
     'dddddddd-dddd-dddd-dddd-dddddddddddd'
 ),
 (
-    'trx-004',
+    '88888888-0001-0001-0001-000000000004',
     'TRX-004',
     'expense',
     'payment',
@@ -300,16 +300,16 @@ INSERT INTO transactions (id, code, transaction_type, category, description, amo
     '2025-11-10',
     'paid',
     'credit_card',
-    'bank-001',
-    'acc-e-004',
-    'cc-003',
+    '55555555-0001-0001-0001-000000000001',
+    '66666666-0001-0001-0001-000000000007',
+    '77777777-0001-0001-0001-000000000003',
     NULL,
     'Microsoft Corporation',
     '04.712.500/0001-07',
     'dddddddd-dddd-dddd-dddd-dddddddddddd'
 ),
 (
-    'trx-005',
+    '88888888-0001-0001-0001-000000000005',
     'TRX-005',
     'expense',
     'payment',
@@ -320,16 +320,16 @@ INSERT INTO transactions (id, code, transaction_type, category, description, amo
     '2025-11-21',
     'paid',
     'credit_card',
-    'bank-001',
-    'acc-e-003',
-    'cc-002',
+    '55555555-0001-0001-0001-000000000001',
+    '66666666-0001-0001-0001-000000000006',
+    '77777777-0001-0001-0001-000000000002',
     NULL,
     'Google Brasil',
     '06.990.590/0001-23',
     'dddddddd-dddd-dddd-dddd-dddddddddddd'
 ),
 (
-    'trx-006',
+    '88888888-0001-0001-0001-000000000006',
     'TRX-006',
     'income',
     'invoice',
@@ -340,16 +340,16 @@ INSERT INTO transactions (id, code, transaction_type, category, description, amo
     '2025-11-03',
     'paid',
     'pix',
-    'bank-001',
-    'acc-r-002',
-    'cc-001',
-    'proj-001',
+    '55555555-0001-0001-0001-000000000001',
+    '66666666-0001-0001-0001-000000000002',
+    '77777777-0001-0001-0001-000000000001',
+    '22222222-0001-0001-0001-000000000001',
     'UZZ.AI Interno',
     '99.999.999/0001-99',
     'dddddddd-dddd-dddd-dddd-dddddddddddd'
 ),
 (
-    'trx-007',
+    '88888888-0001-0001-0001-000000000007',
     'TRX-007',
     'expense',
     'payment',
@@ -360,16 +360,16 @@ INSERT INTO transactions (id, code, transaction_type, category, description, amo
     '2025-11-05',
     'paid',
     'bank_transfer',
-    'bank-001',
-    'acc-e-005',
-    'cc-003',
+    '55555555-0001-0001-0001-000000000001',
+    '66666666-0001-0001-0001-000000000008',
+    '77777777-0001-0001-0001-000000000003',
     NULL,
     'Imobiliária Xpto',
     '11.222.333/0001-44',
     'dddddddd-dddd-dddd-dddd-dddddddddddd'
 ),
 (
-    'trx-008',
+    '88888888-0001-0001-0001-000000000008',
     'TRX-008',
     'expense',
     'payment',
@@ -380,9 +380,9 @@ INSERT INTO transactions (id, code, transaction_type, category, description, amo
     NULL,
     'pending',
     'bank_transfer',
-    'bank-001',
-    'acc-e-006',
-    'cc-003',
+    '55555555-0001-0001-0001-000000000001',
+    '66666666-0001-0001-0001-000000000009',
+    '77777777-0001-0001-0001-000000000003',
     NULL,
     'Prefeitura Municipal',
     NULL,
@@ -394,13 +394,13 @@ INSERT INTO transactions (id, code, transaction_type, category, description, amo
 -- ============================================
 INSERT INTO invoices (id, invoice_number, invoice_type, series, issue_date, due_date, transaction_id, issuer_name, issuer_document, recipient_name, recipient_document, gross_amount, tax_amount, net_amount, status) VALUES
 (
-    'inv-001',
+    '99999999-0001-0001-0001-000000000001',
     'NFSe-12345',
     'nfse',
     'A',
     '2025-11-15',
     '2025-11-15',
-    'trx-001',
+    '88888888-0001-0001-0001-000000000001',
     'UZZ.AI Tecnologia LTDA',
     '99.999.999/0001-99',
     'Cliente Externo LTDA',
@@ -411,13 +411,13 @@ INSERT INTO invoices (id, invoice_number, invoice_type, series, issue_date, due_
     'issued'
 ),
 (
-    'inv-002',
+    '99999999-0001-0001-0001-000000000002',
     'NFSe-12346',
     'nfse',
     'A',
     '2025-11-01',
     '2025-11-01',
-    'trx-006',
+    '88888888-0001-0001-0001-000000000006',
     'UZZ.AI Tecnologia LTDA',
     '99.999.999/0001-99',
     'UZZ.AI Interno',
@@ -428,13 +428,13 @@ INSERT INTO invoices (id, invoice_number, invoice_type, series, issue_date, due_
     'issued'
 ),
 (
-    'inv-003',
+    '99999999-0001-0001-0001-000000000003',
     'NFe-789456',
     'nfe',
     '1',
     '2025-11-05',
     '2025-11-05',
-    'trx-003',
+    '88888888-0001-0001-0001-000000000003',
     'Amazon Web Services Brasil LTDA',
     '15.436.940/0001-03',
     'UZZ.AI Tecnologia LTDA',
@@ -449,18 +449,18 @@ INSERT INTO invoices (id, invoice_number, invoice_type, series, issue_date, due_
 -- MOCK DATA - INVOICE ITEMS
 -- ============================================
 INSERT INTO invoice_items (invoice_id, description, quantity, unit_price, total_price, tax_rate, tax_amount) VALUES
-('inv-001', 'Desenvolvimento Portal Web - Sprint 1', 1, 75000.00, 75000.00, 5.00, 3750.00),
-('inv-002', 'Desenvolvimento Sistema ERP - Parcela 3', 1, 41666.67, 41666.67, 5.00, 2083.33),
-('inv-003', 'Servidor EC2 t3.large - 730 horas', 730, 0.85, 620.50, 17.00, 105.49),
-('inv-003', 'Storage S3 - 500GB', 500, 0.30, 150.00, 17.00, 25.50),
-('inv-003', 'RDS PostgreSQL db.t3.medium', 1, 4229.50, 4229.50, 17.00, 719.01);
+('99999999-0001-0001-0001-000000000001', 'Desenvolvimento Portal Web - Sprint 1', 1, 75000.00, 75000.00, 5.00, 3750.00),
+('99999999-0001-0001-0001-000000000002', 'Desenvolvimento Sistema ERP - Parcela 3', 1, 41666.67, 41666.67, 5.00, 2083.33),
+('99999999-0001-0001-0001-000000000003', 'Servidor EC2 t3.large - 730 horas', 730, 0.85, 620.50, 17.00, 105.49),
+('99999999-0001-0001-0001-000000000003', 'Storage S3 - 500GB', 500, 0.30, 150.00, 17.00, 25.50),
+('99999999-0001-0001-0001-000000000003', 'RDS PostgreSQL db.t3.medium', 1, 4229.50, 4229.50, 17.00, 719.01);
 
 -- ============================================
 -- MOCK DATA - DOCUMENTS
 -- ============================================
 INSERT INTO documents (id, document_type, title, description, file_name, file_url, file_size, mime_type, transaction_id, project_id, uploaded_by, tags, is_confidential) VALUES
 (
-    'doc-001',
+    'aaaa1111-0001-0001-0001-000000000001',
     'contract',
     'Contrato Portal Web Cliente Externo',
     'Contrato de desenvolvimento do portal web',
@@ -468,14 +468,14 @@ INSERT INTO documents (id, document_type, title, description, file_name, file_ur
     'https://storage.uzz.ai/docs/contrato_portal_web_2025.pdf',
     2458000,
     'application/pdf',
-    'trx-001',
-    'proj-002',
+    '88888888-0001-0001-0001-000000000001',
+    '22222222-0001-0001-0001-000000000002',
     'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee',
     ARRAY['contrato', 'juridico', 'cliente'],
     TRUE
 ),
 (
-    'doc-002',
+    'aaaa1111-0001-0001-0001-000000000002',
     'invoice',
     'NFSe 12345 - Cliente Externo',
     'Nota fiscal de serviço referente ao projeto portal web',
@@ -483,14 +483,14 @@ INSERT INTO documents (id, document_type, title, description, file_name, file_ur
     'https://storage.uzz.ai/docs/nfse_12345.pdf',
     156000,
     'application/pdf',
-    'trx-001',
-    'proj-002',
+    '88888888-0001-0001-0001-000000000001',
+    '22222222-0001-0001-0001-000000000002',
     'dddddddd-dddd-dddd-dddd-dddddddddddd',
     ARRAY['nota-fiscal', 'nfse'],
     FALSE
 ),
 (
-    'doc-003',
+    'aaaa1111-0001-0001-0001-000000000003',
     'receipt',
     'Comprovante Pagamento AWS',
     'Comprovante de pagamento servidor AWS Novembro',
@@ -498,14 +498,14 @@ INSERT INTO documents (id, document_type, title, description, file_name, file_ur
     'https://storage.uzz.ai/docs/comprovante_aws_nov2025.pdf',
     89000,
     'application/pdf',
-    'trx-003',
-    'proj-001',
+    '88888888-0001-0001-0001-000000000003',
+    '22222222-0001-0001-0001-000000000001',
     'dddddddd-dddd-dddd-dddd-dddddddddddd',
     ARRAY['comprovante', 'infraestrutura'],
     FALSE
 ),
 (
-    'doc-004',
+    'aaaa1111-0001-0001-0001-000000000004',
     'report',
     'Relatório Financeiro Novembro 2025',
     'Relatório financeiro consolidado do mês',
@@ -525,48 +525,48 @@ INSERT INTO documents (id, document_type, title, description, file_name, file_ur
 -- ============================================
 INSERT INTO budgets (id, name, year, month, cost_center_id, account_id, budgeted_amount, spent_amount, status, created_by) VALUES
 (
-    'budget-001',
+    'bbbb2222-0001-0001-0001-000000000001',
     'Orçamento Desenvolvimento - Novembro',
     2025,
     11,
-    'cc-001',
-    'acc-e-002',
+    '77777777-0001-0001-0001-000000000001',
+    '66666666-0001-0001-0001-000000000005',
     40000.00,
     35000.00,
     'active',
     'dddddddd-dddd-dddd-dddd-dddddddddddd'
 ),
 (
-    'budget-002',
+    'bbbb2222-0001-0001-0001-000000000002',
     'Orçamento Marketing - Novembro',
     2025,
     11,
-    'cc-002',
-    'acc-e-003',
+    '77777777-0001-0001-0001-000000000002',
+    '66666666-0001-0001-0001-000000000006',
     10000.00,
     8000.00,
     'active',
     'dddddddd-dddd-dddd-dddd-dddddddddddd'
 ),
 (
-    'budget-003',
+    'bbbb2222-0001-0001-0001-000000000003',
     'Orçamento Infraestrutura - Novembro',
     2025,
     11,
-    'cc-001',
-    'acc-e-004',
+    '77777777-0001-0001-0001-000000000001',
+    '66666666-0001-0001-0001-000000000007',
     8000.00,
     7500.00,
     'active',
     'dddddddd-dddd-dddd-dddd-dddddddddddd'
 ),
 (
-    'budget-004',
+    'bbbb2222-0001-0001-0001-000000000004',
     'Orçamento Administrativo - Novembro',
     2025,
     11,
-    'cc-003',
-    'acc-e-005',
+    '77777777-0001-0001-0001-000000000003',
+    '66666666-0001-0001-0001-000000000008',
     12000.00,
     9500.00,
     'active',

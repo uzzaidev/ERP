@@ -1,190 +1,245 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
-import { Plus } from "lucide-react";
-import { KanbanColumn, KanbanFilters, KanbanCardModal } from "@/components/kanban";
-import { useKanbanStore } from "@/lib/stores";
-import type { KanbanCard } from "@/types/kanban";
+import { useEffect, useState } from "react";
+import { Plus, Search, ExternalLink, Calendar, DollarSign, Users } from "lucide-react";
+import Link from "next/link";
 
-// Mock data
-const mockSprints = [
-  { id: "sprint-1", name: "Sprint 48 - Nov 2025", startDate: "2025-11-18", endDate: "2025-12-01", status: "active" as const },
-  { id: "sprint-2", name: "Sprint 47 - Nov 2025", startDate: "2025-11-04", endDate: "2025-11-17", status: "completed" as const },
-  { id: "sprint-3", name: "Sprint 46 - Out 2025", startDate: "2025-10-21", endDate: "2025-11-03", status: "completed" as const },
-];
-
-const mockCards: KanbanCard[] = [
-  {
-    id: "TASK-001",
-    title: "Implementar autenticacao com Supabase",
-    description: "Configurar Supabase Auth com JWT e integrar com Doppler para gerenciamento de secrets",
-    status: "in-progress",
-    assignee: { id: "user-1", name: "Luis Boff" },
-    sprint: "sprint-1",
-    priority: "high",
-    estimatedHours: 8,
-    completedHours: 5,
-    tags: ["backend", "auth"],
-    comments: [
-      {
-        id: "c1",
-        author: { id: "user-1", name: "Luis Boff" },
-        content: "Ja configurei o client do Supabase, falta integrar com o Doppler",
-        mentions: [],
-        createdAt: "2025-11-28T10:30:00Z",
-      },
-    ],
-    createdAt: "2025-11-25T09:00:00Z",
-    updatedAt: "2025-11-28T10:30:00Z",
-  },
-  {
-    id: "TASK-002",
-    title: "Criar componentes do Kanban Board",
-    description: "Desenvolver KanbanCard, KanbanColumn e KanbanFilters com filtros por sprint e pessoa",
-    status: "done",
-    assignee: { id: "user-1", name: "Luis Boff" },
-    sprint: "sprint-1",
-    priority: "high",
-    estimatedHours: 6,
-    completedHours: 6,
-    tags: ["frontend", "kanban"],
-    comments: [],
-    createdAt: "2025-11-27T14:00:00Z",
-    updatedAt: "2025-11-30T16:00:00Z",
-  },
-  {
-    id: "TASK-003",
-    title: "Configurar Capacitor para mobile",
-    description: "Setup inicial do Capacitor e helper de API para detectar Desktop vs Mobile",
-    status: "review",
-    assignee: { id: "user-2", name: "Maria Silva" },
-    sprint: "sprint-1",
-    priority: "medium",
-    estimatedHours: 10,
-    completedHours: 9,
-    tags: ["mobile", "capacitor"],
-    comments: [],
-    createdAt: "2025-11-26T11:00:00Z",
-    updatedAt: "2025-11-29T15:00:00Z",
-  },
-  {
-    id: "TASK-004",
-    title: "Refatorar sidebar para ser colapsavel",
-    description: "Adicionar funcionalidade de expandir/colapsar sidebar com estado no Zustand",
-    status: "todo",
-    assignee: null,
-    sprint: "sprint-1",
-    priority: "low",
-    estimatedHours: 3,
-    completedHours: 0,
-    tags: ["frontend", "ui"],
-    comments: [],
-    createdAt: "2025-11-29T09:00:00Z",
-    updatedAt: "2025-11-29T09:00:00Z",
-  },
-  {
-    id: "TASK-005",
-    title: "Implementar RAG Insights",
-    description: "Criar modulo de IA para insights automaticos usando RAG",
-    status: "backlog",
-    assignee: null,
-    sprint: null,
-    priority: "medium",
-    estimatedHours: 20,
-    completedHours: 0,
-    tags: ["ai", "backend"],
-    comments: [],
-    createdAt: "2025-11-20T08:00:00Z",
-    updatedAt: "2025-11-20T08:00:00Z",
-  },
-  {
-    id: "TASK-006",
-    title: "Design system com cores mais claras",
-    description: "Ajustar paleta de cores para ter background menos escuro e melhor legibilidade",
-    status: "done",
-    assignee: { id: "user-1", name: "Luis Boff" },
-    sprint: "sprint-2",
-    priority: "medium",
-    estimatedHours: 4,
-    completedHours: 4,
-    tags: ["design", "ui"],
-    comments: [],
-    createdAt: "2025-11-15T10:00:00Z",
-    updatedAt: "2025-11-17T14:00:00Z",
-  },
-];
+interface Project {
+  id: string;
+  code: string;
+  name: string;
+  description: string;
+  status: string;
+  start_date: string;
+  end_date: string;
+  budget: number;
+  spent_amount: number;
+  project_members: any[];
+  created_at: string;
+}
 
 export default function ProjetosPage() {
-  const { cards, setCards, setSprints, filter } = useKanbanStore();
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
-    setCards(mockCards);
-    setSprints(mockSprints);
-  }, [setCards, setSprints]);
-
-  // Filter cards based on current filters
-  const filteredCards = useMemo(() => {
-    return cards.filter((card) => {
-      if (filter.sprint && card.sprint !== filter.sprint) return false;
-      if (filter.assignee && card.assignee?.id !== filter.assignee) return false;
-      if (filter.status && card.status !== filter.status) return false;
-      if (filter.search) {
-        const search = filter.search.toLowerCase();
-        return (
-          card.title.toLowerCase().includes(search) ||
-          card.description.toLowerCase().includes(search) ||
-          card.id.toLowerCase().includes(search)
-        );
+    async function fetchProjects() {
+      try {
+        setLoading(true);
+        const response = await fetch('/api/projects');
+        const data = await response.json();
+        if (data.data) {
+          setProjects(data.data);
+        }
+      } catch (error) {
+        console.error('Error fetching projects:', error);
+      } finally {
+        setLoading(false);
       }
-      return true;
-    });
-  }, [cards, filter]);
+    }
 
-  const columns = [
-    { title: "Backlog", status: "backlog" as const },
-    { title: "A Fazer", status: "todo" as const },
-    { title: "Em Progresso", status: "in-progress" as const },
-    { title: "Em Revisao", status: "review" as const },
-    { title: "Concluido", status: "done" as const },
-  ];
+    fetchProjects();
+  }, []);
+
+  const filteredProjects = projects.filter(project =>
+    project.name.toLowerCase().includes(search.toLowerCase()) ||
+    project.code.toLowerCase().includes(search.toLowerCase()) ||
+    project.description?.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const getStatusColor = (status: string) => {
+    const colors: Record<string, string> = {
+      planning: "bg-blue-500/20 text-blue-300 border-blue-500/30",
+      active: "bg-emerald-500/20 text-emerald-300 border-emerald-500/30",
+      on_hold: "bg-yellow-500/20 text-yellow-300 border-yellow-500/30",
+      completed: "bg-slate-500/20 text-slate-300 border-slate-500/30",
+      cancelled: "bg-red-500/20 text-red-300 border-red-500/30",
+    };
+    return colors[status] || colors.active;
+  };
+
+  const getStatusLabel = (status: string) => {
+    const labels: Record<string, string> = {
+      planning: "Planejamento",
+      active: "Ativo",
+      on_hold: "Em espera",
+      completed: "Concluído",
+      cancelled: "Cancelado",
+    };
+    return labels[status] || status;
+  };
+
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    }).format(value);
+  };
+
+  const formatDate = (date: string) => {
+    return new Date(date).toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
+  };
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-white">Kanban Board</h1>
-          <p className="mt-1 text-sm text-slate-400">Gerencie suas tarefas e sprints</p>
+          <h1 className="text-2xl font-semibold text-white">Projetos</h1>
+          <p className="mt-1 text-sm text-slate-400">
+            Gerencie todos os projetos da empresa
+          </p>
         </div>
         <button className="flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2.5 font-medium text-white transition-colors hover:bg-emerald-700">
           <Plus className="h-5 w-5" />
-          Nova Tarefa
+          Novo Projeto
         </button>
       </div>
 
-      {/* Filters */}
-      <KanbanFilters />
-
-      {/* Kanban Board */}
-      <div className="overflow-x-auto pb-4">
-        <div className="flex gap-4">
-          {columns.map((column) => {
-            const columnCards = filteredCards.filter((card) => card.status === column.status);
-            return (
-              <KanbanColumn
-                key={column.status}
-                title={column.title}
-                status={column.status}
-                cards={columnCards}
-                count={columnCards.length}
-              />
-            );
-          })}
-        </div>
+      {/* Search */}
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+        <input
+          type="text"
+          placeholder="Buscar projetos..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-full rounded-lg border border-slate-700 bg-slate-800 py-2.5 pl-10 pr-4 text-sm text-white placeholder:text-slate-500 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+        />
       </div>
 
-      {/* Card Modal */}
-      <KanbanCardModal />
+      {/* Projects Table */}
+      {loading ? (
+        <div className="flex items-center justify-center py-12">
+          <div className="text-slate-400">Carregando projetos...</div>
+        </div>
+      ) : (
+        <div className="overflow-hidden rounded-xl border border-slate-700/50 bg-slate-900/30">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="border-b border-slate-700/50 bg-slate-800/50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">
+                    Projeto
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">
+                    Período
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">
+                    Orçamento
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">
+                    Equipe
+                  </th>
+                  <th className="px-6 py-3 text-right text-xs font-semibold text-slate-300 uppercase tracking-wider">
+                    Ações
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-700/30">
+                {filteredProjects.map((project) => {
+                  const budgetUsed = project.budget > 0 
+                    ? (project.spent_amount / project.budget) * 100 
+                    : 0;
+
+                  return (
+                    <tr 
+                      key={project.id} 
+                      className="hover:bg-slate-800/30 transition-colors"
+                    >
+                      <td className="px-6 py-4">
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium text-white">
+                              {project.code}
+                            </span>
+                            <span className="text-slate-400">·</span>
+                            <span className="text-white">{project.name}</span>
+                          </div>
+                          {project.description && (
+                            <p className="mt-1 text-sm text-slate-400 line-clamp-1">
+                              {project.description}
+                            </p>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium ${getStatusColor(project.status)}`}>
+                          {getStatusLabel(project.status)}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-1.5 text-sm text-slate-300">
+                          <Calendar className="h-3.5 w-3.5 text-slate-400" />
+                          <span>{formatDate(project.start_date)}</span>
+                          {project.end_date && (
+                            <>
+                              <span className="text-slate-500">→</span>
+                              <span>{formatDate(project.end_date)}</span>
+                            </>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div>
+                          <div className="flex items-center gap-1.5 text-sm text-slate-300">
+                            <DollarSign className="h-3.5 w-3.5 text-slate-400" />
+                            <span>{formatCurrency(project.spent_amount)}</span>
+                            <span className="text-slate-500">/</span>
+                            <span>{formatCurrency(project.budget)}</span>
+                          </div>
+                          {project.budget > 0 && (
+                            <div className="mt-1.5 h-1.5 w-32 overflow-hidden rounded-full bg-slate-700">
+                              <div
+                                className={`h-full transition-all ${
+                                  budgetUsed > 90 ? 'bg-red-500' : budgetUsed > 70 ? 'bg-yellow-500' : 'bg-emerald-500'
+                                }`}
+                                style={{ width: `${Math.min(budgetUsed, 100)}%` }}
+                              />
+                            </div>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-1.5 text-sm text-slate-300">
+                          <Users className="h-3.5 w-3.5 text-slate-400" />
+                          <span>{project.project_members?.length || 0} membros</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center justify-end gap-2">
+                          <Link
+                            href={`/projetos/${project.id}`}
+                            className="rounded-lg border border-slate-700 bg-slate-800 p-2 text-slate-300 transition-colors hover:bg-slate-700 hover:text-white"
+                          >
+                            <ExternalLink className="h-4 w-4" />
+                          </Link>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          {filteredProjects.length === 0 && (
+            <div className="py-12 text-center">
+              <p className="text-slate-400">
+                {search ? 'Nenhum projeto encontrado' : 'Nenhum projeto cadastrado'}
+              </p>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

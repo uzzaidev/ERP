@@ -2,18 +2,41 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { LogIn, Mail, Lock } from "lucide-react";
+import { LogIn, Mail, Lock, AlertCircle } from "lucide-react";
+import { useState } from "react";
+import { signIn } from "@/lib/supabase/auth";
 
 export default function LoginPage() {
   const router = useRouter();
-  const mockCredentials = {
-    email: "admin@uzz.ai",
-    password: "admin123",
-  };
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    router.push("/dashboard");
+    setError("");
+    setLoading(true);
+
+    try {
+      const { data, error: authError } = await signIn({ email, password });
+
+      if (authError) {
+        setError(authError.message === "Invalid login credentials" 
+          ? "Email ou senha incorretos" 
+          : authError.message);
+        setLoading(false);
+        return;
+      }
+
+      if (data) {
+        router.push("/dashboard");
+        router.refresh();
+      }
+    } catch (err) {
+      setError("Erro ao fazer login. Tente novamente.");
+      setLoading(false);
+    }
   };
 
   return (
@@ -36,6 +59,13 @@ export default function LoginPage() {
             <p className="text-sm text-slate-400">Entre com suas credenciais</p>
           </div>
 
+          {error && (
+            <div className="mb-5 rounded-lg bg-red-500/10 border border-red-500/50 p-4 flex items-start gap-3">
+              <AlertCircle className="h-5 w-5 text-red-400 flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-red-400">{error}</p>
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-2">
               <label htmlFor="email" className="text-sm font-medium text-slate-300">
@@ -46,8 +76,12 @@ export default function LoginPage() {
                 <input
                   id="email"
                   type="email"
-                  defaultValue={mockCredentials.email}
-                  className="w-full rounded-lg border border-slate-700 bg-slate-900 py-3 pl-11 pr-4 text-white placeholder:text-slate-500 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  disabled={loading}
+                  className="w-full rounded-lg border border-slate-700 bg-slate-900 py-3 pl-11 pr-4 text-white placeholder:text-slate-500 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  placeholder="seu@email.com"
                 />
               </div>
             </div>
@@ -61,23 +95,34 @@ export default function LoginPage() {
                 <input
                   id="password"
                   type="password"
-                  defaultValue={mockCredentials.password}
-                  className="w-full rounded-lg border border-slate-700 bg-slate-900 py-3 pl-11 pr-4 text-white placeholder:text-slate-500 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  disabled={loading}
+                  className="w-full rounded-lg border border-slate-700 bg-slate-900 py-3 pl-11 pr-4 text-white placeholder:text-slate-500 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  placeholder="••••••••"
                 />
               </div>
             </div>
 
             <button
               type="submit"
-              className="flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-emerald-600 to-teal-600 py-3.5 font-semibold text-white shadow-lg shadow-emerald-900/50 transition-all hover:shadow-xl hover:shadow-emerald-900/60"
+              disabled={loading}
+              className="flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-emerald-600 to-teal-600 py-3.5 font-semibold text-white shadow-lg shadow-emerald-900/50 transition-all hover:shadow-xl hover:shadow-emerald-900/60 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Entrar
+              {loading ? "Entrando..." : "Entrar"}
               <LogIn className="h-5 w-5" />
             </button>
           </form>
 
-          <div className="mt-8 text-center text-sm text-slate-400">
-            <Link href="/" className="text-emerald-400 hover:text-emerald-300 transition-colors">
+          <div className="mt-8 text-center space-y-3">
+            <p className="text-sm text-slate-400">
+              Não tem uma conta?{" "}
+              <Link href="/registro" className="text-emerald-400 hover:text-emerald-300 transition-colors font-medium">
+                Criar conta
+              </Link>
+            </p>
+            <Link href="/" className="block text-sm text-slate-500 hover:text-slate-400 transition-colors">
               Voltar para home
             </Link>
           </div>

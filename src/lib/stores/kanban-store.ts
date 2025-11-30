@@ -1,9 +1,17 @@
 import { create } from "zustand";
 import type { KanbanCard, Sprint, KanbanFilter } from "@/types/kanban";
 
+interface User {
+  id: string;
+  full_name: string;
+  email: string;
+  avatar_url?: string;
+}
+
 interface KanbanState {
   cards: KanbanCard[];
   sprints: Sprint[];
+  users: User[];
   filter: KanbanFilter;
   selectedCard: KanbanCard | null;
   isCardModalOpen: boolean;
@@ -16,6 +24,7 @@ interface KanbanState {
   moveCard: (id: string, status: KanbanCard["status"]) => void;
   
   setSprints: (sprints: Sprint[]) => void;
+  setUsers: (users: User[]) => void;
   setFilter: (filter: Partial<KanbanFilter>) => void;
   resetFilter: () => void;
   
@@ -30,12 +39,14 @@ const defaultFilter: KanbanFilter = {
   sprint: null,
   assignee: null,
   status: null,
+  project: null,
   search: "",
 };
 
 export const useKanbanStore = create<KanbanState>((set) => ({
   cards: [],
   sprints: [],
+  users: [],
   filter: defaultFilter,
   selectedCard: null,
   isCardModalOpen: false,
@@ -64,6 +75,8 @@ export const useKanbanStore = create<KanbanState>((set) => ({
   
   setSprints: (sprints) => set({ sprints }),
   
+  setUsers: (users) => set({ users }),
+  
   setFilter: (filter) => set((state) => ({
     filter: { ...state.filter, ...filter },
   })),
@@ -83,7 +96,7 @@ export const useKanbanStore = create<KanbanState>((set) => ({
               ...card.comments,
               {
                 id: `comment-${Date.now()}`,
-                author: { id: "current-user", name: "Luis Boff" },
+                author: { id: "current-user", full_name: "Luis Boff" },
                 content,
                 mentions,
                 createdAt: new Date().toISOString(),

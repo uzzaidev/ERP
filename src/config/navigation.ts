@@ -52,6 +52,11 @@ export const navigation: NavGroup[] = [
         icon: FolderKanban,
       },
       {
+        title: "Kanban",
+        href: "/kanban",
+        icon: CheckSquare,
+      },
+      {
         title: "Reunioes",
         href: "/reunioes",
         icon: Calendar,
@@ -131,6 +136,11 @@ export const navigation: NavGroup[] = [
   {
     title: "Sistema",
     items: [
+      {
+        title: "Documentacao",
+        href: "/docs",
+        icon: FileText,
+      },
       {
         title: "Configuracoes",
         href: "/configuracoes",

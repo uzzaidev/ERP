@@ -164,23 +164,23 @@ CREATE INDEX idx_task_attachments_task_id ON task_attachments(task_id);
 -- MOCK DATA - TAGS
 -- ============================================
 INSERT INTO tags (id, name, color) VALUES
-('tag-00001', 'frontend', '#3B82F6'),
-('tag-00002', 'backend', '#10B981'),
-('tag-00003', 'mobile', '#8B5CF6'),
-('tag-00004', 'ui', '#F59E0B'),
-('tag-00005', 'design', '#EC4899'),
-('tag-00006', 'bug', '#EF4444'),
-('tag-00007', 'urgent', '#DC2626'),
-('tag-00008', 'auth', '#6366F1'),
-('tag-00009', 'database', '#14B8A6'),
-('tag-00010', 'api', '#84CC16');
+('11111111-0001-0001-0001-000000000001', 'frontend', '#3B82F6'),
+('11111111-0001-0001-0001-000000000002', 'backend', '#10B981'),
+('11111111-0001-0001-0001-000000000003', 'mobile', '#8B5CF6'),
+('11111111-0001-0001-0001-000000000004', 'ui', '#F59E0B'),
+('11111111-0001-0001-0001-000000000005', 'design', '#EC4899'),
+('11111111-0001-0001-0001-000000000006', 'bug', '#EF4444'),
+('11111111-0001-0001-0001-000000000007', 'urgent', '#DC2626'),
+('11111111-0001-0001-0001-000000000008', 'auth', '#6366F1'),
+('11111111-0001-0001-0001-000000000009', 'database', '#14B8A6'),
+('11111111-0001-0001-0001-000000000010', 'api', '#84CC16');
 
 -- ============================================
 -- MOCK DATA - PROJECTS
 -- ============================================
 INSERT INTO projects (id, code, name, description, status, priority, start_date, end_date, estimated_hours, completed_hours, budget, spent, client_name, owner_id, created_by) VALUES
 (
-    'proj-001',
+    '22222222-0001-0001-0001-000000000001',
     'ERP-2025',
     'Sistema ERP UZZ.AI',
     'Desenvolvimento completo do sistema ERP unificado com módulos de projetos, financeiro, estoque e inteligência artificial',
@@ -197,7 +197,7 @@ INSERT INTO projects (id, code, name, description, status, priority, start_date,
     'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'
 ),
 (
-    'proj-002',
+    '22222222-0001-0001-0001-000000000002',
     'WEB-PORTAL',
     'Portal Web Cliente',
     'Portal web para clientes acessarem projetos, documentos e faturas',
@@ -214,7 +214,7 @@ INSERT INTO projects (id, code, name, description, status, priority, start_date,
     'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'
 ),
 (
-    'proj-003',
+    '22222222-0001-0001-0001-000000000003',
     'MOBILE-APP',
     'App Mobile Gerencial',
     'Aplicativo mobile para gestores acompanharem projetos e equipe em tempo real',
@@ -236,42 +236,42 @@ INSERT INTO projects (id, code, name, description, status, priority, start_date,
 -- ============================================
 INSERT INTO project_members (project_id, user_id, role, hourly_rate, added_by) VALUES
 -- ERP Project
-('proj-001', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Tech Lead', 150.00, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'),
-('proj-001', 'cccccccc-cccc-cccc-cccc-cccccccccccc', 'Full Stack Developer', 100.00, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'),
-('proj-001', 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'Project Manager', 120.00, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'),
-('proj-001', 'dddddddd-dddd-dddd-dddd-dddddddddddd', 'Business Analyst', 90.00, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'),
+('22222222-0001-0001-0001-000000000001', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Tech Lead', 150.00, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'),
+('22222222-0001-0001-0001-000000000001', 'cccccccc-cccc-cccc-cccc-cccccccccccc', 'Full Stack Developer', 100.00, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'),
+('22222222-0001-0001-0001-000000000001', 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'Project Manager', 120.00, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'),
+('22222222-0001-0001-0001-000000000001', 'dddddddd-dddd-dddd-dddd-dddddddddddd', 'Business Analyst', 90.00, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'),
 
 -- Portal Web
-('proj-002', 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'Project Manager', 120.00, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'),
-('proj-002', 'cccccccc-cccc-cccc-cccc-cccccccccccc', 'Frontend Developer', 100.00, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'),
+('22222222-0001-0001-0001-000000000002', 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'Project Manager', 120.00, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'),
+('22222222-0001-0001-0001-000000000002', 'cccccccc-cccc-cccc-cccc-cccccccccccc', 'Frontend Developer', 100.00, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'),
 
 -- Mobile App
-('proj-003', 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'Project Manager', 120.00, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa');
+('22222222-0001-0001-0001-000000000003', 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'Project Manager', 120.00, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa');
 
 -- ============================================
 -- MOCK DATA - SPRINTS
 -- ============================================
 INSERT INTO sprints (id, project_id, name, code, start_date, end_date, status, goal) VALUES
-('sprint-001', 'proj-001', 'Sprint 48 - Nov 2025', 'SPRINT-48', '2025-11-18', '2025-12-01', 'active', 'Implementar módulo de autenticação e kanban board'),
-('sprint-002', 'proj-001', 'Sprint 47 - Nov 2025', 'SPRINT-47', '2025-11-04', '2025-11-17', 'completed', 'Design system e componentes base'),
-('sprint-003', 'proj-001', 'Sprint 46 - Out 2025', 'SPRINT-46', '2025-10-21', '2025-11-03', 'completed', 'Setup inicial do projeto e arquitetura'),
-('sprint-004', 'proj-002', 'Sprint 1 - Portal', 'PORTAL-S1', '2025-11-01', '2025-11-15', 'completed', 'Estrutura inicial e login'),
-('sprint-005', 'proj-002', 'Sprint 2 - Portal', 'PORTAL-S2', '2025-11-16', '2025-11-30', 'active', 'Dashboard e listagem de projetos');
+('33333333-0001-0001-0001-000000000001', '22222222-0001-0001-0001-000000000001', 'Sprint 48 - Nov 2025', 'SPRINT-48', '2025-11-18', '2025-12-01', 'active', 'Implementar módulo de autenticação e kanban board'),
+('33333333-0001-0001-0001-000000000002', '22222222-0001-0001-0001-000000000001', 'Sprint 47 - Nov 2025', 'SPRINT-47', '2025-11-04', '2025-11-17', 'completed', 'Design system e componentes base'),
+('33333333-0001-0001-0001-000000000003', '22222222-0001-0001-0001-000000000001', 'Sprint 46 - Out 2025', 'SPRINT-46', '2025-10-21', '2025-11-03', 'completed', 'Setup inicial do projeto e arquitetura'),
+('33333333-0001-0001-0001-000000000004', '22222222-0001-0001-0001-000000000002', 'Sprint 1 - Portal', 'PORTAL-S1', '2025-11-01', '2025-11-15', 'completed', 'Estrutura inicial e login'),
+('33333333-0001-0001-0001-000000000005', '22222222-0001-0001-0001-000000000002', 'Sprint 2 - Portal', 'PORTAL-S2', '2025-11-16', '2025-11-30', 'active', 'Dashboard e listagem de projetos');
 
 -- ============================================
 -- MOCK DATA - TASKS
 -- ============================================
 INSERT INTO tasks (id, code, title, description, status, priority, task_type, project_id, sprint_id, assignee_id, reporter_id, estimated_hours, completed_hours, created_at) VALUES
 (
-    'task-001',
+    '44444444-0001-0001-0001-000000000001',
     'TASK-001',
     'Implementar autenticacao com Supabase',
     'Configurar Supabase Auth com JWT e integrar com Doppler para gerenciamento de secrets',
     'in-progress',
     'high',
     'feature',
-    'proj-001',
-    'sprint-001',
+    '22222222-0001-0001-0001-000000000001',
+    '33333333-0001-0001-0001-000000000001',
     'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
     'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
     8,
@@ -279,15 +279,15 @@ INSERT INTO tasks (id, code, title, description, status, priority, task_type, pr
     '2025-11-25 09:00:00'
 ),
 (
-    'task-002',
+    '44444444-0001-0001-0001-000000000002',
     'TASK-002',
     'Criar componentes do Kanban Board',
     'Desenvolver KanbanCard, KanbanColumn e KanbanFilters com filtros por sprint e pessoa',
     'done',
     'high',
     'feature',
-    'proj-001',
-    'sprint-001',
+    '22222222-0001-0001-0001-000000000001',
+    '33333333-0001-0001-0001-000000000001',
     'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
     'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
     6,
@@ -295,15 +295,15 @@ INSERT INTO tasks (id, code, title, description, status, priority, task_type, pr
     '2025-11-27 14:00:00'
 ),
 (
-    'task-003',
+    '44444444-0001-0001-0001-000000000003',
     'TASK-003',
     'Configurar Capacitor para mobile',
     'Setup inicial do Capacitor e helper de API para detectar Desktop vs Mobile',
     'review',
     'medium',
     'feature',
-    'proj-001',
-    'sprint-001',
+    '22222222-0001-0001-0001-000000000001',
+    '33333333-0001-0001-0001-000000000001',
     'cccccccc-cccc-cccc-cccc-cccccccccccc',
     'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
     10,
@@ -311,15 +311,15 @@ INSERT INTO tasks (id, code, title, description, status, priority, task_type, pr
     '2025-11-26 11:00:00'
 ),
 (
-    'task-004',
+    '44444444-0001-0001-0001-000000000004',
     'TASK-004',
     'Refatorar sidebar para ser colapsavel',
     'Adicionar funcionalidade de expandir/colapsar sidebar com estado no Zustand',
     'todo',
     'low',
     'improvement',
-    'proj-001',
-    'sprint-001',
+    '22222222-0001-0001-0001-000000000001',
+    '33333333-0001-0001-0001-000000000001',
     NULL,
     'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
     3,
@@ -327,14 +327,14 @@ INSERT INTO tasks (id, code, title, description, status, priority, task_type, pr
     '2025-11-29 09:00:00'
 ),
 (
-    'task-005',
+    '44444444-0001-0001-0001-000000000005',
     'TASK-005',
     'Implementar RAG Insights',
     'Criar modulo de IA para insights automaticos usando RAG',
     'backlog',
     'medium',
     'feature',
-    'proj-001',
+    '22222222-0001-0001-0001-000000000001',
     NULL,
     NULL,
     'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
@@ -343,15 +343,15 @@ INSERT INTO tasks (id, code, title, description, status, priority, task_type, pr
     '2025-11-20 08:00:00'
 ),
 (
-    'task-006',
+    '44444444-0001-0001-0001-000000000006',
     'TASK-006',
     'Design system com cores mais claras',
     'Ajustar paleta de cores para ter background menos escuro e melhor legibilidade',
     'done',
     'medium',
     'improvement',
-    'proj-001',
-    'sprint-002',
+    '22222222-0001-0001-0001-000000000001',
+    '33333333-0001-0001-0001-000000000002',
     'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
     'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
     4,
@@ -359,14 +359,14 @@ INSERT INTO tasks (id, code, title, description, status, priority, task_type, pr
     '2025-11-15 10:00:00'
 ),
 (
-    'task-007',
+    '44444444-0001-0001-0001-000000000007',
     'TASK-007',
     'Corrigir bug no filtro de sprints',
     'Filtro não está mostrando sprints completados',
     'backlog',
     'high',
     'bug',
-    'proj-001',
+    '22222222-0001-0001-0001-000000000001',
     NULL,
     NULL,
     'cccccccc-cccc-cccc-cccc-cccccccccccc',
@@ -375,15 +375,15 @@ INSERT INTO tasks (id, code, title, description, status, priority, task_type, pr
     '2025-11-29 16:00:00'
 ),
 (
-    'task-008',
+    '44444444-0001-0001-0001-000000000008',
     'PORTAL-001',
     'Criar página de login do portal',
     'Design e implementação da tela de login para clientes',
     'done',
     'high',
     'feature',
-    'proj-002',
-    'sprint-004',
+    '22222222-0001-0001-0001-000000000002',
+    '33333333-0001-0001-0001-000000000004',
     'cccccccc-cccc-cccc-cccc-cccccccccccc',
     'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
     6,
@@ -391,15 +391,15 @@ INSERT INTO tasks (id, code, title, description, status, priority, task_type, pr
     '2025-11-01 10:00:00'
 ),
 (
-    'task-009',
+    '44444444-0001-0001-0001-000000000009',
     'PORTAL-002',
     'Implementar dashboard do cliente',
     'Dashboard com cards de projetos ativos e documentos recentes',
     'in-progress',
     'high',
     'feature',
-    'proj-002',
-    'sprint-005',
+    '22222222-0001-0001-0001-000000000002',
+    '33333333-0001-0001-0001-000000000005',
     'cccccccc-cccc-cccc-cccc-cccccccccccc',
     'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
     10,
@@ -407,15 +407,15 @@ INSERT INTO tasks (id, code, title, description, status, priority, task_type, pr
     '2025-11-18 09:00:00'
 ),
 (
-    'task-010',
+    '44444444-0001-0001-0001-000000000010',
     'PORTAL-003',
     'Criar API de listagem de projetos',
     'Endpoint para listar projetos do cliente com filtros e paginação',
     'todo',
     'medium',
     'feature',
-    'proj-002',
-    'sprint-005',
+    '22222222-0001-0001-0001-000000000002',
+    '33333333-0001-0001-0001-000000000005',
     NULL,
     'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
     8,
@@ -427,49 +427,49 @@ INSERT INTO tasks (id, code, title, description, status, priority, task_type, pr
 -- MOCK DATA - TASK TAGS
 -- ============================================
 INSERT INTO task_tags (task_id, tag_id) VALUES
-('task-001', 'tag-00002'), -- backend
-('task-001', 'tag-00008'), -- auth
-('task-002', 'tag-00001'), -- frontend
-('task-002', 'tag-00004'), -- ui
-('task-003', 'tag-00003'), -- mobile
-('task-004', 'tag-00001'), -- frontend
-('task-004', 'tag-00004'), -- ui
-('task-005', 'tag-00002'), -- backend
-('task-005', 'tag-00010'), -- api
-('task-006', 'tag-00005'), -- design
-('task-006', 'tag-00004'), -- ui
-('task-007', 'tag-00006'), -- bug
-('task-007', 'tag-00007'), -- urgent
-('task-008', 'tag-00001'), -- frontend
-('task-009', 'tag-00001'), -- frontend
-('task-009', 'tag-00004'), -- ui
-('task-010', 'tag-00002'), -- backend
-('task-010', 'tag-00010'); -- api
+('44444444-0001-0001-0001-000000000001', '11111111-0001-0001-0001-000000000002'), -- backend
+('44444444-0001-0001-0001-000000000001', '11111111-0001-0001-0001-000000000008'), -- auth
+('44444444-0001-0001-0001-000000000002', '11111111-0001-0001-0001-000000000001'), -- frontend
+('44444444-0001-0001-0001-000000000002', '11111111-0001-0001-0001-000000000004'), -- ui
+('44444444-0001-0001-0001-000000000003', '11111111-0001-0001-0001-000000000003'), -- mobile
+('44444444-0001-0001-0001-000000000004', '11111111-0001-0001-0001-000000000001'), -- frontend
+('44444444-0001-0001-0001-000000000004', '11111111-0001-0001-0001-000000000004'), -- ui
+('44444444-0001-0001-0001-000000000005', '11111111-0001-0001-0001-000000000002'), -- backend
+('44444444-0001-0001-0001-000000000005', '11111111-0001-0001-0001-000000000010'), -- api
+('44444444-0001-0001-0001-000000000006', '11111111-0001-0001-0001-000000000005'), -- design
+('44444444-0001-0001-0001-000000000006', '11111111-0001-0001-0001-000000000004'), -- ui
+('44444444-0001-0001-0001-000000000007', '11111111-0001-0001-0001-000000000006'), -- bug
+('44444444-0001-0001-0001-000000000007', '11111111-0001-0001-0001-000000000007'), -- urgent
+('44444444-0001-0001-0001-000000000008', '11111111-0001-0001-0001-000000000001'), -- frontend
+('44444444-0001-0001-0001-000000000009', '11111111-0001-0001-0001-000000000001'), -- frontend
+('44444444-0001-0001-0001-000000000009', '11111111-0001-0001-0001-000000000004'), -- ui
+('44444444-0001-0001-0001-000000000010', '11111111-0001-0001-0001-000000000002'), -- backend
+('44444444-0001-0001-0001-000000000010', '11111111-0001-0001-0001-000000000010'); -- api
 
 -- ============================================
 -- MOCK DATA - TASK COMMENTS
 -- ============================================
 INSERT INTO task_comments (task_id, author_id, content, mentions) VALUES
 (
-    'task-001',
+    '44444444-0001-0001-0001-000000000001',
     'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
     'Ja configurei o client do Supabase, falta integrar com o Doppler',
     ARRAY[]::UUID[]
 ),
 (
-    'task-002',
+    '44444444-0001-0001-0001-000000000002',
     'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
     'Componentes concluídos e testados. @maria.silva pode revisar?',
     ARRAY['bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb']::UUID[]
 ),
 (
-    'task-002',
+    '44444444-0001-0001-0001-000000000002',
     'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
     'Revisado e aprovado! Excelente trabalho @luis.boff',
     ARRAY['aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa']::UUID[]
 ),
 (
-    'task-003',
+    '44444444-0001-0001-0001-000000000003',
     'cccccccc-cccc-cccc-cccc-cccccccccccc',
     'Setup do Capacitor completo. Preciso que @luis.boff revise antes de mergear',
     ARRAY['aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa']::UUID[]
@@ -479,15 +479,15 @@ INSERT INTO task_comments (task_id, author_id, content, mentions) VALUES
 -- MOCK DATA - TIME LOGS
 -- ============================================
 INSERT INTO task_time_logs (task_id, user_id, hours, description, logged_date) VALUES
-('task-001', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 3, 'Setup inicial do Supabase client', '2025-11-25'),
-('task-001', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 2, 'Integração com Doppler', '2025-11-28'),
-('task-002', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 4, 'Desenvolvimento dos componentes', '2025-11-27'),
-('task-002', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 2, 'Testes e ajustes finais', '2025-11-30'),
-('task-003', 'cccccccc-cccc-cccc-cccc-cccccccccccc', 5, 'Configuração do Capacitor', '2025-11-26'),
-('task-003', 'cccccccc-cccc-cccc-cccc-cccccccccccc', 4, 'Helper de detecção de plataforma', '2025-11-29'),
-('task-006', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 4, 'Ajuste completo das cores', '2025-11-15'),
-('task-008', 'cccccccc-cccc-cccc-cccc-cccccccccccc', 6, 'Implementação completa do login', '2025-11-05'),
-('task-009', 'cccccccc-cccc-cccc-cccc-cccccccccccc', 4, 'Dashboard parcialmente implementado', '2025-11-20');
+('44444444-0001-0001-0001-000000000001', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 3, 'Setup inicial do Supabase client', '2025-11-25'),
+('44444444-0001-0001-0001-000000000001', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 2, 'Integração com Doppler', '2025-11-28'),
+('44444444-0001-0001-0001-000000000002', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 4, 'Desenvolvimento dos componentes', '2025-11-27'),
+('44444444-0001-0001-0001-000000000002', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 2, 'Testes e ajustes finais', '2025-11-30'),
+('44444444-0001-0001-0001-000000000003', 'cccccccc-cccc-cccc-cccc-cccccccccccc', 5, 'Configuração do Capacitor', '2025-11-26'),
+('44444444-0001-0001-0001-000000000003', 'cccccccc-cccc-cccc-cccc-cccccccccccc', 4, 'Helper de detecção de plataforma', '2025-11-29'),
+('44444444-0001-0001-0001-000000000006', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 4, 'Ajuste completo das cores', '2025-11-15'),
+('44444444-0001-0001-0001-000000000008', 'cccccccc-cccc-cccc-cccc-cccccccccccc', 6, 'Implementação completa do login', '2025-11-05'),
+('44444444-0001-0001-0001-000000000009', 'cccccccc-cccc-cccc-cccc-cccccccccccc', 4, 'Dashboard parcialmente implementado', '2025-11-20');
 
 -- ============================================
 -- TRIGGERS

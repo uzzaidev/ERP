@@ -4,8 +4,12 @@ import { useState } from "react";
 import { X, Clock, User, MessageSquare, Send, Tag } from "lucide-react";
 import { useKanbanStore } from "@/lib/stores";
 
-export function KanbanCardModal() {
-  const { selectedCard, isCardModalOpen, closeCardModal, updateCard, addComment, updateTimeTracking } = useKanbanStore();
+interface KanbanCardModalProps {
+  onAssigneeChange?: (cardId: string, userId: string | null) => void;
+}
+
+export function KanbanCardModal({ onAssigneeChange }: KanbanCardModalProps) {
+  const { selectedCard, isCardModalOpen, closeCardModal, updateCard, addComment, updateTimeTracking, users } = useKanbanStore();
   const [newComment, setNewComment] = useState("");
   const [completedHours, setCompletedHours] = useState(selectedCard?.completedHours || 0);
 
@@ -23,6 +27,11 @@ export function KanbanCardModal() {
 
   const handleUpdateTime = () => {
     updateTimeTracking(selectedCard.id, completedHours);
+  };
+
+  const handleAssigneeSelect = (userId: string) => {
+    const newUserId = userId || null;
+    onAssigneeChange?.(selectedCard.id, newUserId);
   };
 
   const remainingHours = selectedCard.estimatedHours - completedHours;
@@ -100,9 +109,18 @@ export function KanbanCardModal() {
                   <User className="h-4 w-4" />
                   Responsavel
                 </label>
-                <div className="rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-white">
-                  {selectedCard.assignee?.name || "Nao atribuido"}
-                </div>
+                <select
+                  value={selectedCard.assignee?.id || ''}
+                  onChange={(e) => handleAssigneeSelect(e.target.value)}
+                  className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                >
+                  <option value="">Sem responsável</option>
+                  {users.map((user) => (
+                    <option key={user.id} value={user.id}>
+                      {user.full_name}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               {/* Tags */}
@@ -189,7 +207,7 @@ export function KanbanCardModal() {
                 {selectedCard.comments.map((comment) => (
                   <div key={comment.id} className="rounded-lg border border-slate-700 bg-slate-800/50 p-3">
                     <div className="mb-2 flex items-center justify-between">
-                      <span className="text-sm font-medium text-white">{comment.author.name}</span>
+                      <span className="text-sm font-medium text-white">{comment.author.full_name}</span>
                       <span className="text-xs text-slate-500">
                         {new Date(comment.createdAt).toLocaleString("pt-BR", {
                           day: "2-digit",

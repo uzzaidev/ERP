@@ -15,6 +15,7 @@ interface KanbanState {
   filter: KanbanFilter;
   selectedCard: KanbanCard | null;
   isCardModalOpen: boolean;
+  currentUser: User | null;
   
   // Actions
   setCards: (cards: KanbanCard[]) => void;
@@ -25,6 +26,7 @@ interface KanbanState {
   
   setSprints: (sprints: Sprint[]) => void;
   setUsers: (users: User[]) => void;
+  setCurrentUser: (user: User) => void;
   setFilter: (filter: Partial<KanbanFilter>) => void;
   resetFilter: () => void;
   
@@ -50,6 +52,7 @@ export const useKanbanStore = create<KanbanState>((set) => ({
   filter: defaultFilter,
   selectedCard: null,
   isCardModalOpen: false,
+  currentUser: null,
   
   setCards: (cards) => set({ cards }),
   
@@ -77,6 +80,8 @@ export const useKanbanStore = create<KanbanState>((set) => ({
   
   setUsers: (users) => set({ users }),
   
+  setCurrentUser: (user) => set({ currentUser: user }),
+  
   setFilter: (filter) => set((state) => ({
     filter: { ...state.filter, ...filter },
   })),
@@ -87,26 +92,34 @@ export const useKanbanStore = create<KanbanState>((set) => ({
   
   closeCardModal: () => set({ selectedCard: null, isCardModalOpen: false }),
   
-  addComment: (cardId, content, mentions) => set((state) => ({
-    cards: state.cards.map((card) =>
-      card.id === cardId
-        ? {
-            ...card,
-            comments: [
-              ...card.comments,
-              {
-                id: `comment-${Date.now()}`,
-                author: { id: "current-user", full_name: "Luis Boff" },
-                content,
-                mentions,
-                createdAt: new Date().toISOString(),
-              },
-            ],
-            updatedAt: new Date().toISOString(),
-          }
-        : card
-    ),
-  })),
+  addComment: (cardId, content, mentions) => set((state) => {
+    const author = state.currentUser || { 
+      id: "current-user", 
+      full_name: "Usuário", 
+      email: ""
+    };
+
+    return {
+      cards: state.cards.map((card) =>
+        card.id === cardId
+          ? {
+              ...card,
+              comments: [
+                ...card.comments,
+                {
+                  id: `comment-${Date.now()}`,
+                  author,
+                  content,
+                  mentions,
+                  createdAt: new Date().toISOString(),
+                },
+              ],
+              updatedAt: new Date().toISOString(),
+            }
+          : card
+      ),
+    };
+  }),
   
   updateTimeTracking: (cardId, completed) => set((state) => ({
     cards: state.cards.map((card) =>

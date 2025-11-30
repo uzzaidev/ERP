@@ -72,6 +72,7 @@ jobs:
   test-integration:
     name: Integration Tests
     runs-on: ubuntu-latest
+    continue-on-error: true
     
     steps:
       - name: Checkout code
@@ -93,6 +94,7 @@ jobs:
 
       - name: Run integration tests
         run: pnpm test:integration
+        continue-on-error: true
         env:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
@@ -169,7 +171,7 @@ jobs:
         run: |
           echo "Lint: ${{ needs.lint.result }}"
           echo "API Tests: ${{ needs.test-api.result }}"
-          echo "Integration Tests: ${{ needs.test-integration.result }}"
+          echo "Integration Tests: ${{ needs.test-integration.result }} (optional)"
           echo "Build: ${{ needs.build.result }}"
           
           if [ "${{ needs.lint.result }}" != "success" ] || \

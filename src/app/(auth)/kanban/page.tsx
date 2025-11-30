@@ -8,7 +8,7 @@ import { useKanbanStore } from "@/lib/stores";
 import type { KanbanCard } from "@/types/kanban";
 
 export default function KanbanPage() {
-  const { cards, setCards, setSprints, filter, setUsers } = useKanbanStore();
+  const { cards, setCards, setSprints, filter, setUsers, setCurrentUser } = useKanbanStore();
   const [loading, setLoading] = useState(true);
   const [activeCard, setActiveCard] = useState<KanbanCard | null>(null);
 
@@ -25,6 +25,13 @@ export default function KanbanPage() {
     async function fetchData() {
       try {
         setLoading(true);
+        
+        // Fetch current user
+        const currentUserRes = await fetch('/api/auth/me');
+        const currentUserData = await currentUserRes.json();
+        if (currentUserData.user) {
+          setCurrentUser(currentUserData.user);
+        }
         
         // Fetch sprints
         const sprintsRes = await fetch('/api/sprints');

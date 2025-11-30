@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { navigation } from "@/config/navigation";
 import {
@@ -9,23 +12,78 @@ import {
   Zap,
 } from "lucide-react";
 
-const kpis = [
-  { title: "Projetos ativos", value: "12", icon: FolderKanban },
-  { title: "Acoes pendentes", value: "48", icon: CheckSquare },
-  { title: "Equipe online", value: "08", icon: Users },
-  { title: "Velocidade", value: "68%", icon: Zap },
-];
-
-const activity = [
-  { title: "Reuniao finalizada", detail: "Sprint Planning", time: "2h" },
-  { title: "Acao concluida", detail: "Login Capacitor", time: "4h" },
-];
-
-const alerts = [
-  { title: "Sprint termina em 2 dias", tone: "warning" },
-];
+interface DashboardStats {
+  projectsActive: number;
+  tasksPending: number;
+  teamOnline: number;
+  velocity: number;
+}
 
 export default function DashboardPage() {
+  const [stats, setStats] = useState<DashboardStats>({
+    projectsActive: 0,
+    tasksPending: 0,
+    teamOnline: 0,
+    velocity: 0,
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchStats() {
+      try {
+        // Buscar projetos ativos
+        const projectsRes = await fetch('/api/projects?status=active');
+        const projectsData = await projectsRes.json();
+        const projectsActive = projectsData.data?.length || 0;
+
+        // Buscar tarefas pendentes
+        const tasksRes = await fetch('/api/tasks?status=todo,in-progress');
+        const tasksData = await tasksRes.json();
+        const tasksPending = tasksData.data?.length || 0;
+
+        // Buscar usuários ativos
+        const usersRes = await fetch('/api/users?is_active=true');
+        const usersData = await usersRes.json();
+        const teamOnline = usersData.data?.length || 0;
+
+        // Calcular velocidade (exemplo: % de tasks concluídas)
+        const completedRes = await fetch('/api/tasks?status=done');
+        const completedData = await completedRes.json();
+        const completed = completedData.data?.length || 0;
+        const total = tasksPending + completed;
+        const velocity = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+        setStats({
+          projectsActive,
+          tasksPending,
+          teamOnline,
+          velocity,
+        });
+      } catch (error) {
+        console.error('Error fetching dashboard stats:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchStats();
+  }, []);
+
+  const kpis = [
+    { title: "Projetos ativos", value: loading ? "..." : String(stats.projectsActive), icon: FolderKanban },
+    { title: "Acoes pendentes", value: loading ? "..." : String(stats.tasksPending), icon: CheckSquare },
+    { title: "Equipe online", value: loading ? "..." : String(stats.teamOnline), icon: Users },
+    { title: "Velocidade", value: loading ? "..." : `${stats.velocity}%`, icon: Zap },
+  ];
+
+  const activity = [
+    { title: "Reuniao finalizada", detail: "Sprint Planning", time: "2h" },
+    { title: "Acao concluida", detail: "Login Capacitor", time: "4h" },
+  ];
+
+  const alerts = [
+    { title: "Sprint termina em 2 dias", tone: "warning" },
+  ];
   const quickModules = navigation.flatMap((group) =>
     group.items.slice(0, 2).map((item) => ({
       title: item.title,

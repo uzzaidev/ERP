@@ -99,6 +99,54 @@ describe('Integration: API Schema Validation', () => {
       expect(error).toBeNull();
       console.log('✅ Update com assignee_id funciona!');
     });
+
+    it('should validate update returns assignee data correctly', async () => {
+      const supabase = await createClient();
+      
+      // Busca uma task para atualizar
+      const { data: tasks } = await supabase
+        .from('tasks')
+        .select('id, assignee_id')
+        .limit(1);
+
+      if (!tasks || tasks.length === 0) {
+        console.warn('⚠️  Nenhuma task para testar update');
+        return;
+      }
+
+      const taskId = tasks[0].id;
+      const currentAssignee = tasks[0].assignee_id;
+
+      // Faz update e retorna os dados (como a API faz)
+      const { data, error } = await supabase
+        .from('tasks')
+        .update({ assignee_id: currentAssignee })
+        .eq('id', taskId)
+        .select(`
+          *,
+          assignee:users!tasks_assignee_id_fkey (
+            id,
+            full_name,
+            email,
+            avatar_url
+          )
+        `)
+        .single();
+
+      // Se retornar PGRST116, significa que não encontrou a row
+      if (error && error.code === 'PGRST116') {
+        console.error('❌ UPDATE não retornou dados (PGRST116)!');
+        console.error('Isso significa que o .eq() não encontrou a task');
+        console.error('Verifique se o ID existe:', taskId);
+      }
+
+      expect(error).toBeNull();
+      expect(data).toBeDefined();
+      expect(data).toHaveProperty('assignee');
+      
+      console.log('✅ Update retorna assignee corretamente!');
+      console.log('Assignee:', data?.assignee?.full_name || 'null');
+    });
   });
 
   describe('Projects API - Schema Consistency', () => {

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { X, Clock, User, MessageSquare, Send, Tag } from "lucide-react";
 import { useKanbanStore } from "@/lib/stores";
+import type { KanbanCard } from "@/types/kanban";
 
 interface KanbanCardModalProps {
   onAssigneeChange?: (cardId: string, userId: string | null) => void;
@@ -77,7 +78,7 @@ export function KanbanCardModal({ onAssigneeChange }: KanbanCardModalProps) {
                 <label className="mb-2 block text-sm font-semibold text-slate-300">Status</label>
                 <select
                   value={selectedCard.status}
-                  onChange={(e) => updateCard(selectedCard.id, { status: e.target.value as any })}
+                  onChange={(e) => updateCard(selectedCard.id, { status: e.target.value as KanbanCard["status"] })}
                   className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
                 >
                   <option value="backlog">Backlog</option>
@@ -93,7 +94,7 @@ export function KanbanCardModal({ onAssigneeChange }: KanbanCardModalProps) {
                 <label className="mb-2 block text-sm font-semibold text-slate-300">Prioridade</label>
                 <select
                   value={selectedCard.priority}
-                  onChange={(e) => updateCard(selectedCard.id, { priority: e.target.value as any })}
+                  onChange={(e) => updateCard(selectedCard.id, { priority: e.target.value as KanbanCard["priority"] })}
                   className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
                 >
                   <option value="low">Baixa</option>

@@ -1,6 +1,6 @@
 "use client";
 
-import { Search, Filter, Calendar, User, FolderKanban } from "lucide-react";
+import { Search, Calendar, User, FolderKanban } from "lucide-react";
 import { useKanbanStore } from "@/lib/stores";
 import { useEffect, useState } from "react";
 

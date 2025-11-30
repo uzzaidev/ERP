@@ -14,7 +14,7 @@ interface Project {
   end_date: string;
   budget: number;
   spent_amount: number;
-  project_members: any[];
+  project_members: Array<{ user_id: string; role: string }>;
   created_at: string;
 }
 

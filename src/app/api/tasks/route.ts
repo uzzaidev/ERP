@@ -88,7 +88,7 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    const updateData: any = {};
+    const updateData: { status?: string; assignee_id?: string | null } = {};
     if (status !== undefined) updateData.status = status;
     if (assignee_id !== undefined) updateData.assignee_id = assignee_id;
 

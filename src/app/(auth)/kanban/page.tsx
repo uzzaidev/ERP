@@ -52,22 +52,39 @@ export default function KanbanPage() {
         const tasksData = await tasksRes.json();
         if (tasksData.data) {
           // Transform database tasks to KanbanCard format
-          const transformedCards: KanbanCard[] = tasksData.data.map((task: any) => ({
+          const transformedCards: KanbanCard[] = tasksData.data.map((task: {
+            code?: string;
+            id: string;
+            title: string;
+            description?: string;
+            status: string;
+            priority: string;
+            project_id: string;
+            sprint_id: string;
+            assignee_id?: string;
+            estimated_hours?: number;
+            completed_hours?: number;
+            due_date?: string;
+            created_at: string;
+            updated_at: string;
+            assignee?: { id: string; full_name: string; email: string; avatar_url?: string };
+            task_tags?: Array<{ tag?: { name: string } }>;
+          }) => ({
             id: task.code || task.id,
             title: task.title,
             description: task.description || '',
             status: task.status,
-            assignee: task.assigned_to_user ? {
-              id: task.assigned_to_user.id,
-              full_name: task.assigned_to_user.full_name,
-              email: task.assigned_to_user.email,
-              avatar: task.assigned_to_user.avatar_url
+            assignee: task.assignee ? {
+              id: task.assignee.id,
+              full_name: task.assignee.full_name,
+              email: task.assignee.email,
+              avatar: task.assignee.avatar_url
             } : null,
             sprint: task.sprint_id,
             priority: task.priority,
             estimatedHours: task.estimated_hours || 0,
             completedHours: task.completed_hours || 0,
-            tags: task.task_tags?.map((tt: any) => tt.tag?.name).filter(Boolean) || [],
+            tags: task.task_tags?.map((tt) => tt.tag?.name).filter(Boolean) || [],
             comments: [],
             createdAt: task.created_at,
             updatedAt: task.updated_at,
@@ -77,14 +94,14 @@ export default function KanbanPage() {
           setCards(transformedCards);
         }
       } catch (error) {
-        console.error('Error fetching Kanban data:', error);
+        console.error('Error fetching data:', error);
       } finally {
         setLoading(false);
       }
     }
 
     fetchData();
-  }, [setCards, setSprints, setUsers]);
+  }, [setCards, setSprints, setUsers, setCurrentUser]);
 
   // Filter cards based on current filters
   const filteredCards = useMemo(() => {
@@ -118,7 +135,7 @@ export default function KanbanPage() {
     try {
       // Optimistic update
       const updatedCards = cards.map(c =>
-        c.id === cardId ? { ...c, status: newStatus as any } : c
+        c.id === cardId ? { ...c, status: newStatus as KanbanCard["status"] } : c
       );
       setCards(updatedCards);
 
@@ -170,7 +187,7 @@ export default function KanbanPage() {
   }, [handleCardDrop, cards]);
 
   // Handle assignee change
-  const handleAssigneeChange = useCallback(async (cardId: string, userId: string | null) => {
+  const handleAssigneeChange = useCallback(async (cardId: string, userId: string | null | undefined) => {
     const card = cards.find(c => c.id === cardId);
     if (!card || !card.dbId) return;
 
@@ -252,7 +269,6 @@ export default function KanbanPage() {
                     status={column.status}
                     cards={columnCards}
                     count={columnCards.length}
-                    onCardDrop={handleCardDrop}
                     onAssigneeChange={handleAssigneeChange}
                   />
                 );

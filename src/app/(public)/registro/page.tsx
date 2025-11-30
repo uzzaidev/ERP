@@ -51,7 +51,7 @@ export default function RegistroPage() {
           router.push("/login");
         }, 2000);
       }
-    } catch (err) {
+    } catch {
       setError("Erro ao criar conta. Tente novamente.");
       setLoading(false);
     }

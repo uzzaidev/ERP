@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Bell, Search, User } from "lucide-react";
+import { Bell, Search } from "lucide-react";
+import Image from "next/image";
 
 interface CurrentUser {
   id: string;
@@ -55,10 +56,12 @@ export function Topbar() {
           </button>
           <button className="flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-800 px-3 py-2">
             {currentUser?.avatar_url ? (
-              <img
+              <Image
                 src={currentUser.avatar_url}
                 alt={currentUser.full_name}
-                className="h-8 w-8 rounded-full object-cover"
+                width={32}
+                height={32}
+                className="rounded-full object-cover"
               />
             ) : (
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 text-white text-xs font-medium">

@@ -11,7 +11,6 @@ interface KanbanColumnProps {
   status: KanbanCardType["status"];
   cards: KanbanCardType[];
   count: number;
-  onCardDrop?: (cardId: string, newStatus: string) => void;
   onAssigneeChange?: (cardId: string, userId: string | null) => void;
 }
 
@@ -28,7 +27,6 @@ export const KanbanColumn = memo(function KanbanColumn({
   status, 
   cards, 
   count,
-  onCardDrop,
   onAssigneeChange 
 }: KanbanColumnProps) {
   const { setNodeRef, isOver } = useDroppable({

@@ -6,7 +6,7 @@ import { Book, Code, Database, FileText, GitBranch, Layers, Search, Server } fro
 interface DocSection {
   id: string;
   title: string;
-  icon: any;
+  icon: React.ComponentType<{ className?: string }>;
   content: string;
   subsections?: { title: string; content: string }[];
 }
@@ -511,7 +511,6 @@ export default function DocsPage() {
                   // Detect code blocks
                   if (paragraph.startsWith('```')) {
                     const lines = paragraph.split('\n');
-                    const language = lines[0].replace('```', '');
                     const code = lines.slice(1, -1).join('\n');
                     return (
                       <pre key={idx} className="overflow-x-auto rounded-lg border border-slate-700 bg-slate-800 p-4">

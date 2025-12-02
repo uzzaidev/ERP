@@ -102,13 +102,20 @@ export async function POST(request: NextRequest) {
     }
 
     // TODO: Send invitation email with token link
-    // const invitationLink = `${process.env.NEXT_PUBLIC_APP_URL}/accept-invitation?token=${token}`;
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL;
+    
+    if (!appUrl) {
+      console.error('NEXT_PUBLIC_APP_URL is not set');
+      // Return without link in development, but this should be required in production
+    }
+    
+    const invitationLink = appUrl ? `${appUrl}/accept-invitation?token=${token}` : null;
 
     return NextResponse.json({ 
       success: true, 
       data: {
         ...data,
-        invitation_link: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/accept-invitation?token=${token}`
+        invitation_link: invitationLink
       }
     });
   } catch (error) {

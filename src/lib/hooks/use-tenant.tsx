@@ -111,17 +111,13 @@ export function useTenant() {
 
 /**
  * Hook to get tenant ID directly
- * Throws error if tenant is not loaded
+ * Returns null if tenant is still loading or not available
  */
-export function useTenantId(): string {
+export function useTenantId(): string | null {
   const { tenantId, isLoading } = useTenant();
 
-  if (isLoading) {
-    throw new Error('Tenant is still loading');
-  }
-
-  if (!tenantId) {
-    throw new Error('No tenant ID available');
+  if (isLoading || !tenantId) {
+    return null;
   }
 
   return tenantId;

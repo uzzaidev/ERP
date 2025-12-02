@@ -7,6 +7,7 @@
 -- ============================================
 CREATE TABLE bank_accounts (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
     name VARCHAR(255) NOT NULL,
     bank_name VARCHAR(255),
     account_number VARCHAR(50),
@@ -25,14 +26,18 @@ CREATE TABLE bank_accounts (
 -- ============================================
 CREATE TABLE chart_of_accounts (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    code VARCHAR(50) UNIQUE NOT NULL, -- e.g., '1.1.01.001'
+    tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+    code VARCHAR(50) NOT NULL, -- e.g., '1.1.01.001'
     name VARCHAR(255) NOT NULL,
     account_type VARCHAR(50) NOT NULL, -- revenue, expense, asset, liability, equity
     category VARCHAR(100), -- e.g., 'Marketing', 'Salários', 'Equipamentos'
     parent_id UUID REFERENCES chart_of_accounts(id) ON DELETE CASCADE,
     is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    -- Code must be unique within a tenant
+    UNIQUE(tenant_id, code)
 );
 
 -- ============================================
@@ -40,13 +45,17 @@ CREATE TABLE chart_of_accounts (
 -- ============================================
 CREATE TABLE cost_centers (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    code VARCHAR(50) UNIQUE NOT NULL,
+    tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+    code VARCHAR(50) NOT NULL,
     name VARCHAR(255) NOT NULL,
     description TEXT,
     manager_id UUID REFERENCES users(id) ON DELETE SET NULL,
     is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    -- Code must be unique within a tenant
+    UNIQUE(tenant_id, code)
 );
 
 -- ============================================
@@ -54,7 +63,8 @@ CREATE TABLE cost_centers (
 -- ============================================
 CREATE TABLE transactions (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    code VARCHAR(50) UNIQUE NOT NULL, -- e.g., 'TRX-001'
+    tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+    code VARCHAR(50) NOT NULL, -- e.g., 'TRX-001'
     transaction_type VARCHAR(50) NOT NULL, -- income, expense, transfer
     category VARCHAR(100), -- e.g., 'payment', 'invoice', 'salary', 'reimbursement'
     description TEXT NOT NULL,
@@ -76,7 +86,10 @@ CREATE TABLE transactions (
     approved_at TIMESTAMP,
     created_by UUID REFERENCES users(id) ON DELETE SET NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    -- Code must be unique within a tenant
+    UNIQUE(tenant_id, code)
 );
 
 -- ============================================
@@ -84,7 +97,8 @@ CREATE TABLE transactions (
 -- ============================================
 CREATE TABLE invoices (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    invoice_number VARCHAR(100) UNIQUE NOT NULL,
+    tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+    invoice_number VARCHAR(100) NOT NULL,
     invoice_type VARCHAR(50) NOT NULL, -- nfse, nfe, nfce
     series VARCHAR(20),
     issue_date DATE NOT NULL,
@@ -103,7 +117,10 @@ CREATE TABLE invoices (
     status VARCHAR(50) DEFAULT 'issued', -- issued, cancelled, rejected
     notes TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    -- Invoice number must be unique within a tenant
+    UNIQUE(tenant_id, invoice_number)
 );
 
 -- ============================================
@@ -111,6 +128,7 @@ CREATE TABLE invoices (
 -- ============================================
 CREATE TABLE invoice_items (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
     invoice_id UUID NOT NULL REFERENCES invoices(id) ON DELETE CASCADE,
     description TEXT NOT NULL,
     quantity DECIMAL(10,3) NOT NULL,
@@ -126,6 +144,7 @@ CREATE TABLE invoice_items (
 -- ============================================
 CREATE TABLE documents (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
     document_type VARCHAR(50) NOT NULL, -- contract, invoice, receipt, agreement, report
     title VARCHAR(255) NOT NULL,
     description TEXT,
@@ -147,6 +166,7 @@ CREATE TABLE documents (
 -- ============================================
 CREATE TABLE budgets (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
     name VARCHAR(255) NOT NULL,
     year INTEGER NOT NULL,
     month INTEGER, -- NULL for annual budgets
@@ -164,20 +184,27 @@ CREATE TABLE budgets (
 -- ============================================
 -- INDEXES
 -- ============================================
+CREATE INDEX idx_bank_accounts_tenant_id ON bank_accounts(tenant_id);
 CREATE INDEX idx_bank_accounts_active ON bank_accounts(is_active);
+CREATE INDEX idx_chart_of_accounts_tenant_id ON chart_of_accounts(tenant_id);
 CREATE INDEX idx_chart_of_accounts_type ON chart_of_accounts(account_type);
 CREATE INDEX idx_chart_of_accounts_parent_id ON chart_of_accounts(parent_id);
+CREATE INDEX idx_cost_centers_tenant_id ON cost_centers(tenant_id);
 CREATE INDEX idx_cost_centers_active ON cost_centers(is_active);
+CREATE INDEX idx_transactions_tenant_id ON transactions(tenant_id);
 CREATE INDEX idx_transactions_type ON transactions(transaction_type);
 CREATE INDEX idx_transactions_status ON transactions(status);
 CREATE INDEX idx_transactions_date ON transactions(transaction_date);
 CREATE INDEX idx_transactions_bank_account_id ON transactions(bank_account_id);
 CREATE INDEX idx_transactions_project_id ON transactions(project_id);
 CREATE INDEX idx_transactions_created_by ON transactions(created_by);
-CREATE INDEX idx_invoices_number ON invoices(invoice_number);
+CREATE INDEX idx_invoices_tenant_id ON invoices(tenant_id);
+CREATE INDEX idx_invoices_number ON invoices(tenant_id, invoice_number);
 CREATE INDEX idx_invoices_issue_date ON invoices(issue_date);
 CREATE INDEX idx_invoices_status ON invoices(status);
+CREATE INDEX idx_invoice_items_tenant_id ON invoice_items(tenant_id);
 CREATE INDEX idx_invoice_items_invoice_id ON invoice_items(invoice_id);
+CREATE INDEX idx_documents_tenant_id ON documents(tenant_id);
 CREATE INDEX idx_documents_type ON documents(document_type);
 CREATE INDEX idx_documents_transaction_id ON documents(transaction_id);
 CREATE INDEX idx_documents_project_id ON documents(project_id);
@@ -187,49 +214,50 @@ CREATE INDEX idx_budgets_cost_center_id ON budgets(cost_center_id);
 -- ============================================
 -- MOCK DATA - BANK ACCOUNTS
 -- ============================================
-INSERT INTO bank_accounts (id, name, bank_name, account_number, agency, account_type, initial_balance, current_balance) VALUES
-('55555555-0001-0001-0001-000000000001', 'Conta Corrente Principal', 'Banco do Brasil', '12345-6', '0001', 'checking', 100000.00, 185000.00),
-('55555555-0001-0001-0001-000000000002', 'Conta Poupança', 'Caixa Econômica', '98765-4', '0123', 'savings', 50000.00, 52000.00),
-('55555555-0001-0001-0001-000000000003', 'Conta Investimentos', 'Nubank', '55555-5', '0001', 'investment', 200000.00, 210000.00);
+INSERT INTO bank_accounts (id, tenant_id, name, bank_name, account_number, agency, account_type, initial_balance, current_balance) VALUES
+('55555555-0001-0001-0001-000000000001', '10000000-0000-0000-0000-000000000001', 'Conta Corrente Principal', 'Banco do Brasil', '12345-6', '0001', 'checking', 100000.00, 185000.00),
+('55555555-0001-0001-0001-000000000002', '10000000-0000-0000-0000-000000000001', 'Conta Poupança', 'Caixa Econômica', '98765-4', '0123', 'savings', 50000.00, 52000.00),
+('55555555-0001-0001-0001-000000000003', '10000000-0000-0000-0000-000000000001', 'Conta Investimentos', 'Nubank', '55555-5', '0001', 'investment', 200000.00, 210000.00);
 
 -- ============================================
 -- MOCK DATA - CHART OF ACCOUNTS
 -- ============================================
-INSERT INTO chart_of_accounts (id, code, name, account_type, category, parent_id) VALUES
+INSERT INTO chart_of_accounts (id, tenant_id, code, name, account_type, category, parent_id) VALUES
 -- RECEITAS
-('66666666-0001-0001-0001-000000000001', '3.1', 'Receitas Operacionais', 'revenue', NULL, NULL),
-('66666666-0001-0001-0001-000000000002', '3.1.01', 'Receita de Serviços', 'revenue', 'Serviços', '66666666-0001-0001-0001-000000000001'),
-('66666666-0001-0001-0001-000000000003', '3.1.02', 'Receita de Produtos', 'revenue', 'Produtos', '66666666-0001-0001-0001-000000000001'),
+('66666666-0001-0001-0001-000000000001', '10000000-0000-0000-0000-000000000001', '3.1', 'Receitas Operacionais', 'revenue', NULL, NULL),
+('66666666-0001-0001-0001-000000000002', '10000000-0000-0000-0000-000000000001', '3.1.01', 'Receita de Serviços', 'revenue', 'Serviços', '66666666-0001-0001-0001-000000000001'),
+('66666666-0001-0001-0001-000000000003', '10000000-0000-0000-0000-000000000001', '3.1.02', 'Receita de Produtos', 'revenue', 'Produtos', '66666666-0001-0001-0001-000000000001'),
 
 -- DESPESAS
-('66666666-0001-0001-0001-000000000004', '4.1', 'Despesas Operacionais', 'expense', NULL, NULL),
-('66666666-0001-0001-0001-000000000005', '4.1.01', 'Salários e Encargos', 'expense', 'Pessoal', '66666666-0001-0001-0001-000000000004'),
-('66666666-0001-0001-0001-000000000006', '4.1.02', 'Marketing', 'expense', 'Marketing', '66666666-0001-0001-0001-000000000004'),
-('66666666-0001-0001-0001-000000000007', '4.1.03', 'Infraestrutura', 'expense', 'TI', '66666666-0001-0001-0001-000000000004'),
-('66666666-0001-0001-0001-000000000008', '4.1.04', 'Escritório', 'expense', 'Administrativo', '66666666-0001-0001-0001-000000000004'),
-('66666666-0001-0001-0001-000000000009', '4.1.05', 'Impostos', 'expense', 'Fiscal', '66666666-0001-0001-0001-000000000004'),
+('66666666-0001-0001-0001-000000000004', '10000000-0000-0000-0000-000000000001', '4.1', 'Despesas Operacionais', 'expense', NULL, NULL),
+('66666666-0001-0001-0001-000000000005', '10000000-0000-0000-0000-000000000001', '4.1.01', 'Salários e Encargos', 'expense', 'Pessoal', '66666666-0001-0001-0001-000000000004'),
+('66666666-0001-0001-0001-000000000006', '10000000-0000-0000-0000-000000000001', '4.1.02', 'Marketing', 'expense', 'Marketing', '66666666-0001-0001-0001-000000000004'),
+('66666666-0001-0001-0001-000000000007', '10000000-0000-0000-0000-000000000001', '4.1.03', 'Infraestrutura', 'expense', 'TI', '66666666-0001-0001-0001-000000000004'),
+('66666666-0001-0001-0001-000000000008', '10000000-0000-0000-0000-000000000001', '4.1.04', 'Escritório', 'expense', 'Administrativo', '66666666-0001-0001-0001-000000000004'),
+('66666666-0001-0001-0001-000000000009', '10000000-0000-0000-0000-000000000001', '4.1.05', 'Impostos', 'expense', 'Fiscal', '66666666-0001-0001-0001-000000000004'),
 
 -- ATIVOS
-('66666666-0001-0001-0001-000000000010', '1.1', 'Ativo Circulante', 'asset', NULL, NULL),
-('66666666-0001-0001-0001-000000000011', '1.1.01', 'Caixa e Bancos', 'asset', 'Caixa', '66666666-0001-0001-0001-000000000010'),
-('66666666-0001-0001-0001-000000000012', '1.2', 'Ativo Não Circulante', 'asset', NULL, NULL),
-('66666666-0001-0001-0001-000000000013', '1.2.01', 'Imobilizado', 'asset', 'Equipamentos', '66666666-0001-0001-0001-000000000012');
+('66666666-0001-0001-0001-000000000010', '10000000-0000-0000-0000-000000000001', '1.1', 'Ativo Circulante', 'asset', NULL, NULL),
+('66666666-0001-0001-0001-000000000011', '10000000-0000-0000-0000-000000000001', '1.1.01', 'Caixa e Bancos', 'asset', 'Caixa', '66666666-0001-0001-0001-000000000010'),
+('66666666-0001-0001-0001-000000000012', '10000000-0000-0000-0000-000000000001', '1.2', 'Ativo Não Circulante', 'asset', NULL, NULL),
+('66666666-0001-0001-0001-000000000013', '10000000-0000-0000-0000-000000000001', '1.2.01', 'Imobilizado', 'asset', 'Equipamentos', '66666666-0001-0001-0001-000000000012');
 
 -- ============================================
 -- MOCK DATA - COST CENTERS
 -- ============================================
-INSERT INTO cost_centers (id, code, name, description, manager_id) VALUES
-('77777777-0001-0001-0001-000000000001', 'CC-001', 'Desenvolvimento', 'Centro de custo para equipe de desenvolvimento', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'),
-('77777777-0001-0001-0001-000000000002', 'CC-002', 'Marketing', 'Centro de custo para marketing e vendas', 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb'),
-('77777777-0001-0001-0001-000000000003', 'CC-003', 'Administrativo', 'Centro de custo para administrativo e financeiro', 'dddddddd-dddd-dddd-dddd-dddddddddddd'),
-('77777777-0001-0001-0001-000000000004', 'CC-004', 'Jurídico', 'Centro de custo para departamento jurídico', 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee');
+INSERT INTO cost_centers (id, tenant_id, code, name, description, manager_id) VALUES
+('77777777-0001-0001-0001-000000000001', '10000000-0000-0000-0000-000000000001', 'CC-001', 'Desenvolvimento', 'Centro de custo para equipe de desenvolvimento', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'),
+('77777777-0001-0001-0001-000000000002', '10000000-0000-0000-0000-000000000001', 'CC-002', 'Marketing', 'Centro de custo para marketing e vendas', 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb'),
+('77777777-0001-0001-0001-000000000003', '10000000-0000-0000-0000-000000000001', 'CC-003', 'Administrativo', 'Centro de custo para administrativo e financeiro', 'dddddddd-dddd-dddd-dddd-dddddddddddd'),
+('77777777-0001-0001-0001-000000000004', '10000000-0000-0000-0000-000000000001', 'CC-004', 'Jurídico', 'Centro de custo para departamento jurídico', 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee');
 
 -- ============================================
 -- MOCK DATA - TRANSACTIONS
 -- ============================================
-INSERT INTO transactions (id, code, transaction_type, category, description, amount, transaction_date, due_date, payment_date, status, payment_method, bank_account_id, account_id, cost_center_id, project_id, contact_name, contact_document, created_by) VALUES
+INSERT INTO transactions (id, tenant_id, code, transaction_type, category, description, amount, transaction_date, due_date, payment_date, status, payment_method, bank_account_id, account_id, cost_center_id, project_id, contact_name, contact_document, created_by) VALUES
 (
     '88888888-0001-0001-0001-000000000001',
+    '10000000-0000-0000-0000-000000000001',
     'TRX-001',
     'income',
     'invoice',
@@ -250,6 +278,7 @@ INSERT INTO transactions (id, code, transaction_type, category, description, amo
 ),
 (
     '88888888-0001-0001-0001-000000000002',
+    '10000000-0000-0000-0000-000000000001',
     'TRX-002',
     'expense',
     'salary',
@@ -270,6 +299,7 @@ INSERT INTO transactions (id, code, transaction_type, category, description, amo
 ),
 (
     '88888888-0001-0001-0001-000000000003',
+    '10000000-0000-0000-0000-000000000001',
     'TRX-003',
     'expense',
     'payment',
@@ -290,6 +320,7 @@ INSERT INTO transactions (id, code, transaction_type, category, description, amo
 ),
 (
     '88888888-0001-0001-0001-000000000004',
+    '10000000-0000-0000-0000-000000000001',
     'TRX-004',
     'expense',
     'payment',
@@ -310,6 +341,7 @@ INSERT INTO transactions (id, code, transaction_type, category, description, amo
 ),
 (
     '88888888-0001-0001-0001-000000000005',
+    '10000000-0000-0000-0000-000000000001',
     'TRX-005',
     'expense',
     'payment',
@@ -330,6 +362,7 @@ INSERT INTO transactions (id, code, transaction_type, category, description, amo
 ),
 (
     '88888888-0001-0001-0001-000000000006',
+    '10000000-0000-0000-0000-000000000001',
     'TRX-006',
     'income',
     'invoice',
@@ -350,6 +383,7 @@ INSERT INTO transactions (id, code, transaction_type, category, description, amo
 ),
 (
     '88888888-0001-0001-0001-000000000007',
+    '10000000-0000-0000-0000-000000000001',
     'TRX-007',
     'expense',
     'payment',
@@ -370,6 +404,7 @@ INSERT INTO transactions (id, code, transaction_type, category, description, amo
 ),
 (
     '88888888-0001-0001-0001-000000000008',
+    '10000000-0000-0000-0000-000000000001',
     'TRX-008',
     'expense',
     'payment',
@@ -392,15 +427,17 @@ INSERT INTO transactions (id, code, transaction_type, category, description, amo
 -- ============================================
 -- MOCK DATA - INVOICES
 -- ============================================
-INSERT INTO invoices (id, invoice_number, invoice_type, series, issue_date, due_date, transaction_id, issuer_name, issuer_document, recipient_name, recipient_document, gross_amount, tax_amount, net_amount, status) VALUES
+INSERT INTO invoices (id, tenant_id, invoice_number, invoice_type, series, issue_date, due_date, transaction_id, issuer_name, issuer_document, recipient_name, recipient_document, gross_amount, tax_amount, net_amount, status) VALUES
 (
     '99999999-0001-0001-0001-000000000001',
+    '10000000-0000-0000-0000-000000000001',
     'NFSe-12345',
     'nfse',
     'A',
     '2025-11-15',
     '2025-11-15',
     '88888888-0001-0001-0001-000000000001',
+    '10000000-0000-0000-0000-000000000001',
     'UZZ.AI Tecnologia LTDA',
     '99.999.999/0001-99',
     'Cliente Externo LTDA',
@@ -412,12 +449,14 @@ INSERT INTO invoices (id, invoice_number, invoice_type, series, issue_date, due_
 ),
 (
     '99999999-0001-0001-0001-000000000002',
+    '10000000-0000-0000-0000-000000000001',
     'NFSe-12346',
     'nfse',
     'A',
     '2025-11-01',
     '2025-11-01',
     '88888888-0001-0001-0001-000000000006',
+    '10000000-0000-0000-0000-000000000001',
     'UZZ.AI Tecnologia LTDA',
     '99.999.999/0001-99',
     'UZZ.AI Interno',
@@ -429,12 +468,14 @@ INSERT INTO invoices (id, invoice_number, invoice_type, series, issue_date, due_
 ),
 (
     '99999999-0001-0001-0001-000000000003',
+    '10000000-0000-0000-0000-000000000001',
     'NFe-789456',
     'nfe',
     '1',
     '2025-11-05',
     '2025-11-05',
     '88888888-0001-0001-0001-000000000003',
+    '10000000-0000-0000-0000-000000000001',
     'Amazon Web Services Brasil LTDA',
     '15.436.940/0001-03',
     'UZZ.AI Tecnologia LTDA',
@@ -448,17 +489,22 @@ INSERT INTO invoices (id, invoice_number, invoice_type, series, issue_date, due_
 -- ============================================
 -- MOCK DATA - INVOICE ITEMS
 -- ============================================
-INSERT INTO invoice_items (invoice_id, description, quantity, unit_price, total_price, tax_rate, tax_amount) VALUES
-('99999999-0001-0001-0001-000000000001', 'Desenvolvimento Portal Web - Sprint 1', 1, 75000.00, 75000.00, 5.00, 3750.00),
-('99999999-0001-0001-0001-000000000002', 'Desenvolvimento Sistema ERP - Parcela 3', 1, 41666.67, 41666.67, 5.00, 2083.33),
-('99999999-0001-0001-0001-000000000003', 'Servidor EC2 t3.large - 730 horas', 730, 0.85, 620.50, 17.00, 105.49),
-('99999999-0001-0001-0001-000000000003', 'Storage S3 - 500GB', 500, 0.30, 150.00, 17.00, 25.50),
-('99999999-0001-0001-0001-000000000003', 'RDS PostgreSQL db.t3.medium', 1, 4229.50, 4229.50, 17.00, 719.01);
+INSERT INTO invoice_items (tenant_id, invoice_id, description, quantity, unit_price, total_price, tax_rate, tax_amount) VALUES
+('99999999-0001-0001-0001-000000000001',
+    '10000000-0000-0000-0000-000000000001', 'Desenvolvimento Portal Web - Sprint 1', 1, 75000.00, 75000.00, 5.00, 3750.00),
+('99999999-0001-0001-0001-000000000002',
+    '10000000-0000-0000-0000-000000000001', 'Desenvolvimento Sistema ERP - Parcela 3', 1, 41666.67, 41666.67, 5.00, 2083.33),
+('99999999-0001-0001-0001-000000000003',
+    '10000000-0000-0000-0000-000000000001', 'Servidor EC2 t3.large - 730 horas', 730, 0.85, 620.50, 17.00, 105.49),
+('99999999-0001-0001-0001-000000000003',
+    '10000000-0000-0000-0000-000000000001', 'Storage S3 - 500GB', 500, 0.30, 150.00, 17.00, 25.50),
+('99999999-0001-0001-0001-000000000003',
+    '10000000-0000-0000-0000-000000000001', 'RDS PostgreSQL db.t3.medium', 1, 4229.50, 4229.50, 17.00, 719.01);
 
 -- ============================================
 -- MOCK DATA - DOCUMENTS
 -- ============================================
-INSERT INTO documents (id, document_type, title, description, file_name, file_url, file_size, mime_type, transaction_id, project_id, uploaded_by, tags, is_confidential) VALUES
+INSERT INTO documents (id, tenant_id, document_type, title, description, file_name, file_url, file_size, mime_type, transaction_id, project_id, uploaded_by, tags, is_confidential) VALUES
 (
     'aaaa1111-0001-0001-0001-000000000001',
     'contract',
@@ -469,6 +515,7 @@ INSERT INTO documents (id, document_type, title, description, file_name, file_ur
     2458000,
     'application/pdf',
     '88888888-0001-0001-0001-000000000001',
+    '10000000-0000-0000-0000-000000000001',
     '22222222-0001-0001-0001-000000000002',
     'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee',
     ARRAY['contrato', 'juridico', 'cliente'],
@@ -484,6 +531,7 @@ INSERT INTO documents (id, document_type, title, description, file_name, file_ur
     156000,
     'application/pdf',
     '88888888-0001-0001-0001-000000000001',
+    '10000000-0000-0000-0000-000000000001',
     '22222222-0001-0001-0001-000000000002',
     'dddddddd-dddd-dddd-dddd-dddddddddddd',
     ARRAY['nota-fiscal', 'nfse'],
@@ -499,6 +547,7 @@ INSERT INTO documents (id, document_type, title, description, file_name, file_ur
     89000,
     'application/pdf',
     '88888888-0001-0001-0001-000000000003',
+    '10000000-0000-0000-0000-000000000001',
     '22222222-0001-0001-0001-000000000001',
     'dddddddd-dddd-dddd-dddd-dddddddddddd',
     ARRAY['comprovante', 'infraestrutura'],

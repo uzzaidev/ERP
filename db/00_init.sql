@@ -1,6 +1,6 @@
 -- ============================================
 -- SCRIPT COMPLETO DE INICIALIZAÇÃO DO BANCO
--- Sistema ERP UZZ.AI
+-- Sistema ERP UZZ.AI - Multi-Tenant Version
 -- ============================================
 -- Este script executa todos os scripts SQL na ordem correta
 -- para criar o banco de dados completo com dados mock
@@ -11,23 +11,27 @@
 
 \echo '=========================================='
 \echo 'INICIANDO CRIAÇÃO DO BANCO DE DADOS'
-\echo 'Sistema ERP UZZ.AI'
+\echo 'Sistema ERP UZZ.AI - Multi-Tenant'
 \echo '=========================================='
 
 \echo ''
-\echo '[1/4] Criando módulo de usuários e autenticação...'
+\echo '[0/5] Criando infraestrutura de multi-tenancy...'
+\i 00_tenants.sql
+
+\echo ''
+\echo '[1/5] Criando módulo de usuários e autenticação...'
 \i 01_users_and_auth.sql
 
 \echo ''
-\echo '[2/4] Criando módulo de projetos e tasks...'
+\echo '[2/5] Criando módulo de projetos e tasks...'
 \i 02_projects_and_tasks.sql
 
 \echo ''
-\echo '[3/4] Criando módulo financeiro...'
+\echo '[3/5] Criando módulo financeiro...'
 \i 03_finance.sql
 
 \echo ''
-\echo '[4/4] Criando tabelas auxiliares...'
+\echo '[4/5] Criando tabelas auxiliares...'
 \i 04_auxiliary_tables.sql
 
 \echo ''
@@ -37,11 +41,16 @@
 \echo ''
 \echo 'Resumo das tabelas criadas:'
 \echo ''
+\echo 'MÓDULO: Multi-Tenancy (NEW!)'
+\echo '  - tenants (3 companies)'
+\echo '  - tenant_invitations'
+\echo '  - tenant_usage_stats'
+\echo ''
 \echo 'MÓDULO: Usuários e Autenticação'
 \echo '  - roles (5 roles)'
 \echo '  - permissions (27 permissions)'
 \echo '  - role_permissions'
-\echo '  - users (5 users)'
+\echo '  - users (10 users across 3 tenants)'
 \echo '  - user_roles'
 \echo '  - audit_logs'
 \echo ''
@@ -69,7 +78,6 @@
 \echo 'MÓDULO: Auxiliar'
 \echo '  - notifications (4 notifications)'
 \echo '  - user_settings (5 settings)'
-\echo '  - company_settings (1 company)'
 \echo '  - activity_feed (5 activities)'
 \echo '  - favorites (4 favorites)'
 \echo '  - email_templates (3 templates)'
@@ -82,6 +90,8 @@
 \echo 'CREDENCIAIS DE ACESSO MOCK'
 \echo '=========================================='
 \echo ''
+\echo 'TENANT: UzzAI Technologies'
+\echo '=========================================='
 \echo 'Admin:'
 \echo '  Email: admin@uzz.ai'
 \echo '  Senha: admin123'
@@ -108,6 +118,20 @@
 \echo '  Role: Jurídico'
 \echo ''
 \echo '=========================================='
+\echo 'TENANT: Empresa Demo A'
+\echo '=========================================='
+\echo 'Admin:'
+\echo '  Email: admin@empresaa.com.br'
+\echo '  Senha: admin123'
+\echo ''
+\echo '=========================================='
+\echo 'TENANT: Startup Beta'
+\echo '=========================================='
+\echo 'Admin:'
+\echo '  Email: admin@startupbeta.io'
+\echo '  Senha: admin123'
+\echo ''
+\echo '=========================================='
 \echo 'PRÓXIMOS PASSOS'
 \echo '=========================================='
 \echo ''
@@ -115,9 +139,20 @@
 \echo '   DATABASE_URL=postgresql://user:password@localhost:5432/uzz_erp'
 \echo ''
 \echo '2. Desenvolva as APIs RESTful para cada módulo'
+\echo '   - Todas as APIs devem filtrar por tenant_id'
+\echo '   - Implemente middleware de tenant context'
 \echo ''
 \echo '3. Implemente autenticação JWT com Supabase'
+\echo '   - Inclua tenant_id no JWT token'
+\echo '   - Valide tenant_id em todas as requisições'
 \echo ''
 \echo '4. Configure RBAC baseado em roles e permissions'
+\echo '   - Permissões isoladas por tenant'
+\echo '   - Admin pode gerenciar usuários do seu tenant'
+\echo ''
+\echo '5. Implemente sistema de convites'
+\echo '   - Admin pode convidar usuários'
+\echo '   - Usuários aceitam convite e escolhem senha'
+\echo '   - Validação de limites de usuários por plano'
 \echo ''
 \echo '=========================================='

@@ -95,7 +95,7 @@ export async function PATCH(
       'secondary_color',
     ];
 
-    const updateData: any = {};
+    const updateData: Record<string, string | null | undefined> = {};
     allowedFields.forEach(field => {
       if (body[field] !== undefined) {
         updateData[field] = body[field];

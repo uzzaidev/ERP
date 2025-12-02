@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Tenant, User } from '@/types/entities';
 
 interface TenantContextType {
@@ -131,11 +131,16 @@ export function useTenantLimits() {
   const [limits, setLimits] = useState<{
     canAddUser: boolean;
     canAddProject: boolean;
-    currentUsage: any;
+    currentUsage: {
+      users_count: number;
+      projects_count: number;
+      tasks_count: number;
+      storage_used_mb: number;
+    };
   } | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const checkLimits = async () => {
+  const checkLimits = React.useCallback(async () => {
     if (!tenant?.id) return;
 
     try {
@@ -153,11 +158,11 @@ export function useTenantLimits() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [tenant?.id]);
 
   useEffect(() => {
     checkLimits();
-  }, [tenant?.id]);
+  }, [checkLimits]);
 
   return {
     ...limits,

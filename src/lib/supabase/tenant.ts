@@ -1,5 +1,4 @@
 import { createClient } from './server';
-import { User } from '@supabase/supabase-js';
 
 /**
  * Tenant context type
@@ -7,7 +6,21 @@ import { User } from '@supabase/supabase-js';
 export interface TenantContext {
   tenantId: string;
   userId: string;
-  user: any;
+  user: {
+    id: string;
+    tenant_id: string;
+    email: string;
+    full_name: string;
+    tenant?: {
+      id: string;
+      name: string;
+      slug: string;
+      plan: string;
+      status: string;
+      max_users: number;
+      max_projects: number;
+    };
+  };
 }
 
 /**
@@ -63,7 +76,12 @@ export function validateTenantAccess(resourceTenantId: string, userTenantId: str
 export async function checkTenantLimits(tenantId: string): Promise<{
   canAddUser: boolean;
   canAddProject: boolean;
-  currentUsage: any;
+  currentUsage: {
+    users_count: number;
+    projects_count: number;
+    tasks_count: number;
+    storage_used_mb: number;
+  };
 }> {
   const supabase = await createClient();
 
@@ -94,7 +112,12 @@ export async function checkTenantLimits(tenantId: string): Promise<{
     return {
       canAddUser: true,
       canAddProject: true,
-      currentUsage: { users_count: 0, projects_count: 0 },
+      currentUsage: { 
+        users_count: 0, 
+        projects_count: 0, 
+        tasks_count: 0, 
+        storage_used_mb: 0 
+      },
     };
   }
 

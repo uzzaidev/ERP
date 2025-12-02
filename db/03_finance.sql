@@ -5,6 +5,8 @@
 -- ============================================
 -- DROP TABLES IF EXIST (in reverse dependency order)
 -- ============================================
+DROP TABLE IF EXISTS budgets CASCADE;
+DROP TABLE IF EXISTS documents CASCADE;
 DROP TABLE IF EXISTS payment_terms CASCADE;
 DROP TABLE IF EXISTS invoice_items CASCADE;
 DROP TABLE IF EXISTS invoices CASCADE;
@@ -499,16 +501,11 @@ INSERT INTO invoices (id, tenant_id, invoice_number, invoice_type, series, issue
 -- MOCK DATA - INVOICE ITEMS
 -- ============================================
 INSERT INTO invoice_items (tenant_id, invoice_id, description, quantity, unit_price, total_price, tax_rate, tax_amount) VALUES
-('99999999-0001-0001-0001-000000000001',
-    '10000000-0000-0000-0000-000000000001', 'Desenvolvimento Portal Web - Sprint 1', 1, 75000.00, 75000.00, 5.00, 3750.00),
-('99999999-0001-0001-0001-000000000002',
-    '10000000-0000-0000-0000-000000000001', 'Desenvolvimento Sistema ERP - Parcela 3', 1, 41666.67, 41666.67, 5.00, 2083.33),
-('99999999-0001-0001-0001-000000000003',
-    '10000000-0000-0000-0000-000000000001', 'Servidor EC2 t3.large - 730 horas', 730, 0.85, 620.50, 17.00, 105.49),
-('99999999-0001-0001-0001-000000000003',
-    '10000000-0000-0000-0000-000000000001', 'Storage S3 - 500GB', 500, 0.30, 150.00, 17.00, 25.50),
-('99999999-0001-0001-0001-000000000003',
-    '10000000-0000-0000-0000-000000000001', 'RDS PostgreSQL db.t3.medium', 1, 4229.50, 4229.50, 17.00, 719.01);
+('10000000-0000-0000-0000-000000000001', '99999999-0001-0001-0001-000000000001', 'Desenvolvimento Portal Web - Sprint 1', 1, 75000.00, 75000.00, 5.00, 3750.00),
+('10000000-0000-0000-0000-000000000001', '99999999-0001-0001-0001-000000000002', 'Desenvolvimento Sistema ERP - Parcela 3', 1, 41666.67, 41666.67, 5.00, 2083.33),
+('10000000-0000-0000-0000-000000000001', '99999999-0001-0001-0001-000000000003', 'Servidor EC2 t3.large - 730 horas', 730, 0.85, 620.50, 17.00, 105.49),
+('10000000-0000-0000-0000-000000000001', '99999999-0001-0001-0001-000000000003', 'Storage S3 - 500GB', 500, 0.30, 150.00, 17.00, 25.50),
+('10000000-0000-0000-0000-000000000001', '99999999-0001-0001-0001-000000000003', 'RDS PostgreSQL db.t3.medium', 1, 4229.50, 4229.50, 17.00, 719.01);
 
 -- ============================================
 -- MOCK DATA - DOCUMENTS
@@ -516,6 +513,7 @@ INSERT INTO invoice_items (tenant_id, invoice_id, description, quantity, unit_pr
 INSERT INTO documents (id, tenant_id, document_type, title, description, file_name, file_url, file_size, mime_type, transaction_id, project_id, uploaded_by, tags, is_confidential) VALUES
 (
     'aaaa1111-0001-0001-0001-000000000001',
+    '10000000-0000-0000-0000-000000000001',
     'contract',
     'Contrato Portal Web Cliente Externo',
     'Contrato de desenvolvimento do portal web',
@@ -524,7 +522,6 @@ INSERT INTO documents (id, tenant_id, document_type, title, description, file_na
     2458000,
     'application/pdf',
     '88888888-0001-0001-0001-000000000001',
-    '10000000-0000-0000-0000-000000000001',
     '22222222-0001-0001-0001-000000000002',
     'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee',
     ARRAY['contrato', 'juridico', 'cliente'],
@@ -532,6 +529,7 @@ INSERT INTO documents (id, tenant_id, document_type, title, description, file_na
 ),
 (
     'aaaa1111-0001-0001-0001-000000000002',
+    '10000000-0000-0000-0000-000000000001',
     'invoice',
     'NFSe 12345 - Cliente Externo',
     'Nota fiscal de serviço referente ao projeto portal web',
@@ -540,7 +538,6 @@ INSERT INTO documents (id, tenant_id, document_type, title, description, file_na
     156000,
     'application/pdf',
     '88888888-0001-0001-0001-000000000001',
-    '10000000-0000-0000-0000-000000000001',
     '22222222-0001-0001-0001-000000000002',
     'dddddddd-dddd-dddd-dddd-dddddddddddd',
     ARRAY['nota-fiscal', 'nfse'],
@@ -548,6 +545,7 @@ INSERT INTO documents (id, tenant_id, document_type, title, description, file_na
 ),
 (
     'aaaa1111-0001-0001-0001-000000000003',
+    '10000000-0000-0000-0000-000000000001',
     'receipt',
     'Comprovante Pagamento AWS',
     'Comprovante de pagamento servidor AWS Novembro',
@@ -556,7 +554,6 @@ INSERT INTO documents (id, tenant_id, document_type, title, description, file_na
     89000,
     'application/pdf',
     '88888888-0001-0001-0001-000000000003',
-    '10000000-0000-0000-0000-000000000001',
     '22222222-0001-0001-0001-000000000001',
     'dddddddd-dddd-dddd-dddd-dddddddddddd',
     ARRAY['comprovante', 'infraestrutura'],
@@ -564,6 +561,7 @@ INSERT INTO documents (id, tenant_id, document_type, title, description, file_na
 ),
 (
     'aaaa1111-0001-0001-0001-000000000004',
+    '10000000-0000-0000-0000-000000000001',
     'report',
     'Relatório Financeiro Novembro 2025',
     'Relatório financeiro consolidado do mês',
@@ -581,9 +579,10 @@ INSERT INTO documents (id, tenant_id, document_type, title, description, file_na
 -- ============================================
 -- MOCK DATA - BUDGETS
 -- ============================================
-INSERT INTO budgets (id, name, year, month, cost_center_id, account_id, budgeted_amount, spent_amount, status, created_by) VALUES
+INSERT INTO budgets (id, tenant_id, name, year, month, cost_center_id, account_id, budgeted_amount, spent_amount, status, created_by) VALUES
 (
     'bbbb2222-0001-0001-0001-000000000001',
+    '10000000-0000-0000-0000-000000000001',
     'Orçamento Desenvolvimento - Novembro',
     2025,
     11,
@@ -596,6 +595,7 @@ INSERT INTO budgets (id, name, year, month, cost_center_id, account_id, budgeted
 ),
 (
     'bbbb2222-0001-0001-0001-000000000002',
+    '10000000-0000-0000-0000-000000000001',
     'Orçamento Marketing - Novembro',
     2025,
     11,
@@ -608,6 +608,7 @@ INSERT INTO budgets (id, name, year, month, cost_center_id, account_id, budgeted
 ),
 (
     'bbbb2222-0001-0001-0001-000000000003',
+    '10000000-0000-0000-0000-000000000001',
     'Orçamento Infraestrutura - Novembro',
     2025,
     11,
@@ -620,6 +621,7 @@ INSERT INTO budgets (id, name, year, month, cost_center_id, account_id, budgeted
 ),
 (
     'bbbb2222-0001-0001-0001-000000000004',
+    '10000000-0000-0000-0000-000000000001',
     'Orçamento Administrativo - Novembro',
     2025,
     11,

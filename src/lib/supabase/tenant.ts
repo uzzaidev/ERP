@@ -42,7 +42,13 @@ export async function getTenantContext(): Promise<TenantContext> {
   // Fetch user's tenant_id from users table
   const { data: userData, error: userError } = await supabase
     .from('users')
-    .select('tenant_id, tenant:tenants(*)')
+    .select(`
+      id,
+      tenant_id,
+      email,
+      full_name,
+      tenant:tenants(id, name, slug, plan, status, max_users, max_projects)
+    `)
     .eq('id', user.id)
     .single();
 
@@ -50,10 +56,21 @@ export async function getTenantContext(): Promise<TenantContext> {
     throw new Error('Tenant not found for user');
   }
 
+  // Transform the tenant array to a single object (if it exists)
+  const tenantData = Array.isArray(userData.tenant) && userData.tenant.length > 0 
+    ? userData.tenant[0] 
+    : undefined;
+
   return {
     tenantId: userData.tenant_id,
     userId: user.id,
-    user: userData,
+    user: {
+      id: userData.id,
+      tenant_id: userData.tenant_id,
+      email: userData.email,
+      full_name: userData.full_name,
+      tenant: tenantData,
+    },
   };
 }
 

@@ -6,10 +6,126 @@
 export type ActionStatus = "open" | "in_progress" | "done" | "canceled" | "blocked";
 export type Priority = "high" | "medium" | "low";
 export type ProjectStatus = "planning" | "active" | "on_hold" | "completed" | "canceled";
+export type TenantPlan = "trial" | "basic" | "professional" | "enterprise";
+export type TenantStatus = "active" | "suspended" | "cancelled";
+export type InvitationStatus = "pending" | "accepted" | "expired" | "cancelled";
+
+// ============================================
+// MULTI-TENANCY TYPES
+// ============================================
+
+// Tenant (Company/Organization)
+export interface Tenant {
+  id: string;
+  name: string;
+  slug: string; // URL-friendly identifier
+  document?: string; // CNPJ/Tax ID
+  email?: string;
+  phone?: string;
+  
+  // Address
+  addressStreet?: string;
+  addressNumber?: string;
+  addressComplement?: string;
+  addressNeighborhood?: string;
+  addressCity?: string;
+  addressState?: string;
+  addressZip?: string;
+  addressCountry?: string;
+  
+  // Branding
+  logoUrl?: string;
+  primaryColor?: string;
+  secondaryColor?: string;
+  
+  // Settings
+  currency?: string;
+  timezone?: string;
+  language?: string;
+  fiscalYearStartMonth?: number;
+  
+  // Subscription
+  plan: TenantPlan;
+  status: TenantStatus;
+  trialEndsAt?: string;
+  subscriptionEndsAt?: string;
+  
+  // Limits
+  maxUsers: number;
+  maxProjects: number;
+  storageLimitMb: number;
+  
+  // Metadata
+  createdAt: string;
+  updatedAt: string;
+  createdBy?: string;
+}
+
+// Tenant Invitation
+export interface TenantInvitation {
+  id: string;
+  tenantId: string;
+  tenant?: Tenant;
+  email: string;
+  roleId?: string;
+  roleName: string; // admin, gestor, financeiro, dev, juridico
+  
+  // Invitation details
+  token: string;
+  invitedBy?: string;
+  invitedByUser?: User;
+  
+  // Status
+  status: InvitationStatus;
+  acceptedAt?: string;
+  acceptedBy?: string;
+  expiresAt: string;
+  
+  // Optional message
+  message?: string;
+  
+  // Metadata
+  createdAt: string;
+  updatedAt: string;
+}
+
+// Tenant Usage Stats
+export interface TenantUsageStats {
+  id: string;
+  tenantId: string;
+  usersCount: number;
+  projectsCount: number;
+  tasksCount: number;
+  storageUsedMb: number;
+  lastCalculatedAt: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// User (with tenant relationship)
+export interface User {
+  id: string;
+  tenantId: string;
+  tenant?: Tenant;
+  email: string;
+  fullName: string;
+  avatarUrl?: string;
+  phone?: string;
+  isActive: boolean;
+  emailVerified: boolean;
+  lastLogin?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// ============================================
+// EXISTING TYPES (Updated with tenant_id)
+// ============================================
 
 // Pessoa (unificado: cliente, fornecedor, colaborador)
 export interface Person {
   id: string;
+  tenantId?: string; // Added for multi-tenancy
   fullName: string;
   nicknames: string[];
   types: ("cliente" | "fornecedor" | "colaborador")[];
@@ -38,6 +154,7 @@ export interface Address {
 // Projeto
 export interface Project {
   id: string;
+  tenantId: string; // Added for multi-tenancy
   code: string;
   name: string;
   description?: string;
@@ -55,6 +172,7 @@ export interface Project {
 // Sprint
 export interface Sprint {
   id: string;
+  tenantId: string; // Added for multi-tenancy
   code: string;
   weekLabel: string;
   status: "planning" | "active" | "closed";
@@ -70,6 +188,7 @@ export interface Sprint {
 // Reuniao
 export interface Meeting {
   id: string;
+  tenantId: string; // Added for multi-tenancy
   code: string;
   title: string;
   subtipo: string;
@@ -86,6 +205,7 @@ export interface Meeting {
 // Acao
 export interface Action {
   id: string;
+  tenantId: string; // Added for multi-tenancy
   publicId: string;
   description: string;
   status: ActionStatus;
@@ -108,6 +228,7 @@ export interface Action {
 // Decisao
 export interface Decision {
   id: string;
+  tenantId: string; // Added for multi-tenancy
   publicId: string;
   title: string;
   context: string;
@@ -127,6 +248,7 @@ export interface Decision {
 // Risco
 export interface Risk {
   id: string;
+  tenantId: string; // Added for multi-tenancy
   publicId: string;
   description: string;
   probability: number; // 1-5
@@ -145,6 +267,7 @@ export interface Risk {
 // Kaizen
 export interface Kaizen {
   id: string;
+  tenantId: string; // Added for multi-tenancy
   publicId: string;
   titulo: string;
   categoria: "technical" | "process" | "communication" | "planning";
@@ -160,6 +283,7 @@ export interface Kaizen {
 // Produto
 export interface Product {
   id: string;
+  tenantId: string; // Added for multi-tenancy
   sku: string;
   name: string;
   description?: string;
@@ -176,6 +300,7 @@ export interface Product {
 // Movimentacao de Estoque
 export interface StockMovement {
   id: string;
+  tenantId: string; // Added for multi-tenancy
   productId: string;
   product?: Product;
   tipo: "entrada" | "saida" | "ajuste";
@@ -190,6 +315,7 @@ export interface StockMovement {
 // Venda
 export interface Sale {
   id: string;
+  tenantId: string; // Added for multi-tenancy
   code: string;
   customerId: string;
   customer?: Person;
@@ -206,6 +332,7 @@ export interface Sale {
 
 export interface SaleItem {
   id: string;
+  tenantId: string; // Added for multi-tenancy
   saleId: string;
   productId: string;
   product?: Product;
@@ -217,6 +344,7 @@ export interface SaleItem {
 // Transacao Financeira
 export interface Transaction {
   id: string;
+  tenantId: string; // Added for multi-tenancy
   accountId: string;
   tipo: "receita" | "despesa";
   valor: number;
@@ -236,6 +364,7 @@ export interface Transaction {
 // Nota Fiscal
 export interface Invoice {
   id: string;
+  tenantId: string; // Added for multi-tenancy
   code: string;
   customerId: string;
   customer?: Person;

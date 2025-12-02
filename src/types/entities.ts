@@ -125,7 +125,7 @@ export interface User {
 // Pessoa (unificado: cliente, fornecedor, colaborador)
 export interface Person {
   id: string;
-  tenantId?: string; // Added for multi-tenancy
+  tenantId: string; // Required for multi-tenancy data isolation
   fullName: string;
   nicknames: string[];
   types: ("cliente" | "fornecedor" | "colaborador")[];

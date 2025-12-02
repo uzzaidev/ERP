@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getTenantContext, checkTenantLimits } from '@/lib/supabase/tenant';
+import { sendInvitationEmail } from '@/lib/email/invitation';
 import { randomBytes } from 'crypto';
 
 /**
@@ -101,15 +102,31 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // TODO: Send invitation email with token link
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL;
-    
-    if (!appUrl) {
-      console.error('NEXT_PUBLIC_APP_URL is not set');
-      // Return without link in development, but this should be required in production
-    }
-    
-    const invitationLink = appUrl ? `${appUrl}/accept-invitation?token=${token}` : null;
+    // Send invitation email
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    const invitationLink = `${appUrl}/accept-invitation?token=${token}`;
+
+    // Get tenant and inviter info for email
+    const { data: tenant } = await supabase
+      .from('tenants')
+      .select('name')
+      .eq('id', tenantId)
+      .single();
+
+    const { data: inviter } = await supabase
+      .from('users')
+      .select('full_name')
+      .eq('id', userId)
+      .single();
+
+    // Send email (non-blocking)
+    sendInvitationEmail({
+      to: email,
+      tenantName: tenant?.name || 'Sua Empresa',
+      roleName: role_name,
+      invitedBy: inviter?.full_name || 'Administrador',
+      invitationLink,
+    }).catch(err => console.error('Failed to send invitation email:', err));
 
     return NextResponse.json({ 
       success: true, 

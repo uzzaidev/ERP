@@ -3,6 +3,18 @@
 -- ============================================
 
 -- ============================================
+-- DROP TABLES IF EXIST (in reverse dependency order)
+-- ============================================
+DROP TABLE IF EXISTS payment_terms CASCADE;
+DROP TABLE IF EXISTS invoice_items CASCADE;
+DROP TABLE IF EXISTS invoices CASCADE;
+DROP TABLE IF EXISTS transaction_attachments CASCADE;
+DROP TABLE IF EXISTS transactions CASCADE;
+DROP TABLE IF EXISTS cost_centers CASCADE;
+DROP TABLE IF EXISTS chart_of_accounts CASCADE;
+DROP TABLE IF EXISTS bank_accounts CASCADE;
+
+-- ============================================
 -- BANK_ACCOUNTS (Contas Bancárias)
 -- ============================================
 CREATE TABLE bank_accounts (

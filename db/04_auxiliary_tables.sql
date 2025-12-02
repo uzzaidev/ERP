@@ -3,6 +3,18 @@
 -- ============================================
 
 -- ============================================
+-- DROP TABLES IF EXIST (in reverse dependency order)
+-- ============================================
+DROP TABLE IF EXISTS document_shares CASCADE;
+DROP TABLE IF EXISTS documents CASCADE;
+DROP TABLE IF EXISTS webhook_logs CASCADE;
+DROP TABLE IF EXISTS webhooks CASCADE;
+DROP TABLE IF EXISTS favorites CASCADE;
+DROP TABLE IF EXISTS activity_feed CASCADE;
+DROP TABLE IF EXISTS user_settings CASCADE;
+DROP TABLE IF EXISTS notifications CASCADE;
+
+-- ============================================
 -- NOTIFICATIONS (Sistema de Notificações)
 -- ============================================
 CREATE TABLE notifications (

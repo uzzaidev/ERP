@@ -3,6 +3,19 @@
 -- ============================================
 
 -- ============================================
+-- DROP TABLES IF EXIST (in reverse dependency order)
+-- ============================================
+DROP TABLE IF EXISTS task_attachments CASCADE;
+DROP TABLE IF EXISTS task_time_logs CASCADE;
+DROP TABLE IF EXISTS task_comments CASCADE;
+DROP TABLE IF EXISTS task_tags CASCADE;
+DROP TABLE IF EXISTS tags CASCADE;
+DROP TABLE IF EXISTS tasks CASCADE;
+DROP TABLE IF EXISTS sprints CASCADE;
+DROP TABLE IF EXISTS project_members CASCADE;
+DROP TABLE IF EXISTS projects CASCADE;
+
+-- ============================================
 -- PROJECTS TABLE
 -- ============================================
 CREATE TABLE projects (

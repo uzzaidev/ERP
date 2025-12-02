@@ -8,6 +8,13 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- ============================================
+-- DROP TABLES IF EXIST (in reverse dependency order)
+-- ============================================
+DROP TABLE IF EXISTS tenant_invitations CASCADE;
+DROP TABLE IF EXISTS tenant_usage_stats CASCADE;
+DROP TABLE IF EXISTS tenants CASCADE;
+
+-- ============================================
 -- TENANTS TABLE (Companies)
 -- ============================================
 CREATE TABLE tenants (

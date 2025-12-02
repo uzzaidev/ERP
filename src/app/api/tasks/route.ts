@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { getTenantContext } from '@/lib/supabase/tenant';
 
 export async function GET(request: NextRequest) {
   try {
+    // Get tenant context from authenticated session
+    const { tenantId } = await getTenantContext();
+    
     const supabase = await createClient();
     const searchParams = request.nextUrl.searchParams;
     
@@ -39,7 +43,8 @@ export async function GET(request: NextRequest) {
             color
           )
         )
-      `);
+      `)
+      .eq('tenant_id', tenantId);
 
     if (projectId) {
       query = query.eq('project_id', projectId);
@@ -67,6 +72,15 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ success: true, data });
   } catch (error) {
     console.error('Unexpected error:', error);
+    
+    // Handle authentication errors
+    if (error instanceof Error && error.message === 'Not authenticated') {
+      return NextResponse.json(
+        { success: false, error: 'Not authenticated' },
+        { status: 401 }
+      );
+    }
+    
     return NextResponse.json(
       { success: false, error: 'Internal server error' },
       { status: 500 }
@@ -76,6 +90,9 @@ export async function GET(request: NextRequest) {
 
 export async function PATCH(request: NextRequest) {
   try {
+    // Get tenant context from authenticated session
+    const { tenantId } = await getTenantContext();
+    
     const supabase = await createClient();
     const body = await request.json();
     
@@ -88,6 +105,27 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
+    // First, verify the task belongs to the user's tenant
+    const { data: existingTask, error: fetchError } = await supabase
+      .from('tasks')
+      .select('tenant_id')
+      .eq('id', id)
+      .single();
+
+    if (fetchError || !existingTask) {
+      return NextResponse.json(
+        { success: false, error: 'Task not found' },
+        { status: 404 }
+      );
+    }
+
+    if (existingTask.tenant_id !== tenantId) {
+      return NextResponse.json(
+        { success: false, error: 'Access denied' },
+        { status: 403 }
+      );
+    }
+
     const updateData: { status?: string; assignee_id?: string | null } = {};
     if (status !== undefined) updateData.status = status;
     if (assignee_id !== undefined) updateData.assignee_id = assignee_id;
@@ -96,6 +134,7 @@ export async function PATCH(request: NextRequest) {
       .from('tasks')
       .update(updateData)
       .eq('id', id)
+      .eq('tenant_id', tenantId)
       .select(`
         *,
         project:projects (
@@ -127,6 +166,15 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ success: true, data });
   } catch (error) {
     console.error('Unexpected error:', error);
+    
+    // Handle authentication errors
+    if (error instanceof Error && error.message === 'Not authenticated') {
+      return NextResponse.json(
+        { success: false, error: 'Not authenticated' },
+        { status: 401 }
+      );
+    }
+    
     return NextResponse.json(
       { success: false, error: 'Internal server error' },
       { status: 500 }

@@ -90,7 +90,7 @@ export async function getSession() {
 }
 
 /**
- * Obtém usuário atual
+ * Obtém usuário atual com tenant context
  */
 export async function getCurrentUser() {
   const supabase = createClient();
@@ -100,10 +100,21 @@ export async function getCurrentUser() {
     return { user: null, error };
   }
 
-  // Buscar dados completos da tabela users
+  // Buscar dados completos da tabela users com tenant
   const { data: userData, error: userError } = await supabase
     .from('users')
-    .select('*')
+    .select(`
+      *,
+      tenant:tenants(
+        id,
+        name,
+        slug,
+        plan,
+        status,
+        max_users,
+        max_projects
+      )
+    `)
     .eq('id', user.id)
     .single();
 

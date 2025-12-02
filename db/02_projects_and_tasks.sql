@@ -7,7 +7,8 @@
 -- ============================================
 CREATE TABLE projects (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    code VARCHAR(20) UNIQUE NOT NULL, -- e.g., 'PROJ-001'
+    tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+    code VARCHAR(20) NOT NULL, -- e.g., 'PROJ-001'
     name VARCHAR(255) NOT NULL,
     description TEXT,
     status VARCHAR(50) NOT NULL DEFAULT 'active', -- active, on_hold, completed, cancelled
@@ -24,7 +25,10 @@ CREATE TABLE projects (
     owner_id UUID REFERENCES users(id) ON DELETE SET NULL,
     created_by UUID REFERENCES users(id) ON DELETE SET NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    -- Code must be unique within a tenant
+    UNIQUE(tenant_id, code)
 );
 
 -- ============================================
@@ -32,6 +36,7 @@ CREATE TABLE projects (
 -- ============================================
 CREATE TABLE project_members (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
     project_id UUID NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     role VARCHAR(100), -- e.g., 'Developer', 'Designer', 'QA'
@@ -46,6 +51,7 @@ CREATE TABLE project_members (
 -- ============================================
 CREATE TABLE sprints (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
     project_id UUID REFERENCES projects(id) ON DELETE CASCADE,
     name VARCHAR(255) NOT NULL,
     code VARCHAR(50), -- e.g., 'SPRINT-48'
@@ -62,7 +68,8 @@ CREATE TABLE sprints (
 -- ============================================
 CREATE TABLE tasks (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    code VARCHAR(50) UNIQUE NOT NULL, -- e.g., 'TASK-001'
+    tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+    code VARCHAR(50) NOT NULL, -- e.g., 'TASK-001'
     title VARCHAR(255) NOT NULL,
     description TEXT,
     status VARCHAR(50) NOT NULL DEFAULT 'backlog', -- backlog, todo, in-progress, review, done, blocked
@@ -79,7 +86,10 @@ CREATE TABLE tasks (
     started_at TIMESTAMP,
     completed_at TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    -- Code must be unique within a tenant
+    UNIQUE(tenant_id, code)
 );
 
 -- ============================================
@@ -87,13 +97,18 @@ CREATE TABLE tasks (
 -- ============================================
 CREATE TABLE tags (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    name VARCHAR(50) UNIQUE NOT NULL,
+    tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+    name VARCHAR(50) NOT NULL,
     color VARCHAR(7) DEFAULT '#6B7280', -- Hex color
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    -- Tag name must be unique within a tenant
+    UNIQUE(tenant_id, name)
 );
 
 CREATE TABLE task_tags (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
     task_id UUID NOT NULL REFERENCES tasks(id) ON DELETE CASCADE,
     tag_id UUID NOT NULL REFERENCES tags(id) ON DELETE CASCADE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -105,6 +120,7 @@ CREATE TABLE task_tags (
 -- ============================================
 CREATE TABLE task_comments (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
     task_id UUID NOT NULL REFERENCES tasks(id) ON DELETE CASCADE,
     author_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     content TEXT NOT NULL,
@@ -118,6 +134,7 @@ CREATE TABLE task_comments (
 -- ============================================
 CREATE TABLE task_time_logs (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
     task_id UUID NOT NULL REFERENCES tasks(id) ON DELETE CASCADE,
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     hours DECIMAL(10,2) NOT NULL,
@@ -131,6 +148,7 @@ CREATE TABLE task_time_logs (
 -- ============================================
 CREATE TABLE task_attachments (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
     task_id UUID NOT NULL REFERENCES tasks(id) ON DELETE CASCADE,
     uploaded_by UUID REFERENCES users(id) ON DELETE SET NULL,
     file_name VARCHAR(255) NOT NULL,
@@ -143,44 +161,56 @@ CREATE TABLE task_attachments (
 -- ============================================
 -- INDEXES
 -- ============================================
+CREATE INDEX idx_projects_tenant_id ON projects(tenant_id);
 CREATE INDEX idx_projects_status ON projects(status);
 CREATE INDEX idx_projects_owner_id ON projects(owner_id);
 CREATE INDEX idx_projects_created_by ON projects(created_by);
+CREATE INDEX idx_project_members_tenant_id ON project_members(tenant_id);
 CREATE INDEX idx_project_members_project_id ON project_members(project_id);
 CREATE INDEX idx_project_members_user_id ON project_members(user_id);
+CREATE INDEX idx_sprints_tenant_id ON sprints(tenant_id);
 CREATE INDEX idx_sprints_project_id ON sprints(project_id);
 CREATE INDEX idx_sprints_status ON sprints(status);
+CREATE INDEX idx_tasks_tenant_id ON tasks(tenant_id);
 CREATE INDEX idx_tasks_project_id ON tasks(project_id);
 CREATE INDEX idx_tasks_sprint_id ON tasks(sprint_id);
 CREATE INDEX idx_tasks_assignee_id ON tasks(assignee_id);
 CREATE INDEX idx_tasks_status ON tasks(status);
 CREATE INDEX idx_tasks_parent_task_id ON tasks(parent_task_id);
+CREATE INDEX idx_tags_tenant_id ON tags(tenant_id);
+CREATE INDEX idx_task_tags_tenant_id ON task_tags(tenant_id);
+CREATE INDEX idx_task_comments_tenant_id ON task_comments(tenant_id);
 CREATE INDEX idx_task_comments_task_id ON task_comments(task_id);
+CREATE INDEX idx_task_time_logs_tenant_id ON task_time_logs(tenant_id);
 CREATE INDEX idx_task_time_logs_task_id ON task_time_logs(task_id);
 CREATE INDEX idx_task_time_logs_user_id ON task_time_logs(user_id);
+CREATE INDEX idx_task_attachments_tenant_id ON task_attachments(tenant_id);
 CREATE INDEX idx_task_attachments_task_id ON task_attachments(task_id);
 
 -- ============================================
 -- MOCK DATA - TAGS
 -- ============================================
-INSERT INTO tags (id, name, color) VALUES
-('11111111-0001-0001-0001-000000000001', 'frontend', '#3B82F6'),
-('11111111-0001-0001-0001-000000000002', 'backend', '#10B981'),
-('11111111-0001-0001-0001-000000000003', 'mobile', '#8B5CF6'),
-('11111111-0001-0001-0001-000000000004', 'ui', '#F59E0B'),
-('11111111-0001-0001-0001-000000000005', 'design', '#EC4899'),
-('11111111-0001-0001-0001-000000000006', 'bug', '#EF4444'),
-('11111111-0001-0001-0001-000000000007', 'urgent', '#DC2626'),
-('11111111-0001-0001-0001-000000000008', 'auth', '#6366F1'),
-('11111111-0001-0001-0001-000000000009', 'database', '#14B8A6'),
-('11111111-0001-0001-0001-000000000010', 'api', '#84CC16');
+-- Tags for UzzAI Technologies (tenant 1)
+INSERT INTO tags (id, tenant_id, name, color) VALUES
+('11111111-0001-0001-0001-000000000001', '10000000-0000-0000-0000-000000000001', 'frontend', '#3B82F6'),
+('11111111-0001-0001-0001-000000000002', '10000000-0000-0000-0000-000000000001', 'backend', '#10B981'),
+('11111111-0001-0001-0001-000000000003', '10000000-0000-0000-0000-000000000001', 'mobile', '#8B5CF6'),
+('11111111-0001-0001-0001-000000000004', '10000000-0000-0000-0000-000000000001', 'ui', '#F59E0B'),
+('11111111-0001-0001-0001-000000000005', '10000000-0000-0000-0000-000000000001', 'design', '#EC4899'),
+('11111111-0001-0001-0001-000000000006', '10000000-0000-0000-0000-000000000001', 'bug', '#EF4444'),
+('11111111-0001-0001-0001-000000000007', '10000000-0000-0000-0000-000000000001', 'urgent', '#DC2626'),
+('11111111-0001-0001-0001-000000000008', '10000000-0000-0000-0000-000000000001', 'auth', '#6366F1'),
+('11111111-0001-0001-0001-000000000009', '10000000-0000-0000-0000-000000000001', 'database', '#14B8A6'),
+('11111111-0001-0001-0001-000000000010', '10000000-0000-0000-0000-000000000001', 'api', '#84CC16');
 
 -- ============================================
 -- MOCK DATA - PROJECTS
 -- ============================================
-INSERT INTO projects (id, code, name, description, status, priority, start_date, end_date, estimated_hours, completed_hours, budget, spent, client_name, owner_id, created_by) VALUES
+-- Projects for UzzAI Technologies (tenant 1)
+INSERT INTO projects (id, tenant_id, code, name, description, status, priority, start_date, end_date, estimated_hours, completed_hours, budget, spent, client_name, owner_id, created_by) VALUES
 (
     '22222222-0001-0001-0001-000000000001',
+    '10000000-0000-0000-0000-000000000001',
     'ERP-2025',
     'Sistema ERP UZZ.AI',
     'Desenvolvimento completo do sistema ERP unificado com módulos de projetos, financeiro, estoque e inteligência artificial',
@@ -198,6 +228,7 @@ INSERT INTO projects (id, code, name, description, status, priority, start_date,
 ),
 (
     '22222222-0001-0001-0001-000000000002',
+    '10000000-0000-0000-0000-000000000001',
     'WEB-PORTAL',
     'Portal Web Cliente',
     'Portal web para clientes acessarem projetos, documentos e faturas',
@@ -215,6 +246,7 @@ INSERT INTO projects (id, code, name, description, status, priority, start_date,
 ),
 (
     '22222222-0001-0001-0001-000000000003',
+    '10000000-0000-0000-0000-000000000001',
     'MOBILE-APP',
     'App Mobile Gerencial',
     'Aplicativo mobile para gestores acompanharem projetos e equipe em tempo real',
@@ -234,36 +266,37 @@ INSERT INTO projects (id, code, name, description, status, priority, start_date,
 -- ============================================
 -- MOCK DATA - PROJECT MEMBERS
 -- ============================================
-INSERT INTO project_members (project_id, user_id, role, hourly_rate, added_by) VALUES
+INSERT INTO project_members (tenant_id, project_id, user_id, role, hourly_rate, added_by) VALUES
 -- ERP Project
-('22222222-0001-0001-0001-000000000001', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Tech Lead', 150.00, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'),
-('22222222-0001-0001-0001-000000000001', 'cccccccc-cccc-cccc-cccc-cccccccccccc', 'Full Stack Developer', 100.00, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'),
-('22222222-0001-0001-0001-000000000001', 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'Project Manager', 120.00, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'),
-('22222222-0001-0001-0001-000000000001', 'dddddddd-dddd-dddd-dddd-dddddddddddd', 'Business Analyst', 90.00, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'),
+('10000000-0000-0000-0000-000000000001', '22222222-0001-0001-0001-000000000001', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Tech Lead', 150.00, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'),
+('10000000-0000-0000-0000-000000000001', '22222222-0001-0001-0001-000000000001', 'cccccccc-cccc-cccc-cccc-cccccccccccc', 'Full Stack Developer', 100.00, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'),
+('10000000-0000-0000-0000-000000000001', '22222222-0001-0001-0001-000000000001', 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'Project Manager', 120.00, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'),
+('10000000-0000-0000-0000-000000000001', '22222222-0001-0001-0001-000000000001', 'dddddddd-dddd-dddd-dddd-dddddddddddd', 'Business Analyst', 90.00, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'),
 
 -- Portal Web
-('22222222-0001-0001-0001-000000000002', 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'Project Manager', 120.00, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'),
-('22222222-0001-0001-0001-000000000002', 'cccccccc-cccc-cccc-cccc-cccccccccccc', 'Frontend Developer', 100.00, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'),
+('10000000-0000-0000-0000-000000000001', '22222222-0001-0001-0001-000000000002', 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'Project Manager', 120.00, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'),
+('10000000-0000-0000-0000-000000000001', '22222222-0001-0001-0001-000000000002', 'cccccccc-cccc-cccc-cccc-cccccccccccc', 'Frontend Developer', 100.00, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'),
 
 -- Mobile App
-('22222222-0001-0001-0001-000000000003', 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'Project Manager', 120.00, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa');
+('10000000-0000-0000-0000-000000000001', '22222222-0001-0001-0001-000000000003', 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'Project Manager', 120.00, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa');
 
 -- ============================================
 -- MOCK DATA - SPRINTS
 -- ============================================
-INSERT INTO sprints (id, project_id, name, code, start_date, end_date, status, goal) VALUES
-('33333333-0001-0001-0001-000000000001', '22222222-0001-0001-0001-000000000001', 'Sprint 48 - Nov 2025', 'SPRINT-48', '2025-11-18', '2025-12-01', 'active', 'Implementar módulo de autenticação e kanban board'),
-('33333333-0001-0001-0001-000000000002', '22222222-0001-0001-0001-000000000001', 'Sprint 47 - Nov 2025', 'SPRINT-47', '2025-11-04', '2025-11-17', 'completed', 'Design system e componentes base'),
-('33333333-0001-0001-0001-000000000003', '22222222-0001-0001-0001-000000000001', 'Sprint 46 - Out 2025', 'SPRINT-46', '2025-10-21', '2025-11-03', 'completed', 'Setup inicial do projeto e arquitetura'),
-('33333333-0001-0001-0001-000000000004', '22222222-0001-0001-0001-000000000002', 'Sprint 1 - Portal', 'PORTAL-S1', '2025-11-01', '2025-11-15', 'completed', 'Estrutura inicial e login'),
-('33333333-0001-0001-0001-000000000005', '22222222-0001-0001-0001-000000000002', 'Sprint 2 - Portal', 'PORTAL-S2', '2025-11-16', '2025-11-30', 'active', 'Dashboard e listagem de projetos');
+INSERT INTO sprints (id, tenant_id, project_id, name, code, start_date, end_date, status, goal) VALUES
+('33333333-0001-0001-0001-000000000001', '10000000-0000-0000-0000-000000000001', '22222222-0001-0001-0001-000000000001', 'Sprint 48 - Nov 2025', 'SPRINT-48', '2025-11-18', '2025-12-01', 'active', 'Implementar módulo de autenticação e kanban board'),
+('33333333-0001-0001-0001-000000000002', '10000000-0000-0000-0000-000000000001', '22222222-0001-0001-0001-000000000001', 'Sprint 47 - Nov 2025', 'SPRINT-47', '2025-11-04', '2025-11-17', 'completed', 'Design system e componentes base'),
+('33333333-0001-0001-0001-000000000003', '10000000-0000-0000-0000-000000000001', '22222222-0001-0001-0001-000000000001', 'Sprint 46 - Out 2025', 'SPRINT-46', '2025-10-21', '2025-11-03', 'completed', 'Setup inicial do projeto e arquitetura'),
+('33333333-0001-0001-0001-000000000004', '10000000-0000-0000-0000-000000000001', '22222222-0001-0001-0001-000000000002', 'Sprint 1 - Portal', 'PORTAL-S1', '2025-11-01', '2025-11-15', 'completed', 'Estrutura inicial e login'),
+('33333333-0001-0001-0001-000000000005', '10000000-0000-0000-0000-000000000001', '22222222-0001-0001-0001-000000000002', 'Sprint 2 - Portal', 'PORTAL-S2', '2025-11-16', '2025-11-30', 'active', 'Dashboard e listagem de projetos');
 
 -- ============================================
 -- MOCK DATA - TASKS
 -- ============================================
-INSERT INTO tasks (id, code, title, description, status, priority, task_type, project_id, sprint_id, assignee_id, reporter_id, estimated_hours, completed_hours, created_at) VALUES
+INSERT INTO tasks (id, tenant_id, code, title, description, status, priority, task_type, project_id, sprint_id, assignee_id, reporter_id, estimated_hours, completed_hours, created_at) VALUES
 (
     '44444444-0001-0001-0001-000000000001',
+    '10000000-0000-0000-0000-000000000001',
     'TASK-001',
     'Implementar autenticacao com Supabase',
     'Configurar Supabase Auth com JWT e integrar com Doppler para gerenciamento de secrets',
@@ -280,6 +313,7 @@ INSERT INTO tasks (id, code, title, description, status, priority, task_type, pr
 ),
 (
     '44444444-0001-0001-0001-000000000002',
+    '10000000-0000-0000-0000-000000000001',
     'TASK-002',
     'Criar componentes do Kanban Board',
     'Desenvolver KanbanCard, KanbanColumn e KanbanFilters com filtros por sprint e pessoa',
@@ -296,6 +330,7 @@ INSERT INTO tasks (id, code, title, description, status, priority, task_type, pr
 ),
 (
     '44444444-0001-0001-0001-000000000003',
+    '10000000-0000-0000-0000-000000000001',
     'TASK-003',
     'Configurar Capacitor para mobile',
     'Setup inicial do Capacitor e helper de API para detectar Desktop vs Mobile',
@@ -312,6 +347,7 @@ INSERT INTO tasks (id, code, title, description, status, priority, task_type, pr
 ),
 (
     '44444444-0001-0001-0001-000000000004',
+    '10000000-0000-0000-0000-000000000001',
     'TASK-004',
     'Refatorar sidebar para ser colapsavel',
     'Adicionar funcionalidade de expandir/colapsar sidebar com estado no Zustand',
@@ -328,6 +364,7 @@ INSERT INTO tasks (id, code, title, description, status, priority, task_type, pr
 ),
 (
     '44444444-0001-0001-0001-000000000005',
+    '10000000-0000-0000-0000-000000000001',
     'TASK-005',
     'Implementar RAG Insights',
     'Criar modulo de IA para insights automaticos usando RAG',
@@ -344,6 +381,7 @@ INSERT INTO tasks (id, code, title, description, status, priority, task_type, pr
 ),
 (
     '44444444-0001-0001-0001-000000000006',
+    '10000000-0000-0000-0000-000000000001',
     'TASK-006',
     'Design system com cores mais claras',
     'Ajustar paleta de cores para ter background menos escuro e melhor legibilidade',
@@ -360,6 +398,7 @@ INSERT INTO tasks (id, code, title, description, status, priority, task_type, pr
 ),
 (
     '44444444-0001-0001-0001-000000000007',
+    '10000000-0000-0000-0000-000000000001',
     'TASK-007',
     'Corrigir bug no filtro de sprints',
     'Filtro não está mostrando sprints completados',
@@ -376,6 +415,7 @@ INSERT INTO tasks (id, code, title, description, status, priority, task_type, pr
 ),
 (
     '44444444-0001-0001-0001-000000000008',
+    '10000000-0000-0000-0000-000000000001',
     'PORTAL-001',
     'Criar página de login do portal',
     'Design e implementação da tela de login para clientes',
@@ -392,6 +432,7 @@ INSERT INTO tasks (id, code, title, description, status, priority, task_type, pr
 ),
 (
     '44444444-0001-0001-0001-000000000009',
+    '10000000-0000-0000-0000-000000000001',
     'PORTAL-002',
     'Implementar dashboard do cliente',
     'Dashboard com cards de projetos ativos e documentos recentes',
@@ -408,6 +449,7 @@ INSERT INTO tasks (id, code, title, description, status, priority, task_type, pr
 ),
 (
     '44444444-0001-0001-0001-000000000010',
+    '10000000-0000-0000-0000-000000000001',
     'PORTAL-003',
     'Criar API de listagem de projetos',
     'Endpoint para listar projetos do cliente com filtros e paginação',
@@ -426,49 +468,53 @@ INSERT INTO tasks (id, code, title, description, status, priority, task_type, pr
 -- ============================================
 -- MOCK DATA - TASK TAGS
 -- ============================================
-INSERT INTO task_tags (task_id, tag_id) VALUES
-('44444444-0001-0001-0001-000000000001', '11111111-0001-0001-0001-000000000002'), -- backend
-('44444444-0001-0001-0001-000000000001', '11111111-0001-0001-0001-000000000008'), -- auth
-('44444444-0001-0001-0001-000000000002', '11111111-0001-0001-0001-000000000001'), -- frontend
-('44444444-0001-0001-0001-000000000002', '11111111-0001-0001-0001-000000000004'), -- ui
-('44444444-0001-0001-0001-000000000003', '11111111-0001-0001-0001-000000000003'), -- mobile
-('44444444-0001-0001-0001-000000000004', '11111111-0001-0001-0001-000000000001'), -- frontend
-('44444444-0001-0001-0001-000000000004', '11111111-0001-0001-0001-000000000004'), -- ui
-('44444444-0001-0001-0001-000000000005', '11111111-0001-0001-0001-000000000002'), -- backend
-('44444444-0001-0001-0001-000000000005', '11111111-0001-0001-0001-000000000010'), -- api
-('44444444-0001-0001-0001-000000000006', '11111111-0001-0001-0001-000000000005'), -- design
-('44444444-0001-0001-0001-000000000006', '11111111-0001-0001-0001-000000000004'), -- ui
-('44444444-0001-0001-0001-000000000007', '11111111-0001-0001-0001-000000000006'), -- bug
-('44444444-0001-0001-0001-000000000007', '11111111-0001-0001-0001-000000000007'), -- urgent
-('44444444-0001-0001-0001-000000000008', '11111111-0001-0001-0001-000000000001'), -- frontend
-('44444444-0001-0001-0001-000000000009', '11111111-0001-0001-0001-000000000001'), -- frontend
-('44444444-0001-0001-0001-000000000009', '11111111-0001-0001-0001-000000000004'), -- ui
-('44444444-0001-0001-0001-000000000010', '11111111-0001-0001-0001-000000000002'), -- backend
-('44444444-0001-0001-0001-000000000010', '11111111-0001-0001-0001-000000000010'); -- api
+INSERT INTO task_tags (tenant_id, task_id, tag_id) VALUES
+('10000000-0000-0000-0000-000000000001', '44444444-0001-0001-0001-000000000001', '11111111-0001-0001-0001-000000000002'), -- backend
+('10000000-0000-0000-0000-000000000001', '44444444-0001-0001-0001-000000000001', '11111111-0001-0001-0001-000000000008'), -- auth
+('10000000-0000-0000-0000-000000000001', '44444444-0001-0001-0001-000000000002', '11111111-0001-0001-0001-000000000001'), -- frontend
+('10000000-0000-0000-0000-000000000001', '44444444-0001-0001-0001-000000000002', '11111111-0001-0001-0001-000000000004'), -- ui
+('10000000-0000-0000-0000-000000000001', '44444444-0001-0001-0001-000000000003', '11111111-0001-0001-0001-000000000003'), -- mobile
+('10000000-0000-0000-0000-000000000001', '44444444-0001-0001-0001-000000000004', '11111111-0001-0001-0001-000000000001'), -- frontend
+('10000000-0000-0000-0000-000000000001', '44444444-0001-0001-0001-000000000004', '11111111-0001-0001-0001-000000000004'), -- ui
+('10000000-0000-0000-0000-000000000001', '44444444-0001-0001-0001-000000000005', '11111111-0001-0001-0001-000000000002'), -- backend
+('10000000-0000-0000-0000-000000000001', '44444444-0001-0001-0001-000000000005', '11111111-0001-0001-0001-000000000010'), -- api
+('10000000-0000-0000-0000-000000000001', '44444444-0001-0001-0001-000000000006', '11111111-0001-0001-0001-000000000005'), -- design
+('10000000-0000-0000-0000-000000000001', '44444444-0001-0001-0001-000000000006', '11111111-0001-0001-0001-000000000004'), -- ui
+('10000000-0000-0000-0000-000000000001', '44444444-0001-0001-0001-000000000007', '11111111-0001-0001-0001-000000000006'), -- bug
+('10000000-0000-0000-0000-000000000001', '44444444-0001-0001-0001-000000000007', '11111111-0001-0001-0001-000000000007'), -- urgent
+('10000000-0000-0000-0000-000000000001', '44444444-0001-0001-0001-000000000008', '11111111-0001-0001-0001-000000000001'), -- frontend
+('10000000-0000-0000-0000-000000000001', '44444444-0001-0001-0001-000000000009', '11111111-0001-0001-0001-000000000001'), -- frontend
+('10000000-0000-0000-0000-000000000001', '44444444-0001-0001-0001-000000000009', '11111111-0001-0001-0001-000000000004'), -- ui
+('10000000-0000-0000-0000-000000000001', '44444444-0001-0001-0001-000000000010', '11111111-0001-0001-0001-000000000002'), -- backend
+('10000000-0000-0000-0000-000000000001', '44444444-0001-0001-0001-000000000010', '11111111-0001-0001-0001-000000000010'); -- api
 
 -- ============================================
 -- MOCK DATA - TASK COMMENTS
 -- ============================================
-INSERT INTO task_comments (task_id, author_id, content, mentions) VALUES
+INSERT INTO task_comments (tenant_id, task_id, author_id, content, mentions) VALUES
 (
+    '10000000-0000-0000-0000-000000000001',
     '44444444-0001-0001-0001-000000000001',
     'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
     'Ja configurei o client do Supabase, falta integrar com o Doppler',
     ARRAY[]::UUID[]
 ),
 (
+    '10000000-0000-0000-0000-000000000001',
     '44444444-0001-0001-0001-000000000002',
     'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
     'Componentes concluídos e testados. @maria.silva pode revisar?',
     ARRAY['bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb']::UUID[]
 ),
 (
+    '10000000-0000-0000-0000-000000000001',
     '44444444-0001-0001-0001-000000000002',
     'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
     'Revisado e aprovado! Excelente trabalho @luis.boff',
     ARRAY['aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa']::UUID[]
 ),
 (
+    '10000000-0000-0000-0000-000000000001',
     '44444444-0001-0001-0001-000000000003',
     'cccccccc-cccc-cccc-cccc-cccccccccccc',
     'Setup do Capacitor completo. Preciso que @luis.boff revise antes de mergear',
@@ -478,16 +524,16 @@ INSERT INTO task_comments (task_id, author_id, content, mentions) VALUES
 -- ============================================
 -- MOCK DATA - TIME LOGS
 -- ============================================
-INSERT INTO task_time_logs (task_id, user_id, hours, description, logged_date) VALUES
-('44444444-0001-0001-0001-000000000001', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 3, 'Setup inicial do Supabase client', '2025-11-25'),
-('44444444-0001-0001-0001-000000000001', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 2, 'Integração com Doppler', '2025-11-28'),
-('44444444-0001-0001-0001-000000000002', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 4, 'Desenvolvimento dos componentes', '2025-11-27'),
-('44444444-0001-0001-0001-000000000002', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 2, 'Testes e ajustes finais', '2025-11-30'),
-('44444444-0001-0001-0001-000000000003', 'cccccccc-cccc-cccc-cccc-cccccccccccc', 5, 'Configuração do Capacitor', '2025-11-26'),
-('44444444-0001-0001-0001-000000000003', 'cccccccc-cccc-cccc-cccc-cccccccccccc', 4, 'Helper de detecção de plataforma', '2025-11-29'),
-('44444444-0001-0001-0001-000000000006', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 4, 'Ajuste completo das cores', '2025-11-15'),
-('44444444-0001-0001-0001-000000000008', 'cccccccc-cccc-cccc-cccc-cccccccccccc', 6, 'Implementação completa do login', '2025-11-05'),
-('44444444-0001-0001-0001-000000000009', 'cccccccc-cccc-cccc-cccc-cccccccccccc', 4, 'Dashboard parcialmente implementado', '2025-11-20');
+INSERT INTO task_time_logs (tenant_id, task_id, user_id, hours, description, logged_date) VALUES
+('10000000-0000-0000-0000-000000000001', '44444444-0001-0001-0001-000000000001', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 3, 'Setup inicial do Supabase client', '2025-11-25'),
+('10000000-0000-0000-0000-000000000001', '44444444-0001-0001-0001-000000000001', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 2, 'Integração com Doppler', '2025-11-28'),
+('10000000-0000-0000-0000-000000000001', '44444444-0001-0001-0001-000000000002', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 4, 'Desenvolvimento dos componentes', '2025-11-27'),
+('10000000-0000-0000-0000-000000000001', '44444444-0001-0001-0001-000000000002', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 2, 'Testes e ajustes finais', '2025-11-30'),
+('10000000-0000-0000-0000-000000000001', '44444444-0001-0001-0001-000000000003', 'cccccccc-cccc-cccc-cccc-cccccccccccc', 5, 'Configuração do Capacitor', '2025-11-26'),
+('10000000-0000-0000-0000-000000000001', '44444444-0001-0001-0001-000000000003', 'cccccccc-cccc-cccc-cccc-cccccccccccc', 4, 'Helper de detecção de plataforma', '2025-11-29'),
+('10000000-0000-0000-0000-000000000001', '44444444-0001-0001-0001-000000000006', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 4, 'Ajuste completo das cores', '2025-11-15'),
+('10000000-0000-0000-0000-000000000001', '44444444-0001-0001-0001-000000000008', 'cccccccc-cccc-cccc-cccc-cccccccccccc', 6, 'Implementação completa do login', '2025-11-05'),
+('10000000-0000-0000-0000-000000000001', '44444444-0001-0001-0001-000000000009', 'cccccccc-cccc-cccc-cccc-cccccccccccc', 4, 'Dashboard parcialmente implementado', '2025-11-20');
 
 -- ============================================
 -- TRIGGERS

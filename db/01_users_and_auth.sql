@@ -48,7 +48,8 @@ CREATE TABLE role_permissions (
 -- ============================================
 CREATE TABLE users (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    email VARCHAR(255) UNIQUE NOT NULL,
+    tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+    email VARCHAR(255) NOT NULL,
     password_hash TEXT NOT NULL,
     full_name VARCHAR(255) NOT NULL,
     avatar_url TEXT,
@@ -57,7 +58,10 @@ CREATE TABLE users (
     email_verified BOOLEAN DEFAULT FALSE,
     last_login TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    -- Ensure email is unique within a tenant
+    UNIQUE(tenant_id, email)
 );
 
 -- ============================================
@@ -67,9 +71,10 @@ CREATE TABLE user_roles (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     role_id UUID NOT NULL REFERENCES roles(id) ON DELETE CASCADE,
+    tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
     assigned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     assigned_by UUID REFERENCES users(id),
-    UNIQUE(user_id, role_id)
+    UNIQUE(user_id, role_id, tenant_id)
 );
 
 -- ============================================
@@ -77,6 +82,7 @@ CREATE TABLE user_roles (
 -- ============================================
 CREATE TABLE audit_logs (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
     user_id UUID REFERENCES users(id) ON DELETE SET NULL,
     action VARCHAR(100) NOT NULL, -- e.g., 'user.login', 'project.created', 'task.updated'
     entity_type VARCHAR(50), -- e.g., 'user', 'project', 'task'
@@ -91,12 +97,16 @@ CREATE TABLE audit_logs (
 -- ============================================
 -- INDEXES
 -- ============================================
+CREATE INDEX idx_users_tenant_id ON users(tenant_id);
 CREATE INDEX idx_users_email ON users(email);
 CREATE INDEX idx_users_active ON users(is_active);
+CREATE INDEX idx_users_tenant_email ON users(tenant_id, email);
 CREATE INDEX idx_user_roles_user_id ON user_roles(user_id);
 CREATE INDEX idx_user_roles_role_id ON user_roles(role_id);
+CREATE INDEX idx_user_roles_tenant_id ON user_roles(tenant_id);
 CREATE INDEX idx_role_permissions_role_id ON role_permissions(role_id);
 CREATE INDEX idx_role_permissions_permission_id ON role_permissions(permission_id);
+CREATE INDEX idx_audit_logs_tenant_id ON audit_logs(tenant_id);
 CREATE INDEX idx_audit_logs_user_id ON audit_logs(user_id);
 CREATE INDEX idx_audit_logs_created_at ON audit_logs(created_at);
 CREATE INDEX idx_audit_logs_action ON audit_logs(action);
@@ -207,22 +217,46 @@ WHERE code IN (
 -- MOCK DATA - USERS
 -- ============================================
 -- Password: admin123 (hashed with bcrypt)
-INSERT INTO users (id, email, password_hash, full_name, avatar_url, phone, is_active, email_verified) VALUES
-('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'admin@uzz.ai', '$2b$10$rXQZJ0QYP.QHpZTqW6qR9OXqZ5L5fZ5YJZqZ5L5fZ5YJZqZ5L5fZ5', 'Luis Boff', NULL, '+55 47 99999-0001', TRUE, TRUE),
-('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'maria.silva@uzz.ai', '$2b$10$rXQZJ0QYP.QHpZTqW6qR9OXqZ5L5fZ5YJZqZ5L5fZ5YJZqZ5L5fZ5', 'Maria Silva', NULL, '+55 47 99999-0002', TRUE, TRUE),
-('cccccccc-cccc-cccc-cccc-cccccccccccc', 'joao.santos@uzz.ai', '$2b$10$rXQZJ0QYP.QHpZTqW6qR9OXqZ5L5fZ5YJZqZ5L5fZ5YJZqZ5L5fZ5', 'João Santos', NULL, '+55 47 99999-0003', TRUE, TRUE),
-('dddddddd-dddd-dddd-dddd-dddddddddddd', 'ana.costa@uzz.ai', '$2b$10$rXQZJ0QYP.QHpZTqW6qR9OXqZ5L5fZ5YJZqZ5L5fZ5YJZqZ5L5fZ5', 'Ana Costa', NULL, '+55 47 99999-0004', TRUE, TRUE),
-('eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee', 'pedro.oliveira@uzz.ai', '$2b$10$rXQZJ0QYP.QHpZTqW6qR9OXqZ5L5fZ5YJZqZ5L5fZ5YJZqZ5L5fZ5', 'Pedro Oliveira', NULL, '+55 47 99999-0005', TRUE, TRUE);
+-- UzzAI Technologies users
+INSERT INTO users (id, tenant_id, email, password_hash, full_name, avatar_url, phone, is_active, email_verified) VALUES
+('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '10000000-0000-0000-0000-000000000001', 'admin@uzz.ai', '$2b$10$rXQZJ0QYP.QHpZTqW6qR9OXqZ5L5fZ5YJZqZ5L5fZ5YJZqZ5L5fZ5', 'Luis Boff', NULL, '+55 47 99999-0001', TRUE, TRUE),
+('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', '10000000-0000-0000-0000-000000000001', 'maria.silva@uzz.ai', '$2b$10$rXQZJ0QYP.QHpZTqW6qR9OXqZ5L5fZ5YJZqZ5L5fZ5YJZqZ5L5fZ5', 'Maria Silva', NULL, '+55 47 99999-0002', TRUE, TRUE),
+('cccccccc-cccc-cccc-cccc-cccccccccccc', '10000000-0000-0000-0000-000000000001', 'joao.santos@uzz.ai', '$2b$10$rXQZJ0QYP.QHpZTqW6qR9OXqZ5L5fZ5YJZqZ5L5fZ5YJZqZ5L5fZ5', 'João Santos', NULL, '+55 47 99999-0003', TRUE, TRUE),
+('dddddddd-dddd-dddd-dddd-dddddddddddd', '10000000-0000-0000-0000-000000000001', 'ana.costa@uzz.ai', '$2b$10$rXQZJ0QYP.QHpZTqW6qR9OXqZ5L5fZ5YJZqZ5L5fZ5YJZqZ5L5fZ5', 'Ana Costa', NULL, '+55 47 99999-0004', TRUE, TRUE),
+('eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee', '10000000-0000-0000-0000-000000000001', 'pedro.oliveira@uzz.ai', '$2b$10$rXQZJ0QYP.QHpZTqW6qR9OXqZ5L5fZ5YJZqZ5L5fZ5YJZqZ5L5fZ5', 'Pedro Oliveira', NULL, '+55 47 99999-0005', TRUE, TRUE);
+
+-- Empresa Demo A users
+INSERT INTO users (id, tenant_id, email, password_hash, full_name, avatar_url, phone, is_active, email_verified) VALUES
+('aaaaaaaa-aaaa-aaaa-aaaa-bbbbbbbbbbbb', '10000000-0000-0000-0000-000000000002', 'admin@empresaa.com.br', '$2b$10$rXQZJ0QYP.QHpZTqW6qR9OXqZ5L5fZ5YJZqZ5L5fZ5YJZqZ5L5fZ5', 'Carlos Souza', NULL, '+55 11 98888-0002', TRUE, TRUE),
+('bbbbbbbb-bbbb-bbbb-bbbb-cccccccccccc', '10000000-0000-0000-0000-000000000002', 'gestor@empresaa.com.br', '$2b$10$rXQZJ0QYP.QHpZTqW6qR9OXqZ5L5fZ5YJZqZ5L5fZ5YJZqZ5L5fZ5', 'Paula Santos', NULL, '+55 11 98888-0003', TRUE, TRUE),
+('cccccccc-cccc-cccc-cccc-dddddddddddd', '10000000-0000-0000-0000-000000000002', 'financeiro@empresaa.com.br', '$2b$10$rXQZJ0QYP.QHpZTqW6qR9OXqZ5L5fZ5YJZqZ5L5fZ5YJZqZ5L5fZ5', 'Roberto Lima', NULL, '+55 11 98888-0004', TRUE, TRUE);
+
+-- Startup Beta users
+INSERT INTO users (id, tenant_id, email, password_hash, full_name, avatar_url, phone, is_active, email_verified) VALUES
+('aaaaaaaa-aaaa-aaaa-aaaa-dddddddddddd', '10000000-0000-0000-0000-000000000003', 'admin@startupbeta.io', '$2b$10$rXQZJ0QYP.QHpZTqW6qR9OXqZ5L5fZ5YJZqZ5L5fZ5YJZqZ5L5fZ5', 'Felipe Costa', NULL, '+55 21 97777-0002', TRUE, TRUE),
+('bbbbbbbb-bbbb-bbbb-bbbb-eeeeeeeeeeee', '10000000-0000-0000-0000-000000000003', 'dev@startupbeta.io', '$2b$10$rXQZJ0QYP.QHpZTqW6qR9OXqZ5L5fZ5YJZqZ5L5fZ5YJZqZ5L5fZ5', 'Julia Martins', NULL, '+55 21 97777-0003', TRUE, TRUE);
 
 -- ============================================
 -- MOCK DATA - USER ROLES
 -- ============================================
-INSERT INTO user_roles (user_id, role_id, assigned_by) VALUES
-('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '11111111-1111-1111-1111-111111111111', NULL), -- Luis = Admin
-('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', '22222222-2222-2222-2222-222222222222', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'), -- Maria = Gestor
-('cccccccc-cccc-cccc-cccc-cccccccccccc', '55555555-5555-5555-5555-555555555555', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'), -- João = Dev
-('dddddddd-dddd-dddd-dddd-dddddddddddd', '33333333-3333-3333-3333-333333333333', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'), -- Ana = Financeiro
-('eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee', '44444444-4444-4444-4444-444444444444', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'); -- Pedro = Jurídico
+-- UzzAI Technologies user roles
+INSERT INTO user_roles (user_id, role_id, tenant_id, assigned_by) VALUES
+('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '11111111-1111-1111-1111-111111111111', '10000000-0000-0000-0000-000000000001', NULL), -- Luis = Admin
+('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', '22222222-2222-2222-2222-222222222222', '10000000-0000-0000-0000-000000000001', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'), -- Maria = Gestor
+('cccccccc-cccc-cccc-cccc-cccccccccccc', '55555555-5555-5555-5555-555555555555', '10000000-0000-0000-0000-000000000001', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'), -- João = Dev
+('dddddddd-dddd-dddd-dddd-dddddddddddd', '33333333-3333-3333-3333-333333333333', '10000000-0000-0000-0000-000000000001', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'), -- Ana = Financeiro
+('eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee', '44444444-4444-4444-4444-444444444444', '10000000-0000-0000-0000-000000000001', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'); -- Pedro = Jurídico
+
+-- Empresa Demo A user roles
+INSERT INTO user_roles (user_id, role_id, tenant_id, assigned_by) VALUES
+('aaaaaaaa-aaaa-aaaa-aaaa-bbbbbbbbbbbb', '11111111-1111-1111-1111-111111111111', '10000000-0000-0000-0000-000000000002', NULL), -- Carlos = Admin
+('bbbbbbbb-bbbb-bbbb-bbbb-cccccccccccc', '22222222-2222-2222-2222-222222222222', '10000000-0000-0000-0000-000000000002', 'aaaaaaaa-aaaa-aaaa-aaaa-bbbbbbbbbbbb'), -- Paula = Gestor
+('cccccccc-cccc-cccc-cccc-dddddddddddd', '33333333-3333-3333-3333-333333333333', '10000000-0000-0000-0000-000000000002', 'aaaaaaaa-aaaa-aaaa-aaaa-bbbbbbbbbbbb'); -- Roberto = Financeiro
+
+-- Startup Beta user roles
+INSERT INTO user_roles (user_id, role_id, tenant_id, assigned_by) VALUES
+('aaaaaaaa-aaaa-aaaa-aaaa-dddddddddddd', '11111111-1111-1111-1111-111111111111', '10000000-0000-0000-0000-000000000003', NULL), -- Felipe = Admin
+('bbbbbbbb-bbbb-bbbb-bbbb-eeeeeeeeeeee', '55555555-5555-5555-5555-555555555555', '10000000-0000-0000-0000-000000000003', 'aaaaaaaa-aaaa-aaaa-aaaa-dddddddddddd'); -- Julia = Dev
 
 -- ============================================
 -- TRIGGERS FOR UPDATED_AT

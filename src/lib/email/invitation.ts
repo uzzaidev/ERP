@@ -40,7 +40,21 @@ export async function sendInvitationEmail(data: InvitationEmailData): Promise<vo
 
   try {
     // Dynamic import to avoid errors if resend is not installed
-    const { Resend } = await import('resend');
+    let Resend;
+    try {
+      const resendModule = await import('resend');
+      Resend = resendModule.Resend;
+    } catch (importError) {
+      console.warn('⚠️  Resend package not installed. To enable email sending, run: npm install resend');
+      console.log('Invitation details:', {
+        to,
+        tenantName,
+        roleName,
+        invitedBy,
+        invitationLink
+      });
+      return;
+    }
     const resend = new Resend(resendApiKey);
 
     const { data: emailData, error } = await resend.emails.send({

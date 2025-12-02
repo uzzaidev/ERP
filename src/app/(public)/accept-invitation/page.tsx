@@ -38,18 +38,8 @@ export default function AcceptInvitationPage() {
     confirmPassword: '',
   });
 
-  // Validate token on mount
-  useEffect(() => {
-    if (!token) {
-      setError('Token de convite inválido ou ausente');
-      setLoading(false);
-      return;
-    }
-
-    validateToken();
-  }, [token]);
-
-  const validateToken = async () => {
+  // Validate token function
+  const validateToken = React.useCallback(async () => {
     try {
       const response = await fetch(`/api/invitations/accept?token=${token}`);
       const data = await response.json();
@@ -64,7 +54,18 @@ export default function AcceptInvitationPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [token]);
+
+  // Validate token on mount
+  useEffect(() => {
+    if (!token) {
+      setError('Token de convite inválido ou ausente');
+      setLoading(false);
+      return;
+    }
+
+    validateToken();
+  }, [token, validateToken]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

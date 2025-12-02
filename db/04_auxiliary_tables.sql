@@ -7,6 +7,9 @@
 -- ============================================
 DROP TABLE IF EXISTS document_shares CASCADE;
 DROP TABLE IF EXISTS documents CASCADE;
+DROP TABLE IF EXISTS recurring_transactions CASCADE;
+DROP TABLE IF EXISTS email_templates CASCADE;
+DROP TABLE IF EXISTS api_keys CASCADE;
 DROP TABLE IF EXISTS webhook_logs CASCADE;
 DROP TABLE IF EXISTS webhooks CASCADE;
 DROP TABLE IF EXISTS favorites CASCADE;

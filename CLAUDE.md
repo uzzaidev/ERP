@@ -230,7 +230,7 @@ import { createClient } from '@/lib/supabase/client';
 const supabase = createClient();
 ```
 
-### Testing
+### Testing & Quality Assurance
 
 **Test setup**: `__tests__/setup.ts` configures Jest environment
 **Coverage thresholds**: 50% minimum (branches, functions, lines, statements)
@@ -240,6 +240,28 @@ const supabase = createClient();
 - Mock Supabase client for API route tests
 - Integration tests require `INTEGRATION_TEST=true` environment variable
 - API tests should verify multi-tenant isolation
+
+**QA Workflow** (⚠️ IMPORTANT):
+```bash
+# ALWAYS run before commits/deploys
+pnpm qa          # Full QA (lint + types + tests + build)
+pnpm qa:win      # Windows PowerShell version
+
+# After schema changes
+pnpm test:integration
+
+# During development
+pnpm test:watch
+```
+
+**Critical QA Rules**:
+- ✅ Run `pnpm qa` before EVERY important commit
+- ✅ Run `pnpm test:integration` after SQL schema changes
+- ✅ Run `pnpm qa` before EVERY deploy
+- ❌ Never commit failing tests
+- ❌ Never skip QA before production deploys
+
+See [docs/3. QA/QA_WORKFLOW.md](docs/3.%20QA/QA_WORKFLOW.md) for complete QA documentation.
 
 ### Environment Variables
 

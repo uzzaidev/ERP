@@ -4,6 +4,10 @@ jest.mock('@/lib/supabase/server', () => ({
   createClient: jest.fn(),
 }));
 
+jest.mock('@/lib/supabase/tenant', () => ({
+  getTenantContext: jest.fn(),
+}));
+
 jest.mock('next/server', () => ({
   NextResponse: {
     json: (data: any, init?: any) => ({
@@ -18,6 +22,19 @@ describe('/api/tasks', () => {
   let mockQuery: any;
 
   beforeEach(() => {
+    // Mock getTenantContext to return test tenant
+    const { getTenantContext } = require('@/lib/supabase/tenant');
+    (getTenantContext as jest.Mock).mockResolvedValue({
+      tenantId: 'test-tenant-id',
+      userId: 'test-user-id',
+      user: {
+        id: 'test-user-id',
+        tenant_id: 'test-tenant-id',
+        email: 'test@example.com',
+        full_name: 'Test User',
+      },
+    });
+
     // Create a chainable query mock that returns itself for all methods
     mockQuery = {
       select: jest.fn(),
@@ -25,7 +42,7 @@ describe('/api/tasks', () => {
       update: jest.fn(),
       single: jest.fn(),
     };
-    
+
     // Make all methods chainable (return mockQuery)
     mockQuery.select.mockReturnValue(mockQuery);
     mockQuery.eq.mockReturnValue(mockQuery);
@@ -35,7 +52,7 @@ describe('/api/tasks', () => {
     mockSupabase = {
       from: jest.fn().mockReturnValue(mockQuery),
     };
-    
+
     (createClient as jest.Mock).mockResolvedValue(mockSupabase);
   });
 
@@ -54,9 +71,9 @@ describe('/api/tasks', () => {
         },
       ];
 
-      mockQuery.select.mockResolvedValue({
-        data: mockTasks,
-        error: null,
+      // Make the final query awaitable
+      Object.assign(mockQuery, {
+        then: (resolve: any) => resolve({ data: mockTasks, error: null }),
       });
 
       const { GET } = await import('@/app/api/tasks/route');
@@ -65,7 +82,7 @@ describe('/api/tasks', () => {
           searchParams: new URLSearchParams(),
         },
       } as any;
-      
+
       const response = await GET(request);
       const data = await response.json();
 
@@ -84,13 +101,10 @@ describe('/api/tasks', () => {
         },
       ];
 
-      // Mock the final result when eq is called
-      const finalQuery = {
-        ...mockQuery,
+      // Make the query awaitable
+      Object.assign(mockQuery, {
         then: (resolve: any) => resolve({ data: mockTasks, error: null }),
-      };
-      
-      mockQuery.eq.mockReturnValue(finalQuery);
+      });
 
       const { GET } = await import('@/app/api/tasks/route');
       const request = {
@@ -98,7 +112,7 @@ describe('/api/tasks', () => {
           searchParams: new URLSearchParams(`project_id=${projectId}`),
         },
       } as any;
-      
+
       const response = await GET(request);
       const data = await response.json();
 
@@ -109,14 +123,11 @@ describe('/api/tasks', () => {
 
     it('should filter tasks by status', async () => {
       const status = 'in-progress';
-      
-      // Mock the final result
-      const finalQuery = {
-        ...mockQuery,
+
+      // Make the query awaitable
+      Object.assign(mockQuery, {
         then: (resolve: any) => resolve({ data: [], error: null }),
-      };
-      
-      mockQuery.eq.mockReturnValue(finalQuery);
+      });
 
       const { GET } = await import('@/app/api/tasks/route');
       const request = {
@@ -124,7 +135,7 @@ describe('/api/tasks', () => {
           searchParams: new URLSearchParams(`status=${status}`),
         },
       } as any;
-      
+
       await GET(request);
 
       expect(mockQuery.eq).toHaveBeenCalledWith('status', status);
@@ -141,7 +152,14 @@ describe('/api/tasks', () => {
         title: 'Updated Task',
       };
 
-      mockQuery.single.mockResolvedValue({
+      // Mock the tenant verification query (first .select().eq().single())
+      mockQuery.single.mockResolvedValueOnce({
+        data: { tenant_id: 'test-tenant-id' },
+        error: null,
+      });
+
+      // Mock the update query (second .update().eq().select().single())
+      mockQuery.single.mockResolvedValueOnce({
         data: updatedTask,
         error: null,
       });
@@ -167,7 +185,14 @@ describe('/api/tasks', () => {
         assigned_to: userId,
       };
 
-      mockQuery.single.mockResolvedValue({
+      // Mock the tenant verification query
+      mockQuery.single.mockResolvedValueOnce({
+        data: { tenant_id: 'test-tenant-id' },
+        error: null,
+      });
+
+      // Mock the update query
+      mockQuery.single.mockResolvedValueOnce({
         data: updatedTask,
         error: null,
       });
@@ -186,7 +211,9 @@ describe('/api/tasks', () => {
 
     it('should handle update errors', async () => {
       const mockError = { message: 'Update failed' };
-      mockQuery.single.mockResolvedValue({
+
+      // Mock the tenant verification to return null (task not found)
+      mockQuery.single.mockResolvedValueOnce({
         data: null,
         error: mockError,
       });
@@ -199,7 +226,7 @@ describe('/api/tasks', () => {
       const response = await PATCH(request);
       const data = await response.json();
 
-      expect(response.status).toBe(500);
+      expect(response.status).toBe(404);
       expect(data.success).toBe(false);
     });
   });

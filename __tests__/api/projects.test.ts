@@ -5,6 +5,11 @@ jest.mock('@/lib/supabase/server', () => ({
   createClient: jest.fn(),
 }));
 
+// Mock tenant context
+jest.mock('@/lib/supabase/tenant', () => ({
+  getTenantContext: jest.fn(),
+}));
+
 // Mock Next.js
 jest.mock('next/server', () => ({
   NextResponse: {
@@ -19,9 +24,23 @@ describe('/api/projects', () => {
   let mockSupabase: any;
 
   beforeEach(() => {
+    // Mock getTenantContext to return test tenant
+    const { getTenantContext } = require('@/lib/supabase/tenant');
+    (getTenantContext as jest.Mock).mockResolvedValue({
+      tenantId: 'test-tenant-id',
+      userId: 'test-user-id',
+      user: {
+        id: 'test-user-id',
+        tenant_id: 'test-tenant-id',
+        email: 'test@example.com',
+        full_name: 'Test User',
+      },
+    });
+
     mockSupabase = {
       from: jest.fn().mockReturnThis(),
       select: jest.fn().mockReturnThis(),
+      eq: jest.fn().mockReturnThis(),
       order: jest.fn().mockReturnThis(),
     };
     (createClient as jest.Mock).mockResolvedValue(mockSupabase);

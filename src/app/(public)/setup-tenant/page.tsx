@@ -37,7 +37,7 @@ export default function SetupTenantPage() {
       // Buscar dados do usuário na tabela users
       const { data: userData, error: fetchUserError } = await supabase
         .from('users')
-        .select('id, email, full_name, tenant_id')
+        .select('id, email, full_name, tenant_id, is_active')
         .eq('id', user.id)
         .single();
 
@@ -48,8 +48,61 @@ export default function SetupTenantPage() {
         return;
       }
 
-      if (userData.tenant_id) {
-        setError("Você já está vinculado a uma empresa");
+      // Caso especial: usuário tem tenant mas está inativo
+      // (resolve o loop "precisa vincular" vs "já vinculado")
+      if (userData.tenant_id && !userData.is_active) {
+        console.log('User has tenant but is inactive, activating...');
+
+        // Ativar usuário
+        const { error: activateError } = await supabase
+          .from('users')
+          .update({ is_active: true })
+          .eq('id', user.id);
+
+        if (activateError) {
+          console.error('Error activating user:', activateError);
+          setError("Erro ao ativar usuário");
+          setLoading(false);
+          return;
+        }
+
+        // Garantir que tem role atribuída
+        const { data: adminRole } = await supabase
+          .from('roles')
+          .select('id')
+          .eq('name', 'admin')
+          .single();
+
+        if (adminRole) {
+          // Verificar se já tem role
+          const { data: existingRole } = await supabase
+            .from('user_roles')
+            .select('id')
+            .eq('user_id', user.id)
+            .eq('tenant_id', userData.tenant_id)
+            .single();
+
+          if (!existingRole) {
+            await supabase.from('user_roles').insert({
+              user_id: user.id,
+              role_id: adminRole.id,
+              tenant_id: userData.tenant_id,
+              assigned_by: user.id,
+            });
+          }
+        }
+
+        setSuccess(true);
+        setTimeout(() => {
+          router.push('/dashboard');
+          router.refresh();
+        }, 2000);
+        return;
+      }
+
+      // Caso normal: usuário já está ativo e vinculado
+      if (userData.tenant_id && userData.is_active) {
+        setError("Você já está vinculado e ativo em uma empresa");
         setLoading(false);
         return;
       }
@@ -93,7 +146,6 @@ export default function SetupTenantPage() {
           .from('users')
           .update({
             tenant_id: tenant.id,
-            role_name: 'admin',
             is_active: true,
           })
           .eq('id', user.id);
@@ -103,6 +155,29 @@ export default function SetupTenantPage() {
           setError("Erro ao vincular usuário");
           setLoading(false);
           return;
+        }
+
+        // Atribuir role de admin ao usuário
+        const { data: adminRole } = await supabase
+          .from('roles')
+          .select('id')
+          .eq('name', 'admin')
+          .single();
+
+        if (adminRole) {
+          const { error: roleError } = await supabase
+            .from('user_roles')
+            .insert({
+              user_id: user.id,
+              role_id: adminRole.id,
+              tenant_id: tenant.id,
+              assigned_by: user.id, // Self-assigned
+            });
+
+          if (roleError) {
+            console.error('Error assigning role:', roleError);
+            // Continue anyway, user is linked to tenant
+          }
         }
 
         setSuccess(true);

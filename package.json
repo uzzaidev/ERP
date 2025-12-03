@@ -15,6 +15,8 @@
     "test:integration": "cross-env INTEGRATION_TEST=true jest __tests__/integration",
     "test:all": "jest",
     "test:coverage": "jest --coverage --testPathIgnorePatterns=integration",
+    "qa": "bash scripts/qa-complete.sh",
+    "qa:win": "powershell -ExecutionPolicy Bypass -File scripts/qa-complete.ps1",
     "cap:sync": "npx cap sync",
     "cap:android": "npx cap open android",
     "cap:ios": "npx cap open ios"

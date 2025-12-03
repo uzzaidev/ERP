@@ -3,6 +3,7 @@
 import { Sidebar, Topbar } from "@/components/layout";
 import { useUIStore } from "@/lib/stores";
 import { TenantProvider } from "@/lib/hooks";
+import { RequireTenantSetup } from "@/components/auth/require-tenant-setup";
 
 export default function AuthLayout({
   children,
@@ -12,14 +13,16 @@ export default function AuthLayout({
   const { sidebarCollapsed } = useUIStore();
 
   return (
-    <TenantProvider>
-      <div className="min-h-screen bg-background">
-        <Sidebar />
-        <div className={sidebarCollapsed ? "lg:pl-16" : "lg:pl-72"}>
-          <Topbar />
-          <main className="p-6 lg:p-8">{children}</main>
+    <RequireTenantSetup>
+      <TenantProvider>
+        <div className="min-h-screen bg-background">
+          <Sidebar />
+          <div className={sidebarCollapsed ? "lg:pl-16" : "lg:pl-72"}>
+            <Topbar />
+            <main className="p-6 lg:p-8">{children}</main>
+          </div>
         </div>
-      </div>
-    </TenantProvider>
+      </TenantProvider>
+    </RequireTenantSetup>
   );
 }

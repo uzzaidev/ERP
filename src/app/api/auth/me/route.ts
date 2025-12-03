@@ -1,30 +1,35 @@
 import { NextResponse } from 'next/server';
-import { getCurrentUser } from '@/lib/supabase/auth';
+import { getTenantContext } from '@/lib/supabase/tenant';
+import { handleApiError } from '@/lib/api-errors';
+import { createClient } from '@/lib/supabase/server';
 
 /**
  * GET /api/auth/me
- * Retorna o usuário autenticado atual
+ * Retorna o usuário autenticado atual com contexto do tenant
  */
 export async function GET() {
   try {
-    const { user, error } = await getCurrentUser();
+    const context = await getTenantContext();
 
-    if (error || !user) {
-      return NextResponse.json(
-        { success: false, error: 'Não autenticado' },
-        { status: 401 }
-      );
+    // Se tenant não veio nos dados, buscar separadamente
+    if (!context.user.tenant && context.user.tenant_id) {
+      const supabase = await createClient();
+      const { data: tenantData } = await supabase
+        .from('tenants')
+        .select('id, name, slug, plan, status, max_users, max_projects')
+        .eq('id', context.user.tenant_id)
+        .single();
+
+      if (tenantData) {
+        context.user.tenant = tenantData;
+      }
     }
 
-    return NextResponse.json({ 
-      success: true, 
-      data: user 
+    return NextResponse.json({
+      success: true,
+      user: context.user
     });
   } catch (error) {
-    console.error('Error fetching current user:', error);
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }

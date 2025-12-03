@@ -84,7 +84,6 @@ export async function signUp(data: SignUpData) {
         tenant_id: tenant.id,
         email,
         full_name: name,
-        role_name: 'admin', // Primeiro usuário é admin
         is_active: true,
         email_verified: false,
       });
@@ -92,6 +91,22 @@ export async function signUp(data: SignUpData) {
       if (userError) {
         console.error('Error creating user record:', userError);
         return { data: null, error: userError, mode: 'create' };
+      }
+
+      // Atribuir role de admin ao primeiro usuário
+      const { data: adminRole } = await supabase
+        .from('roles')
+        .select('id')
+        .eq('name', 'admin')
+        .single();
+
+      if (adminRole) {
+        await supabase.from('user_roles').insert({
+          user_id: authData.user.id,
+          role_id: adminRole.id,
+          tenant_id: tenant.id,
+          assigned_by: authData.user.id, // Self-assigned
+        });
       }
 
       return { data: { ...authData, tenant }, error: null, mode: 'create' };
@@ -128,7 +143,6 @@ export async function signUp(data: SignUpData) {
         tenant_id: null, // Sem tenant até aprovação
         email,
         full_name: name,
-        role_name: 'member',
         is_active: false, // Inativo até aprovação
         email_verified: false,
       });

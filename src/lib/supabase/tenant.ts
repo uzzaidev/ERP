@@ -26,15 +26,15 @@ export interface TenantContext {
 /**
  * Get tenant context from authenticated session
  * Extracts tenant_id from the user's database record
- * 
+ *
  * @throws Error if user is not authenticated or tenant not found
  */
 export async function getTenantContext(): Promise<TenantContext> {
   const supabase = await createClient();
-  
+
   // Get authenticated user
   const { data: { user }, error: authError } = await supabase.auth.getUser();
-  
+
   if (authError || !user) {
     throw new Error('Not authenticated');
   }
@@ -47,19 +47,36 @@ export async function getTenantContext(): Promise<TenantContext> {
       tenant_id,
       email,
       full_name,
+      is_active,
       tenant:tenants(id, name, slug, plan, status, max_users, max_projects)
     `)
     .eq('id', user.id)
     .single();
 
-  if (userError || !userData || !userData.tenant_id) {
-    throw new Error('Tenant not found for user');
+  if (userError || !userData) {
+    throw new Error('User not found in database');
+  }
+
+  // Usuário sem tenant ou inativo = precisa passar por /setup-tenant
+  if (!userData.tenant_id || !userData.is_active) {
+    const error = new Error('Tenant not configured for user') as Error & { code: string; needsSetup: boolean };
+    error.code = 'TENANT_NOT_CONFIGURED';
+    error.needsSetup = true;
+    throw error;
   }
 
   // Transform the tenant array to a single object (if it exists)
-  const tenantData = Array.isArray(userData.tenant) && userData.tenant.length > 0 
-    ? userData.tenant[0] 
-    : undefined;
+  // Supabase retorna relações como array mesmo quando é one-to-one
+  let tenantData = undefined;
+
+  if (userData.tenant) {
+    if (Array.isArray(userData.tenant) && userData.tenant.length > 0) {
+      tenantData = userData.tenant[0];
+    } else if (!Array.isArray(userData.tenant)) {
+      // Às vezes retorna como objeto direto
+      tenantData = userData.tenant;
+    }
+  }
 
   return {
     tenantId: userData.tenant_id,

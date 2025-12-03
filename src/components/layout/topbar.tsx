@@ -9,6 +9,11 @@ interface CurrentUser {
   full_name: string;
   email: string;
   avatar_url?: string;
+  tenant?: {
+    id: string;
+    name: string;
+    slug: string;
+  };
 }
 
 export function Topbar() {
@@ -26,13 +31,20 @@ export function Topbar() {
       .catch(err => console.error('Error fetching current user:', err));
   }, []);
 
-  const displayName = currentUser?.full_name?.split(' ')[0] || 'Usuário';
+  // Pegar primeiro e último nome
+  const nameParts = currentUser?.full_name?.split(' ') || [];
+  const displayName = nameParts.length > 1
+    ? `${nameParts[0]} ${nameParts[nameParts.length - 1]}`
+    : nameParts[0] || 'Usuário';
+
   const initials = currentUser?.full_name
     ?.split(' ')
     .map(n => n[0])
     .slice(0, 2)
     .join('')
     .toUpperCase() || 'U';
+
+  const tenantName = currentUser?.tenant?.name || 'Sem empresa';
 
   return (
     <header className="sticky top-0 z-30 border-b border-slate-700/30 bg-slate-900/80 backdrop-blur-xl">
@@ -68,8 +80,9 @@ export function Topbar() {
                 {initials}
               </div>
             )}
-            <div className="hidden text-sm text-white sm:block">
-              <p className="font-medium">{displayName}</p>
+            <div className="hidden text-sm sm:block">
+              <p className="font-medium text-white leading-tight">{displayName}</p>
+              <p className="text-xs text-slate-400 leading-tight">{tenantName}</p>
             </div>
           </button>
         </div>

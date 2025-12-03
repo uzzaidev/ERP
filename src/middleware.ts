@@ -3,16 +3,18 @@ import { createClient } from '@/lib/supabase/server';
 
 /**
  * Middleware para proteger rotas autenticadas
- * 
- * Rotas públicas: /, /login, /registro
+ *
+ * Rotas públicas: /, /login, /registro, /setup-tenant, /accept-invitation
  * Rotas protegidas: todas em (auth)
+ *
+ * Também verifica se usuário tem tenant_id e redireciona para /setup-tenant se não tiver
  */
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Rotas públicas que não precisam de auth
-  const publicRoutes = ['/', '/login', '/registro'];
-  const isPublicRoute = publicRoutes.some(route => pathname === route);
+  const publicRoutes = ['/', '/login', '/registro', '/setup-tenant', '/accept-invitation'];
+  const isPublicRoute = publicRoutes.some(route => pathname === route || pathname.startsWith(route));
 
   if (isPublicRoute) {
     return NextResponse.next();
@@ -30,11 +32,33 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(redirectUrl);
     }
 
-    // Se está autenticado, permite acesso
+    // Verificar se usuário tem tenant_id
+    const { data: user, error: userError } = await supabase
+      .from('users')
+      .select('id, tenant_id, is_active')
+      .eq('id', session.user.id)
+      .single();
+
+    if (userError) {
+      console.error('Error fetching user in middleware:', userError);
+      // Em caso de erro, permite acesso (evita loop)
+      return NextResponse.next();
+    }
+
+    // Se usuário não tem tenant_id OU não está ativo, redireciona para setup-tenant
+    if (!user.tenant_id || !user.is_active) {
+      // Não redireciona se já está na página de setup-tenant
+      if (!pathname.startsWith('/setup-tenant')) {
+        const redirectUrl = new URL('/setup-tenant', request.url);
+        return NextResponse.redirect(redirectUrl);
+      }
+    }
+
+    // Se está autenticado e tem tenant, permite acesso
     return NextResponse.next();
   } catch (error) {
     console.error('Middleware error:', error);
-    
+
     // Em caso de erro, redireciona para login por segurança
     const redirectUrl = new URL('/login', request.url);
     return NextResponse.redirect(redirectUrl);

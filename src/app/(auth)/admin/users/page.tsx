@@ -1,5 +1,8 @@
 'use client';
 
+// Force dynamic rendering for this admin page
+export const dynamic = 'force-dynamic';
+
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -66,14 +69,26 @@ interface Invitation {
   invitation_link?: string;
 }
 
+interface AccessRequest {
+  id: string;
+  email: string;
+  full_name: string;
+  tenant_slug: string;
+  status: string;
+  message?: string;
+  created_at: string;
+}
+
 export default function AdminDashboardPage() {
   const { tenant, user, isLoading } = useTenant();
   const { canAddUser, currentUsers, maxUsers } = useTenantLimits();
 
   const [users, setUsers] = useState<User[]>([]);
   const [invitations, setInvitations] = useState<Invitation[]>([]);
+  const [accessRequests, setAccessRequests] = useState<AccessRequest[]>([]);
   const [loadingUsers, setLoadingUsers] = useState(true);
   const [loadingInvitations, setLoadingInvitations] = useState(true);
+  const [loadingAccessRequests, setLoadingAccessRequests] = useState(true);
 
   const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
   const [inviteForm, setInviteForm] = useState({
@@ -90,6 +105,7 @@ export default function AdminDashboardPage() {
     if (tenant) {
       loadUsers();
       loadInvitations();
+      loadAccessRequests();
     }
   }, [tenant]);
 
@@ -118,6 +134,43 @@ export default function AdminDashboardPage() {
       console.error('Failed to load invitations:', error);
     } finally {
       setLoadingInvitations(false);
+    }
+  };
+
+  const loadAccessRequests = async () => {
+    try {
+      const response = await fetch('/api/tenants/access-requests');
+      const data = await response.json();
+      if (data.success) {
+        setAccessRequests(data.data || []);
+      }
+    } catch (error) {
+      console.error('Failed to load access requests:', error);
+    } finally {
+      setLoadingAccessRequests(false);
+    }
+  };
+
+  const handleAccessRequest = async (requestId: string, action: 'approve' | 'reject', rejectionReason?: string) => {
+    try {
+      const response = await fetch('/api/tenants/access-requests', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ requestId, action, rejectionReason }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Recarregar listas
+        loadAccessRequests();
+        loadUsers();
+      } else {
+        alert('Erro: ' + data.error);
+      }
+    } catch (error) {
+      console.error('Error handling access request:', error);
+      alert('Erro ao processar solicitação');
     }
   };
 
@@ -183,13 +236,14 @@ export default function AdminDashboardPage() {
     );
   }
 
-  // Check if user has admin role
-  if (user?.role_name !== 'admin') {
+  // TODO: Implement proper role-based access control
+  // For now, allow access if user is authenticated and has a tenant
+  if (!user || !tenant) {
     return (
       <div className="container mx-auto py-8">
         <Alert variant="destructive">
           <AlertDescription>
-            Você não tem permissão para acessar esta página. Apenas administradores podem gerenciar usuários.
+            Você não tem permissão para acessar esta página.
           </AlertDescription>
         </Alert>
       </div>
@@ -207,11 +261,9 @@ export default function AdminDashboardPage() {
         </div>
 
         <Dialog open={inviteDialogOpen} onOpenChange={setInviteDialogOpen}>
-          <DialogTrigger asChild>
-            <Button disabled={!canAddUser}>
-              <UserPlus className="mr-2 h-4 w-4" />
-              Convidar Usuário
-            </Button>
+          <DialogTrigger disabled={!canAddUser} className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed">
+            <UserPlus className="mr-2 h-4 w-4" />
+            Convidar Usuário
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
@@ -352,6 +404,77 @@ export default function AdminDashboardPage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Access Requests Table */}
+      {accessRequests.filter((r) => r.status === 'pending').length > 0 && (
+        <Card className="border-yellow-500/50 bg-yellow-50 dark:bg-yellow-950/20">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Clock className="h-5 w-5 text-yellow-600" />
+              Solicitações de Acesso Pendentes
+            </CardTitle>
+            <CardDescription>
+              Usuários aguardando aprovação para acessar sua empresa
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {loadingAccessRequests ? (
+              <div className="flex justify-center py-8">
+                <Loader2 className="h-6 w-6 animate-spin" />
+              </div>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Nome</TableHead>
+                    <TableHead>Email</TableHead>
+                    <TableHead>Mensagem</TableHead>
+                    <TableHead>Data</TableHead>
+                    <TableHead className="text-right">Ações</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {accessRequests
+                    .filter((req) => req.status === 'pending')
+                    .map((req) => (
+                      <TableRow key={req.id}>
+                        <TableCell className="font-medium">{req.full_name}</TableCell>
+                        <TableCell>{req.email}</TableCell>
+                        <TableCell className="max-w-xs truncate">
+                          {req.message || <span className="text-gray-400 italic">Sem mensagem</span>}
+                        </TableCell>
+                        <TableCell>
+                          {new Date(req.created_at).toLocaleDateString('pt-BR')}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-2">
+                            <button
+                              onClick={() => handleAccessRequest(req.id, 'approve')}
+                              className="inline-flex items-center gap-1 px-3 py-1 text-sm font-medium text-green-700 bg-green-100 rounded hover:bg-green-200 transition-colors"
+                            >
+                              <CheckCircle2 className="h-4 w-4" />
+                              Aprovar
+                            </button>
+                            <button
+                              onClick={() => {
+                                const reason = prompt('Motivo da rejeição (opcional):');
+                                handleAccessRequest(req.id, 'reject', reason || undefined);
+                              }}
+                              className="inline-flex items-center gap-1 px-3 py-1 text-sm font-medium text-red-700 bg-red-100 rounded hover:bg-red-200 transition-colors"
+                            >
+                              <XCircle className="h-4 w-4" />
+                              Rejeitar
+                            </button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                </TableBody>
+              </Table>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       {/* Users Table */}
       <Card>

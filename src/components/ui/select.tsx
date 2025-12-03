@@ -5,12 +5,13 @@ import * as React from 'react';
 interface SelectProps {
   value?: string;
   onValueChange?: (value: string) => void;
+  disabled?: boolean;
   children: React.ReactNode;
 }
 
-const Select: React.FC<SelectProps> = ({ value, onValueChange, children }) => {
+const Select: React.FC<SelectProps> = ({ value, onValueChange, disabled, children }) => {
   return (
-    <SelectContext.Provider value={{ value, onValueChange }}>
+    <SelectContext.Provider value={{ value, onValueChange, disabled }}>
       {children}
     </SelectContext.Provider>
   );
@@ -19,20 +20,23 @@ const Select: React.FC<SelectProps> = ({ value, onValueChange, children }) => {
 const SelectContext = React.createContext<{
   value?: string;
   onValueChange?: (value: string) => void;
+  disabled?: boolean;
 }>({});
 
 const SelectTrigger = React.forwardRef<
   HTMLButtonElement,
   React.ButtonHTMLAttributes<HTMLButtonElement>
 >(({ className = '', children, ...props }, ref) => {
+  const { disabled } = React.useContext(SelectContext);
   const [isOpen, setIsOpen] = React.useState(false);
-  
+
   return (
     <button
       ref={ref}
       type="button"
+      disabled={disabled}
       className={`flex h-10 w-full items-center justify-between rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
-      onClick={() => setIsOpen(!isOpen)}
+      onClick={() => !disabled && setIsOpen(!isOpen)}
       {...props}
     >
       {children}
@@ -58,13 +62,13 @@ const SelectItem = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement> & { value: string }
 >(({ className = '', value, children, ...props }, ref) => {
-  const { onValueChange } = React.useContext(SelectContext);
-  
+  const { onValueChange, disabled } = React.useContext(SelectContext);
+
   return (
     <div
       ref={ref}
-      className={`relative flex cursor-pointer select-none items-center px-3 py-2 text-sm outline-none hover:bg-gray-100 ${className}`}
-      onClick={() => onValueChange?.(value)}
+      className={`relative flex cursor-pointer select-none items-center px-3 py-2 text-sm outline-none hover:bg-gray-100 ${disabled ? 'opacity-50 cursor-not-allowed' : ''} ${className}`}
+      onClick={() => !disabled && onValueChange?.(value)}
       {...props}
     >
       {children}

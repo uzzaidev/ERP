@@ -69,21 +69,52 @@ export interface TenantInvitation {
   email: string;
   roleId?: string;
   roleName: string; // admin, gestor, financeiro, dev, juridico
-  
+
   // Invitation details
   token: string;
   invitedBy?: string;
   invitedByUser?: User;
-  
+
   // Status
   status: InvitationStatus;
   acceptedAt?: string;
   acceptedBy?: string;
   expiresAt: string;
-  
+
   // Optional message
   message?: string;
-  
+
+  // Metadata
+  createdAt: string;
+  updatedAt: string;
+}
+
+// Tenant Access Request (solicitação de acesso)
+export type AccessRequestStatus = 'pending' | 'approved' | 'rejected' | 'cancelled';
+
+export interface TenantAccessRequest {
+  id: string;
+
+  // Solicitante
+  userId: string;
+  email: string;
+  fullName: string;
+
+  // Tenant solicitado
+  tenantId: string;
+  tenantSlug: string;
+  tenant?: Tenant;
+
+  // Status
+  status: AccessRequestStatus;
+  message?: string;
+
+  // Aprovação/Rejeição
+  reviewedBy?: string;
+  reviewedByUser?: User;
+  reviewedAt?: string;
+  rejectionReason?: string;
+
   // Metadata
   createdAt: string;
   updatedAt: string;

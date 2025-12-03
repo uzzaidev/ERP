@@ -169,6 +169,6 @@ export function useTenantLimits() {
     isLoading,
     refetch: checkLimits,
     currentUsers: limits?.currentUsage?.users_count,
-    maxUsers: tenant?.max_users,
+    maxUsers: tenant?.maxUsers,
   };
 }

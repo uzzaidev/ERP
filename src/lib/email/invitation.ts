@@ -45,7 +45,7 @@ export async function sendInvitationEmail(data: InvitationEmailData): Promise<vo
       const resendModule = await import('resend');
       Resend = resendModule.Resend;
     } catch {
-      console.warn('⚠️  Resend package not installed. To enable email sending, run: npm install resend');
+      console.warn('⚠️  Resend package not installed. To enable email sending, run: pnpm install resend');
       console.log('Invitation details:', {
         to,
         tenantName,

@@ -1,7 +1,7 @@
 # 🚀 Plano de Implementação - UzzAI ERP
 
 **Data**: 2025-12-05
-**Status Atual**: 65% MVP | **Próximo Milestone**: 80% MVP Funcional
+**Status Atual**: 80% MVP | **Próximo Milestone**: Analytics & Relatórios
 **Prazo Estimado MVP**: 1 semana
 
 ---
@@ -17,10 +17,11 @@
 | **CRUD Tarefas** | ✅ **100%** | **COMPLETO** ✅ |
 | **CRUD Projetos** | ✅ **100%** | **COMPLETO** ✅ |
 | **CRUD Sprints** | ✅ **100%** | **COMPLETO** ✅ |
+| **Comentários + Time Logs** | ✅ **100%** | **COMPLETO** ✅ |
 | Analytics/Charts | ❌ 0% | Não iniciado |
 | Features Únicas | ❌ 0% | Não iniciado |
 
-**Progresso**: Sprints 1, 2 e 3 completas! Iniciando Sprint 4 (Comentários + Time Logs)
+**Progresso**: Sprints 1, 2, 3 e 4 completas! 🎉 Iniciando Sprint 5 (Burndown Chart)
 
 ---
 
@@ -186,30 +187,33 @@
 
 ---
 
-### 📅 Sprint 4: Comentários + Time Logs (Semana 2-3) - **P1**
+### 📅 Sprint 4: Comentários + Time Logs (Semana 2-3) - ✅ **COMPLETO**
 
-**Arquivos a modificar**:
-- `src/app/api/tasks/[id]/comments/route.ts` (criar)
-- `src/app/api/tasks/[id]/time-logs/route.ts` (criar)
-- `src/components/tasks/TaskComments.tsx` (criar)
-- `src/components/tasks/TimeLogEntry.tsx` (criar)
+**Arquivos modificados**:
+- ✅ `src/app/api/tasks/[id]/comments/route.ts` (criado)
+- ✅ `src/app/api/tasks/[id]/time-logs/route.ts` (criado)
+- ✅ `src/components/tasks/TaskComments.tsx` (criado)
+- ✅ `src/components/tasks/TimeLogEntry.tsx` (criado)
+- ✅ `src/components/tasks/EditTaskModal.tsx` (modificado)
+- ✅ `src/types/entities.ts` (modificado)
+- ✅ `db/13_task_time_tracking_functions.sql` (criado)
 
 #### Tasks:
 
-- [ ] **4.1 Comentários em Tarefas**
-  - [ ] Componente TaskComments
-  - [ ] API POST /api/tasks/:id/comments
-  - [ ] API GET /api/tasks/:id/comments
-  - [ ] Mostrar no modal de editar tarefa
-  - [ ] Suporte a @mentions (básico)
+- [x] **4.1 Comentários em Tarefas** ✅
+  - [x] Componente TaskComments
+  - [x] API POST /api/tasks/:id/comments
+  - [x] API GET /api/tasks/:id/comments
+  - [x] Mostrar no modal de editar tarefa
+  - [x] Suporte a @mentions (básico)
 
-- [ ] **4.2 Time Tracking Manual**
-  - [ ] Componente TimeLogEntry
-  - [ ] API POST /api/tasks/:id/time-logs
-  - [ ] Form: hours, description, logged_date
-  - [ ] Mostrar total de horas na task
+- [x] **4.2 Time Tracking Manual** ✅
+  - [x] Componente TimeLogEntry
+  - [x] API POST /api/tasks/:id/time-logs
+  - [x] Form: hours, description, logged_date
+  - [x] Mostrar total de horas na task
 
-**Resultado**: Usuários podem comentar e registrar horas em tasks
+**Resultado**: ✅ Usuários podem comentar e registrar horas em tasks
 
 ---
 
@@ -461,7 +465,7 @@ CREATE TABLE meetings (
 - [x] Sprint 1: CRUD Tarefas (6/6 tasks) ✅ **COMPLETO**
 - [x] Sprint 2: CRUD Projetos (5/6 tasks) ✅ **COMPLETO**
 - [x] Sprint 3: CRUD Sprints (6/6 tasks) ✅ **COMPLETO**
-- [ ] Sprint 4: Comentários + Time Logs (0/2 tasks) 🔄 **PRÓXIMO**
+- [x] Sprint 4: Comentários + Time Logs (2/2 tasks) ✅ **COMPLETO**
 
 ### Fase 2 - Analytics (Target: Semana 5)
 - [ ] Sprint 5: Burndown Chart (0/3 tasks)
@@ -479,18 +483,24 @@ CREATE TABLE meetings (
 
 ## 🎯 Próximas Ações (AGORA)
 
-**Sprint 4 - Comentários + Time Logs** (ordem de prioridade):
+**✅ Sprint 4 - COMPLETO!** Comentários e Time Logs implementados com sucesso!
 
-1. 🔄 Sprint 4, Task 4.1: Implementar sistema de comentários em tarefas
-   - Criar `src/components/tasks/TaskComments.tsx`
-   - API POST `/api/tasks/:id/comments`
-   - API GET `/api/tasks/:id/comments`
-   - Integrar no modal de editar tarefa
+**Sprint 5 - Burndown Chart** (próximo):
+
+1. 🔄 Sprint 5, Task 5.1: Implementar Burndown Chart Component
+   - Criar `src/components/charts/BurndownChart.tsx`
+   - Usar Chart.js ou Recharts
+   - Calcular ideal line vs actual line
+   - API GET `/api/sprints/:id/burndown`
    
-2. 🔄 Sprint 4, Task 4.2: Implementar time tracking manual
-   - Criar `src/components/tasks/TimeLogEntry.tsx`
-   - API POST `/api/tasks/:id/time-logs`
-   - Mostrar total de horas na task
+2. 🔄 Sprint 5, Task 5.2: Criar API Burndown Data
+   - Criar `src/app/api/sprints/[id]/burndown/route.ts`
+   - Calcular story points ou horas por dia
+   - Retornar dados para gráfico
+
+3. 🔄 Sprint 5, Task 5.3: Mostrar no Kanban
+   - Adicionar tab "Analytics" no Kanban
+   - Mostrar burndown do sprint ativo
 
 ---
 

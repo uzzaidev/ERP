@@ -410,3 +410,43 @@ export interface Invoice {
   createdAt: string;
   updatedAt: string;
 }
+
+// ============================================
+// TASK COMMENTS & TIME LOGS
+// ============================================
+
+// Task Comment (API Response)
+export interface TaskComment {
+  id: string;
+  tenantId: string;
+  taskId: string;
+  authorId: string;
+  author?: {
+    id: string;
+    full_name: string;
+    email: string;
+    avatar_url?: string;
+  };
+  content: string;
+  mentions?: string[]; // Array of user IDs mentioned
+  createdAt: string;
+  updatedAt: string;
+}
+
+// Task Time Log (API Response)
+export interface TimeLog {
+  id: string;
+  tenantId: string;
+  taskId: string;
+  userId: string;
+  user?: {
+    id: string;
+    full_name: string;
+    email: string;
+    avatar_url?: string;
+  };
+  hours: number;
+  description?: string;
+  loggedDate: string;
+  createdAt: string;
+}

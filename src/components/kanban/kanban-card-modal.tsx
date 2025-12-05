@@ -40,12 +40,12 @@ export function KanbanCardModal({ onAssigneeChange, onEditClick }: KanbanCardMod
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm">
-      <div className="relative max-h-[90vh] w-full max-w-3xl overflow-hidden rounded-xl border border-slate-700/50 bg-slate-900 shadow-2xl">
+      <div className="relative max-h-[90vh] w-full max-w-3xl overflow-hidden rounded-xl border border-border bg-card shadow-2xl">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-slate-700/50 p-6">
+        <div className="flex items-center justify-between border-b border-border bg-card p-6">
           <div>
-            <h2 className="text-xl font-semibold text-white">{selectedCard.title}</h2>
-            <div className="mt-1 flex items-center gap-2 text-sm text-slate-400">
+            <h2 className="text-xl font-semibold text-card-foreground">{selectedCard.title}</h2>
+            <div className="mt-1 flex items-center gap-2 text-sm text-muted-foreground">
               <span>#{selectedCard.id}</span>
               {selectedCard.sprint && (
                 <>
@@ -62,14 +62,14 @@ export function KanbanCardModal({ onAssigneeChange, onEditClick }: KanbanCardMod
                   closeCardModal();
                   onEditClick(selectedCard.dbId!);
                 }}
-                className="rounded-lg px-3 py-1.5 text-sm font-medium text-emerald-400 transition-colors hover:bg-emerald-500/10 hover:text-emerald-300"
+                className="rounded-lg px-3 py-1.5 text-sm font-medium text-primary transition-colors hover:bg-primary/10"
               >
                 Editar
               </button>
             )}
             <button
               onClick={closeCardModal}
-              className="rounded-lg p-2 text-slate-400 transition-colors hover:bg-slate-800 hover:text-white"
+              className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
             >
               <X className="h-5 w-5" />
             </button>
@@ -81,19 +81,19 @@ export function KanbanCardModal({ onAssigneeChange, onEditClick }: KanbanCardMod
           <div className="space-y-6">
             {/* Description */}
             <div>
-              <h3 className="mb-2 text-sm font-semibold text-slate-300">Descricao</h3>
-              <p className="text-sm text-slate-400">{selectedCard.description || "Sem descricao"}</p>
+              <h3 className="mb-2 text-sm font-semibold text-card-foreground">Descricao</h3>
+              <p className="text-sm text-muted-foreground">{selectedCard.description || "Sem descricao"}</p>
             </div>
 
             {/* Details Grid */}
             <div className="grid gap-4 sm:grid-cols-2">
               {/* Status */}
               <div>
-                <label className="mb-2 block text-sm font-semibold text-slate-300">Status</label>
+                <label className="mb-2 block text-sm font-semibold text-card-foreground">Status</label>
                 <select
                   value={selectedCard.status}
                   onChange={(e) => updateCard(selectedCard.id, { status: e.target.value as KanbanCard["status"] })}
-                  className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                  className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/50"
                 >
                   <option value="backlog">Backlog</option>
                   <option value="todo">A Fazer</option>
@@ -105,11 +105,11 @@ export function KanbanCardModal({ onAssigneeChange, onEditClick }: KanbanCardMod
 
               {/* Priority */}
               <div>
-                <label className="mb-2 block text-sm font-semibold text-slate-300">Prioridade</label>
+                <label className="mb-2 block text-sm font-semibold text-card-foreground">Prioridade</label>
                 <select
                   value={selectedCard.priority}
                   onChange={(e) => updateCard(selectedCard.id, { priority: e.target.value as KanbanCard["priority"] })}
-                  className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                  className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/50"
                 >
                   <option value="low">Baixa</option>
                   <option value="medium">Media</option>
@@ -120,14 +120,14 @@ export function KanbanCardModal({ onAssigneeChange, onEditClick }: KanbanCardMod
 
               {/* Assignee */}
               <div>
-                <label className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-300">
+                <label className="mb-2 flex items-center gap-2 text-sm font-semibold text-card-foreground">
                   <User className="h-4 w-4" />
                   Responsavel
                 </label>
                 <select
                   value={selectedCard.assignee?.id || ''}
                   onChange={(e) => handleAssigneeSelect(e.target.value)}
-                  className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                  className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/50"
                 >
                   <option value="">Sem responsável</option>
                   {users.map((user) => (
@@ -140,7 +140,7 @@ export function KanbanCardModal({ onAssigneeChange, onEditClick }: KanbanCardMod
 
               {/* Tags */}
               <div>
-                <label className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-300">
+                <label className="mb-2 flex items-center gap-2 text-sm font-semibold text-card-foreground">
                   <Tag className="h-4 w-4" />
                   Tags
                 </label>
@@ -148,13 +148,13 @@ export function KanbanCardModal({ onAssigneeChange, onEditClick }: KanbanCardMod
                   {selectedCard.tags.map((tag) => (
                     <span
                       key={tag}
-                      className="rounded-full bg-slate-700 px-2 py-1 text-xs text-slate-300"
+                      className="rounded-full bg-muted px-2 py-1 text-xs text-muted-foreground"
                     >
                       {tag}
                     </span>
                   ))}
                   {selectedCard.tags.length === 0 && (
-                    <span className="text-sm text-slate-500">Sem tags</span>
+                    <span className="text-sm text-muted-foreground">Sem tags</span>
                   )}
                 </div>
               </div>
@@ -162,29 +162,29 @@ export function KanbanCardModal({ onAssigneeChange, onEditClick }: KanbanCardMod
 
             {/* Time Tracking */}
             <div>
-              <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-slate-300">
+              <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-card-foreground">
                 <Clock className="h-4 w-4" />
                 Controle de Horas
               </h3>
-              <div className="space-y-3 rounded-lg border border-slate-700 bg-slate-800/50 p-4">
+              <div className="space-y-3 rounded-lg border border-border bg-muted/50 p-4">
                 <div className="grid gap-4 sm:grid-cols-3">
                   <div>
-                    <label className="mb-1 block text-xs text-slate-400">Estimado</label>
-                    <div className="text-lg font-semibold text-white">{selectedCard.estimatedHours}h</div>
+                    <label className="mb-1 block text-xs text-muted-foreground">Estimado</label>
+                    <div className="text-lg font-semibold text-card-foreground">{selectedCard.estimatedHours}h</div>
                   </div>
                   <div>
-                    <label className="mb-1 block text-xs text-slate-400">Realizado</label>
+                    <label className="mb-1 block text-xs text-muted-foreground">Realizado</label>
                     <input
                       type="number"
                       value={completedHours}
                       onChange={(e) => setCompletedHours(Number(e.target.value))}
                       onBlur={handleUpdateTime}
-                      className="w-full rounded border border-slate-600 bg-slate-700 px-2 py-1 text-lg font-semibold text-white focus:border-emerald-500 focus:outline-none"
+                      className="w-full rounded border border-input bg-background px-2 py-1 text-lg font-semibold text-foreground focus:border-ring focus:outline-none"
                     />
                   </div>
                   <div>
-                    <label className="mb-1 block text-xs text-slate-400">Restante</label>
-                    <div className={`text-lg font-semibold ${remainingHours < 0 ? "text-red-400" : "text-emerald-400"}`}>
+                    <label className="mb-1 block text-xs text-muted-foreground">Restante</label>
+                    <div className={`text-lg font-semibold ${remainingHours < 0 ? "text-destructive" : "text-primary"}`}>
                       {remainingHours}h
                     </div>
                   </div>
@@ -194,7 +194,7 @@ export function KanbanCardModal({ onAssigneeChange, onEditClick }: KanbanCardMod
 
             {/* Comments */}
             <div>
-              <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-slate-300">
+              <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-card-foreground">
                 <MessageSquare className="h-4 w-4" />
                 Comentarios ({selectedCard.comments.length})
               </h3>
@@ -207,11 +207,11 @@ export function KanbanCardModal({ onAssigneeChange, onEditClick }: KanbanCardMod
                   onChange={(e) => setNewComment(e.target.value)}
                   onKeyPress={(e) => e.key === "Enter" && handleAddComment()}
                   placeholder="Adicionar comentario... (use @nome para mencionar)"
-                  className="flex-1 rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                  className="flex-1 rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/50"
                 />
                 <button
                   onClick={handleAddComment}
-                  className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-emerald-700"
+                  className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
                 >
                   <Send className="h-4 w-4" />
                 </button>
@@ -220,10 +220,10 @@ export function KanbanCardModal({ onAssigneeChange, onEditClick }: KanbanCardMod
               {/* Comments List */}
               <div className="space-y-3">
                 {selectedCard.comments.map((comment) => (
-                  <div key={comment.id} className="rounded-lg border border-slate-700 bg-slate-800/50 p-3">
+                  <div key={comment.id} className="rounded-lg border border-border bg-card p-3">
                     <div className="mb-2 flex items-center justify-between">
-                      <span className="text-sm font-medium text-white">{comment.author.full_name}</span>
-                      <span className="text-xs text-slate-500">
+                      <span className="text-sm font-medium text-card-foreground">{comment.author.full_name}</span>
+                      <span className="text-xs text-muted-foreground">
                         {new Date(comment.createdAt).toLocaleString("pt-BR", {
                           day: "2-digit",
                           month: "2-digit",
@@ -232,11 +232,11 @@ export function KanbanCardModal({ onAssigneeChange, onEditClick }: KanbanCardMod
                         })}
                       </span>
                     </div>
-                    <p className="text-sm text-slate-300">{comment.content}</p>
+                    <p className="text-sm text-foreground">{comment.content}</p>
                     {comment.mentions.length > 0 && (
                       <div className="mt-2 flex flex-wrap gap-1">
                         {comment.mentions.map((mention) => (
-                          <span key={mention} className="text-xs text-emerald-400">
+                          <span key={mention} className="text-xs text-primary">
                             @{mention}
                           </span>
                         ))}
@@ -245,7 +245,7 @@ export function KanbanCardModal({ onAssigneeChange, onEditClick }: KanbanCardMod
                   </div>
                 ))}
                 {selectedCard.comments.length === 0 && (
-                  <div className="py-8 text-center text-sm text-slate-500">
+                  <div className="py-8 text-center text-sm text-muted-foreground">
                     Nenhum comentario ainda
                   </div>
                 )}

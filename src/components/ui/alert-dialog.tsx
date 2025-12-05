@@ -41,7 +41,7 @@ const AlertDialogContent = React.forwardRef<
       <div className="fixed left-1/2 top-1/2 z-50 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 p-4">
         <div
           ref={ref}
-          className={`rounded-lg border bg-slate-900 p-6 shadow-lg ${className}`}
+          className={`rounded-lg border border-border bg-card p-6 shadow-2xl ${className}`}
           {...props}
         >
           {children}
@@ -80,7 +80,7 @@ const AlertDialogTitle = React.forwardRef<
 >(({ className = '', ...props }, ref) => (
   <h2
     ref={ref}
-    className={`text-lg font-semibold ${className}`}
+    className={`text-lg font-semibold text-card-foreground ${className}`}
     {...props}
   />
 ));
@@ -92,7 +92,7 @@ const AlertDialogDescription = React.forwardRef<
 >(({ className = '', ...props }, ref) => (
   <p
     ref={ref}
-    className={`text-sm text-slate-400 ${className}`}
+    className={`text-sm text-muted-foreground ${className}`}
     {...props}
   />
 ));
@@ -129,7 +129,7 @@ const AlertDialogCancel = React.forwardRef<
   return (
     <button
       ref={ref}
-      className={`inline-flex h-10 items-center justify-center rounded-md border px-4 py-2 text-sm font-medium transition-colors hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 ${className}`}
+      className={`inline-flex h-10 items-center justify-center rounded-md border border-border bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 ${className}`}
       onClick={() => onOpenChange?.(false)}
       {...props}
     />

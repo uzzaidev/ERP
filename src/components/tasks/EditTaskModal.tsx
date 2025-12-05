@@ -71,6 +71,7 @@ interface Task {
   sprint_id?: string;
   due_date?: string;
   estimated_hours?: number;
+  completed_hours?: number;
 }
 
 export function EditTaskModal({
@@ -85,6 +86,7 @@ export function EditTaskModal({
   const [sprints, setSprints] = useState<Sprint[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [task, setTask] = useState<Task | null>(null);
+  const [completedHours, setCompletedHours] = useState<number>(0);
 
   const {
     register,
@@ -121,6 +123,8 @@ export function EditTaskModal({
         due_date: task.due_date ? task.due_date.split('T')[0] : "",
         estimated_hours: task.estimated_hours || 0,
       });
+      // Initialize completed hours from task data
+      setCompletedHours(task.completed_hours || 0);
     }
   }, [task, reset]);
 
@@ -400,6 +404,11 @@ export function EditTaskModal({
                   className="mt-1 bg-background border-input text-foreground"
                   placeholder="0"
                 />
+                {completedHours > 0 && (
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Horas trabalhadas: {completedHours.toFixed(1)}h
+                  </p>
+                )}
               </div>
             </div>
 
@@ -407,7 +416,10 @@ export function EditTaskModal({
             {taskId && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-border">
                 <TaskComments taskId={taskId} />
-                <TimeLogEntry taskId={taskId} />
+                <TimeLogEntry 
+                  taskId={taskId} 
+                  onTimeLogged={(totalHours) => setCompletedHours(totalHours)}
+                />
               </div>
             )}
 

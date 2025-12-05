@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Plus, Search, ExternalLink, Calendar, DollarSign, Users } from "lucide-react";
 import Link from "next/link";
+import { CreateProjectModal } from "@/components/projects";
 
 interface Project {
   id: string;
@@ -22,23 +23,24 @@ export default function ProjetosPage() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
+  const fetchProjects = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('/api/projects');
+      const data = await response.json();
+      if (data.data) {
+        setProjects(data.data);
+      }
+    } catch (error) {
+      console.error('Error fetching projects:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    async function fetchProjects() {
-      try {
-        setLoading(true);
-        const response = await fetch('/api/projects');
-        const data = await response.json();
-        if (data.data) {
-          setProjects(data.data);
-        }
-      } catch (error) {
-        console.error('Error fetching projects:', error);
-      } finally {
-        setLoading(false);
-      }
-    }
-
     fetchProjects();
   }, []);
 
@@ -95,7 +97,10 @@ export default function ProjetosPage() {
             Gerencie todos os projetos da empresa
           </p>
         </div>
-        <button className="flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2.5 font-medium text-white transition-colors hover:bg-emerald-700">
+        <button 
+          onClick={() => setIsCreateModalOpen(true)}
+          className="flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2.5 font-medium text-white transition-colors hover:bg-emerald-700"
+        >
           <Plus className="h-5 w-5" />
           Novo Projeto
         </button>
@@ -240,6 +245,13 @@ export default function ProjetosPage() {
           )}
         </div>
       )}
+
+      {/* Create Project Modal */}
+      <CreateProjectModal
+        open={isCreateModalOpen}
+        onOpenChange={setIsCreateModalOpen}
+        onSuccess={fetchProjects}
+      />
     </div>
   );
 }

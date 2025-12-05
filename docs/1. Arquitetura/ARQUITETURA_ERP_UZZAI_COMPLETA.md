@@ -263,6 +263,10 @@ sequenceDiagram
 ### 3.1 Entidades Principais
 
 ```mermaid
+---
+config:
+  layout: elk
+---
 classDiagram
     class Organization {
         +UUID id

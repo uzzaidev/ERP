@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState, useCallback } from "react";
 import { Plus } from "lucide-react";
 import { DndContext, DragEndEvent, DragStartEvent, PointerSensor, useSensor, useSensors, DragOverlay } from "@dnd-kit/core";
 import { KanbanColumn, KanbanFilters, KanbanCardModal, KanbanCard as KanbanCardComponent } from "@/components/kanban";
+import { CreateTaskModal } from "@/components/tasks";
 import { useKanbanStore } from "@/lib/stores";
 import type { KanbanCard } from "@/types/kanban";
 
@@ -11,6 +12,7 @@ export default function KanbanPage() {
   const { cards, setCards, setSprints, filter, setUsers, setCurrentUser } = useKanbanStore();
   const [loading, setLoading] = useState(true);
   const [activeCard, setActiveCard] = useState<KanbanCard | null>(null);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -225,6 +227,63 @@ export default function KanbanPage() {
     }
   }, [cards, setCards]);
 
+  const handleTaskCreated = useCallback(() => {
+    // Reload tasks after creation
+    const fetchTasks = async () => {
+      try {
+        const tasksRes = await fetch('/api/tasks');
+        const tasksData = await tasksRes.json();
+        if (tasksData.data) {
+          // Transform database tasks to KanbanCard format
+          const transformedCards: KanbanCard[] = tasksData.data.map((task: {
+            code?: string;
+            id: string;
+            title: string;
+            description?: string;
+            status: string;
+            priority: string;
+            project_id: string;
+            sprint_id: string;
+            assignee_id?: string;
+            estimated_hours?: number;
+            completed_hours?: number;
+            due_date?: string;
+            created_at: string;
+            updated_at: string;
+            assignee?: { id: string; full_name: string; email: string; avatar_url?: string };
+            task_tags?: Array<{ tag?: { name: string } }>;
+          }) => ({
+            id: task.code || task.id,
+            title: task.title,
+            description: task.description || '',
+            status: task.status,
+            assignee: task.assignee ? {
+              id: task.assignee.id,
+              full_name: task.assignee.full_name,
+              email: task.assignee.email,
+              avatar: task.assignee.avatar_url
+            } : null,
+            sprint: task.sprint_id,
+            priority: task.priority,
+            estimatedHours: task.estimated_hours || 0,
+            completedHours: task.completed_hours || 0,
+            tags: task.task_tags?.map((tt) => tt.tag?.name).filter(Boolean) || [],
+            comments: [],
+            createdAt: task.created_at,
+            updatedAt: task.updated_at,
+            dbId: task.id,
+            projectId: task.project_id,
+          }));
+          setCards(transformedCards);
+        }
+      } catch (error) {
+        console.error('Error fetching tasks:', error);
+      }
+    };
+    
+    fetchTasks();
+  }, [setCards]);
+
   const columns = [
     { title: "Backlog", status: "backlog" as const },
     { title: "A Fazer", status: "todo" as const },
@@ -241,7 +300,10 @@ export default function KanbanPage() {
           <h1 className="text-2xl font-semibold text-white">Kanban Board</h1>
           <p className="mt-1 text-sm text-slate-400">Gerencie suas tarefas e sprints</p>
         </div>
-        <button className="flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2.5 font-medium text-white transition-colors hover:bg-emerald-700">
+        <button 
+          onClick={() => setIsCreateModalOpen(true)}
+          className="flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2.5 font-medium text-white transition-colors hover:bg-emerald-700"
+        >
           <Plus className="h-5 w-5" />
           Nova Tarefa
         </button>
@@ -287,6 +349,13 @@ export default function KanbanPage() {
 
       {/* Card Modal */}
       <KanbanCardModal onAssigneeChange={handleAssigneeChange} />
+      
+      {/* Create Task Modal */}
+      <CreateTaskModal 
+        open={isCreateModalOpen}
+        onOpenChange={setIsCreateModalOpen}
+        onSuccess={handleTaskCreated}
+      />
     </div>
   );
 }

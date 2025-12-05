@@ -208,15 +208,15 @@ export function EditTaskModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-slate-900 border-slate-700/50">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-card border-border">
         <DialogHeader>
           <div className="flex items-center justify-between">
-            <DialogTitle className="text-xl font-semibold text-white">
+            <DialogTitle className="text-xl font-semibold text-card-foreground">
               Editar Tarefa {task?.code && `- ${task.code}`}
             </DialogTitle>
             <button
               onClick={() => onOpenChange(false)}
-              className="rounded-lg p-2 text-slate-400 transition-colors hover:bg-slate-800 hover:text-white"
+              className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
             >
               <X className="h-5 w-5" />
             </button>
@@ -225,35 +225,35 @@ export function EditTaskModal({
 
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
-            <div className="text-slate-400">Carregando...</div>
+            <div className="text-muted-foreground">Carregando...</div>
           </div>
         ) : (
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mt-4">
             {/* Title */}
             <div>
-              <Label htmlFor="title" className="text-slate-300">
+              <Label htmlFor="title" className="text-card-foreground">
                 Título *
               </Label>
               <Input
                 id="title"
                 {...register("title")}
-                className="mt-1 bg-slate-800 border-slate-700 text-white"
+                className="mt-1 bg-background border-input text-foreground"
                 placeholder="Digite o título da tarefa"
               />
               {errors.title && (
-                <p className="mt-1 text-sm text-red-400">{errors.title.message}</p>
+                <p className="mt-1 text-sm text-destructive">{errors.title.message}</p>
               )}
             </div>
 
             {/* Description */}
             <div>
-              <Label htmlFor="description" className="text-slate-300">
+              <Label htmlFor="description" className="text-card-foreground">
                 Descrição
               </Label>
               <textarea
                 id="description"
                 {...register("description")}
-                className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                className="mt-1 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/50"
                 rows={4}
                 placeholder="Descreva a tarefa em detalhes"
               />
@@ -263,13 +263,13 @@ export function EditTaskModal({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {/* Status */}
               <div>
-                <Label htmlFor="status" className="text-slate-300">
+                <Label htmlFor="status" className="text-card-foreground">
                   Status
                 </Label>
                 <select
                   id="status"
                   {...register("status")}
-                  className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                  className="mt-1 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/50"
                 >
                   <option value="backlog">Backlog</option>
                   <option value="todo">A Fazer</option>
@@ -282,13 +282,13 @@ export function EditTaskModal({
 
               {/* Priority */}
               <div>
-                <Label htmlFor="priority" className="text-slate-300">
+                <Label htmlFor="priority" className="text-card-foreground">
                   Prioridade
                 </Label>
                 <select
                   id="priority"
                   {...register("priority")}
-                  className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                  className="mt-1 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/50"
                 >
                   <option value="low">Baixa</option>
                   <option value="medium">Média</option>
@@ -299,13 +299,13 @@ export function EditTaskModal({
 
               {/* Task Type */}
               <div>
-                <Label htmlFor="task_type" className="text-slate-300">
+                <Label htmlFor="task_type" className="text-card-foreground">
                   Tipo
                 </Label>
                 <select
                   id="task_type"
                   {...register("task_type")}
-                  className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                  className="mt-1 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/50"
                 >
                   <option value="feature">Feature</option>
                   <option value="bug">Bug</option>
@@ -316,13 +316,13 @@ export function EditTaskModal({
 
               {/* Assignee */}
               <div>
-                <Label htmlFor="assignee_id" className="text-slate-300">
+                <Label htmlFor="assignee_id" className="text-card-foreground">
                   Responsável
                 </Label>
                 <select
                   id="assignee_id"
                   {...register("assignee_id")}
-                  className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                  className="mt-1 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/50"
                 >
                   <option value="">Não atribuído</option>
                   {users.map((user) => (
@@ -335,13 +335,13 @@ export function EditTaskModal({
 
               {/* Project */}
               <div>
-                <Label htmlFor="project_id" className="text-slate-300">
+                <Label htmlFor="project_id" className="text-card-foreground">
                   Projeto
                 </Label>
                 <select
                   id="project_id"
                   {...register("project_id")}
-                  className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                  className="mt-1 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/50"
                 >
                   <option value="">Sem projeto</option>
                   {projects.map((project) => (
@@ -354,13 +354,13 @@ export function EditTaskModal({
 
               {/* Sprint */}
               <div>
-                <Label htmlFor="sprint_id" className="text-slate-300">
+                <Label htmlFor="sprint_id" className="text-card-foreground">
                   Sprint
                 </Label>
                 <select
                   id="sprint_id"
                   {...register("sprint_id")}
-                  className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                  className="mt-1 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/50"
                 >
                   <option value="">Sem sprint</option>
                   {sprints.map((sprint) => (
@@ -373,20 +373,20 @@ export function EditTaskModal({
 
               {/* Due Date */}
               <div>
-                <Label htmlFor="due_date" className="text-slate-300">
+                <Label htmlFor="due_date" className="text-card-foreground">
                   Data de Entrega
                 </Label>
                 <Input
                   id="due_date"
                   type="date"
                   {...register("due_date")}
-                  className="mt-1 bg-slate-800 border-slate-700 text-white"
+                  className="mt-1 bg-background border-input text-foreground"
                 />
               </div>
 
               {/* Estimated Hours */}
               <div>
-                <Label htmlFor="estimated_hours" className="text-slate-300">
+                <Label htmlFor="estimated_hours" className="text-card-foreground">
                   Horas Estimadas
                 </Label>
                 <Input
@@ -395,27 +395,27 @@ export function EditTaskModal({
                   step="0.5"
                   min="0"
                   {...register("estimated_hours", { valueAsNumber: true })}
-                  className="mt-1 bg-slate-800 border-slate-700 text-white"
+                  className="mt-1 bg-background border-input text-foreground"
                   placeholder="0"
                 />
               </div>
             </div>
 
             {/* Action Buttons */}
-            <div className="flex justify-end gap-3 pt-4 border-t border-slate-700/50">
+            <div className="flex justify-end gap-3 pt-4 border-t border-border">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => onOpenChange(false)}
                 disabled={isSubmitting}
-                className="border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white"
+                className="border-border bg-background text-foreground hover:bg-muted"
               >
                 Cancelar
               </Button>
               <Button
                 type="submit"
                 disabled={isSubmitting || isLoading}
-                className="bg-emerald-600 text-white hover:bg-emerald-700"
+                className="bg-primary text-primary-foreground hover:bg-primary/90"
               >
                 {isSubmitting ? "Salvando..." : "Salvar Alterações"}
               </Button>

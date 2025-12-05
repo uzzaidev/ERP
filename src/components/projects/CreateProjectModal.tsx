@@ -116,15 +116,15 @@ export function CreateProjectModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto bg-slate-900 border-slate-700/50">
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto bg-card border-border">
         <DialogHeader>
           <div className="flex items-center justify-between">
-            <DialogTitle className="text-xl font-semibold text-white">
+            <DialogTitle className="text-xl font-semibold text-card-foreground">
               Novo Projeto
             </DialogTitle>
             <button
               onClick={() => onOpenChange(false)}
-              className="rounded-lg p-2 text-slate-400 transition-colors hover:bg-slate-800 hover:text-white"
+              className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
             >
               <X className="h-5 w-5" />
             </button>
@@ -134,35 +134,35 @@ export function CreateProjectModal({
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 mt-4">
           {/* Basic Information */}
           <div className="space-y-4">
-            <h3 className="text-sm font-semibold text-slate-300 border-b border-slate-700 pb-2">
+            <h3 className="text-sm font-semibold text-card-foreground border-b border-border pb-2">
               Informações Básicas
             </h3>
             
             {/* Name */}
             <div>
-              <Label htmlFor="name" className="text-slate-300">
+              <Label htmlFor="name" className="text-card-foreground">
                 Nome do Projeto *
               </Label>
               <Input
                 id="name"
                 {...register("name")}
-                className="mt-1 bg-slate-800 border-slate-700 text-white"
+                className="mt-1 bg-background border-input text-foreground"
                 placeholder="Digite o nome do projeto"
               />
               {errors.name && (
-                <p className="mt-1 text-sm text-red-400">{errors.name.message}</p>
+                <p className="mt-1 text-sm text-destructive">{errors.name.message}</p>
               )}
             </div>
 
             {/* Description */}
             <div>
-              <Label htmlFor="description" className="text-slate-300">
+              <Label htmlFor="description" className="text-card-foreground">
                 Descrição
               </Label>
               <textarea
                 id="description"
                 {...register("description")}
-                className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                className="mt-1 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/50"
                 rows={3}
                 placeholder="Descreva o projeto"
               />
@@ -171,13 +171,13 @@ export function CreateProjectModal({
             {/* Status and Priority */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="status" className="text-slate-300">
+                <Label htmlFor="status" className="text-card-foreground">
                   Status
                 </Label>
                 <select
                   id="status"
                   {...register("status")}
-                  className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                  className="mt-1 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/50"
                 >
                   <option value="active">Ativo</option>
                   <option value="on_hold">Em Espera</option>
@@ -187,13 +187,13 @@ export function CreateProjectModal({
               </div>
 
               <div>
-                <Label htmlFor="priority" className="text-slate-300">
+                <Label htmlFor="priority" className="text-card-foreground">
                   Prioridade
                 </Label>
                 <select
                   id="priority"
                   {...register("priority")}
-                  className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                  className="mt-1 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/50"
                 >
                   <option value="low">Baixa</option>
                   <option value="medium">Média</option>
@@ -206,33 +206,33 @@ export function CreateProjectModal({
 
           {/* Timeline and Budget */}
           <div className="space-y-4">
-            <h3 className="text-sm font-semibold text-slate-300 border-b border-slate-700 pb-2">
+            <h3 className="text-sm font-semibold text-card-foreground border-b border-border pb-2">
               Cronograma e Orçamento
             </h3>
 
             {/* Dates */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="start_date" className="text-slate-300">
+                <Label htmlFor="start_date" className="text-card-foreground">
                   Data de Início
                 </Label>
                 <Input
                   id="start_date"
                   type="date"
                   {...register("start_date")}
-                  className="mt-1 bg-slate-800 border-slate-700 text-white"
+                  className="mt-1 bg-background border-input text-foreground"
                 />
               </div>
 
               <div>
-                <Label htmlFor="end_date" className="text-slate-300">
+                <Label htmlFor="end_date" className="text-card-foreground">
                   Data de Término
                 </Label>
                 <Input
                   id="end_date"
                   type="date"
                   {...register("end_date")}
-                  className="mt-1 bg-slate-800 border-slate-700 text-white"
+                  className="mt-1 bg-background border-input text-foreground"
                 />
               </div>
             </div>
@@ -240,7 +240,7 @@ export function CreateProjectModal({
             {/* Hours and Budget */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="estimated_hours" className="text-slate-300">
+                <Label htmlFor="estimated_hours" className="text-card-foreground">
                   Horas Estimadas
                 </Label>
                 <Input
@@ -248,16 +248,16 @@ export function CreateProjectModal({
                   type="number"
                   step="0.01"
                   {...register("estimated_hours")}
-                  className="mt-1 bg-slate-800 border-slate-700 text-white"
+                  className="mt-1 bg-background border-input text-foreground"
                   placeholder="0"
                 />
                 {errors.estimated_hours && (
-                  <p className="mt-1 text-sm text-red-400">{errors.estimated_hours.message}</p>
+                  <p className="mt-1 text-sm text-destructive">{errors.estimated_hours.message}</p>
                 )}
               </div>
 
               <div>
-                <Label htmlFor="budget" className="text-slate-300">
+                <Label htmlFor="budget" className="text-card-foreground">
                   Orçamento (R$)
                 </Label>
                 <Input
@@ -265,11 +265,11 @@ export function CreateProjectModal({
                   type="number"
                   step="0.01"
                   {...register("budget")}
-                  className="mt-1 bg-slate-800 border-slate-700 text-white"
+                  className="mt-1 bg-background border-input text-foreground"
                   placeholder="0.00"
                 />
                 {errors.budget && (
-                  <p className="mt-1 text-sm text-red-400">{errors.budget.message}</p>
+                  <p className="mt-1 text-sm text-destructive">{errors.budget.message}</p>
                 )}
               </div>
             </div>
@@ -277,48 +277,48 @@ export function CreateProjectModal({
 
           {/* Client Information */}
           <div className="space-y-4">
-            <h3 className="text-sm font-semibold text-slate-300 border-b border-slate-700 pb-2">
+            <h3 className="text-sm font-semibold text-card-foreground border-b border-border pb-2">
               Informações do Cliente
             </h3>
 
             <div>
-              <Label htmlFor="client_name" className="text-slate-300">
+              <Label htmlFor="client_name" className="text-card-foreground">
                 Nome do Cliente
               </Label>
               <Input
                 id="client_name"
                 {...register("client_name")}
-                className="mt-1 bg-slate-800 border-slate-700 text-white"
+                className="mt-1 bg-background border-input text-foreground"
                 placeholder="Nome ou empresa do cliente"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="client_contact" className="text-slate-300">
+                <Label htmlFor="client_contact" className="text-card-foreground">
                   Contato
                 </Label>
                 <Input
                   id="client_contact"
                   {...register("client_contact")}
-                  className="mt-1 bg-slate-800 border-slate-700 text-white"
+                  className="mt-1 bg-background border-input text-foreground"
                   placeholder="Telefone ou contato"
                 />
               </div>
 
               <div>
-                <Label htmlFor="client_email" className="text-slate-300">
+                <Label htmlFor="client_email" className="text-card-foreground">
                   Email do Cliente
                 </Label>
                 <Input
                   id="client_email"
                   type="email"
                   {...register("client_email")}
-                  className="mt-1 bg-slate-800 border-slate-700 text-white"
+                  className="mt-1 bg-background border-input text-foreground"
                   placeholder="cliente@example.com"
                 />
                 {errors.client_email && (
-                  <p className="mt-1 text-sm text-red-400">{errors.client_email.message}</p>
+                  <p className="mt-1 text-sm text-destructive">{errors.client_email.message}</p>
                 )}
               </div>
             </div>
@@ -326,13 +326,13 @@ export function CreateProjectModal({
 
           {/* Owner */}
           <div>
-            <Label htmlFor="owner_id" className="text-slate-300">
+            <Label htmlFor="owner_id" className="text-card-foreground">
               Responsável pelo Projeto
             </Label>
             <select
               id="owner_id"
               {...register("owner_id")}
-              className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+              className="mt-1 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/50"
             >
               <option value="">Eu (padrão)</option>
               {users.map((user) => (
@@ -344,19 +344,19 @@ export function CreateProjectModal({
           </div>
 
           {/* Action Buttons */}
-          <div className="flex justify-end gap-3 pt-4 border-t border-slate-700">
+          <div className="flex justify-end gap-3 pt-4 border-t border-border">
             <Button
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
-              className="border-slate-700 text-slate-300 hover:bg-slate-800"
+              className="border-border text-foreground hover:bg-muted"
             >
               Cancelar
             </Button>
             <Button
               type="submit"
               disabled={isSubmitting}
-              className="bg-emerald-600 text-white hover:bg-emerald-700"
+              className="bg-primary text-primary-foreground hover:bg-primary/90"
             >
               {isSubmitting ? "Criando..." : "Criar Projeto"}
             </Button>

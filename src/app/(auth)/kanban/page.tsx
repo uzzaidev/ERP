@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState, useCallback } from "react";
 import { Plus } from "lucide-react";
 import { DndContext, DragEndEvent, DragStartEvent, PointerSensor, useSensor, useSensors, DragOverlay } from "@dnd-kit/core";
 import { KanbanColumn, KanbanFilters, KanbanCardModal, KanbanCard as KanbanCardComponent } from "@/components/kanban";
-import { CreateTaskModal } from "@/components/tasks";
+import { CreateTaskModal, EditTaskModal } from "@/components/tasks";
 import { useKanbanStore } from "@/lib/stores";
 import type { KanbanCard } from "@/types/kanban";
 
@@ -13,6 +13,8 @@ export default function KanbanPage() {
   const [loading, setLoading] = useState(true);
   const [activeCard, setActiveCard] = useState<KanbanCard | null>(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -284,6 +286,68 @@ export default function KanbanPage() {
     fetchTasks();
   }, [setCards]);
 
+  const handleEditClick = useCallback((taskId: string) => {
+    setEditingTaskId(taskId);
+    setIsEditModalOpen(true);
+  }, []);
+
+  const handleTaskUpdated = useCallback(() => {
+    // Reload tasks after update
+    const fetchTasks = async () => {
+      try {
+        const tasksRes = await fetch('/api/tasks');
+        const tasksData = await tasksRes.json();
+        if (tasksData.data) {
+          // Transform database tasks to KanbanCard format
+          const transformedCards: KanbanCard[] = tasksData.data.map((task: {
+            code?: string;
+            id: string;
+            title: string;
+            description?: string;
+            status: string;
+            priority: string;
+            project_id: string;
+            sprint_id: string;
+            assignee_id?: string;
+            estimated_hours?: number;
+            completed_hours?: number;
+            due_date?: string;
+            created_at: string;
+            updated_at: string;
+            assignee?: { id: string; full_name: string; email: string; avatar_url?: string };
+            task_tags?: Array<{ tag?: { name: string } }>;
+          }) => ({
+            id: task.code || task.id,
+            title: task.title,
+            description: task.description || '',
+            status: task.status,
+            assignee: task.assignee ? {
+              id: task.assignee.id,
+              full_name: task.assignee.full_name,
+              email: task.assignee.email,
+              avatar: task.assignee.avatar_url
+            } : null,
+            sprint: task.sprint_id,
+            priority: task.priority,
+            estimatedHours: task.estimated_hours || 0,
+            completedHours: task.completed_hours || 0,
+            tags: task.task_tags?.map((tt) => tt.tag?.name).filter(Boolean) || [],
+            comments: [],
+            createdAt: task.created_at,
+            updatedAt: task.updated_at,
+            dbId: task.id,
+            projectId: task.project_id,
+          }));
+          setCards(transformedCards);
+        }
+      } catch (error) {
+        console.error('Error fetching tasks:', error);
+      }
+    };
+    
+    fetchTasks();
+  }, [setCards]);
+
   const columns = [
     { title: "Backlog", status: "backlog" as const },
     { title: "A Fazer", status: "todo" as const },
@@ -348,13 +412,24 @@ export default function KanbanPage() {
       )}
 
       {/* Card Modal */}
-      <KanbanCardModal onAssigneeChange={handleAssigneeChange} />
+      <KanbanCardModal 
+        onAssigneeChange={handleAssigneeChange} 
+        onEditClick={handleEditClick}
+      />
       
       {/* Create Task Modal */}
       <CreateTaskModal 
         open={isCreateModalOpen}
         onOpenChange={setIsCreateModalOpen}
         onSuccess={handleTaskCreated}
+      />
+      
+      {/* Edit Task Modal */}
+      <EditTaskModal 
+        open={isEditModalOpen}
+        onOpenChange={setIsEditModalOpen}
+        taskId={editingTaskId}
+        onSuccess={handleTaskUpdated}
       />
     </div>
   );

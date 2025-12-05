@@ -7,9 +7,10 @@ import type { KanbanCard } from "@/types/kanban";
 
 interface KanbanCardModalProps {
   onAssigneeChange?: (cardId: string, userId: string | null) => void;
+  onEditClick?: (cardId: string) => void;
 }
 
-export function KanbanCardModal({ onAssigneeChange }: KanbanCardModalProps) {
+export function KanbanCardModal({ onAssigneeChange, onEditClick }: KanbanCardModalProps) {
   const { selectedCard, isCardModalOpen, closeCardModal, updateCard, addComment, updateTimeTracking, users } = useKanbanStore();
   const [newComment, setNewComment] = useState("");
   const [completedHours, setCompletedHours] = useState(selectedCard?.completedHours || 0);
@@ -54,12 +55,25 @@ export function KanbanCardModal({ onAssigneeChange }: KanbanCardModalProps) {
               )}
             </div>
           </div>
-          <button
-            onClick={closeCardModal}
-            className="rounded-lg p-2 text-slate-400 transition-colors hover:bg-slate-800 hover:text-white"
-          >
-            <X className="h-5 w-5" />
-          </button>
+          <div className="flex items-center gap-2">
+            {onEditClick && selectedCard.dbId && (
+              <button
+                onClick={() => {
+                  closeCardModal();
+                  onEditClick(selectedCard.dbId!);
+                }}
+                className="rounded-lg px-3 py-1.5 text-sm font-medium text-emerald-400 transition-colors hover:bg-emerald-500/10 hover:text-emerald-300"
+              >
+                Editar
+              </button>
+            )}
+            <button
+              onClick={closeCardModal}
+              className="rounded-lg p-2 text-slate-400 transition-colors hover:bg-slate-800 hover:text-white"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
         </div>
 
         {/* Content */}

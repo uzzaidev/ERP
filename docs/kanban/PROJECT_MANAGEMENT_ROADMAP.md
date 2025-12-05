@@ -1,8 +1,8 @@
 # 🚀 Roadmap Completo - Sistema de Gestão de Projetos ERP UzzAI
 
-**Data**: 2025-12-03
-**Versão**: 2.0 (Consolidado)
-**Status**: 📋 Planejamento Ativo | 🎯 Objetivo: Sistema Enterprise-Grade
+**Data**: 2025-12-05
+**Versão**: 2.1 (Sprint 1 Finalizada)
+**Status**: 🚀 Sprint 2 em Progresso | 🎯 Objetivo: Sistema Enterprise-Grade
 
 ---
 
@@ -83,10 +83,13 @@ estimated_hours, completed_hours
 due_date, started_at, completed_at
 ```
 
-#### 2. **APIs Implementadas (60%)**
+#### 2. **APIs Implementadas (70%)**
 
 - ✅ `GET /api/projects` - Listar projetos
 - ✅ `GET /api/tasks` - Listar tarefas (com filtros)
+- ✅ `POST /api/tasks` - Criar tarefa (Sprint 1) ✅
+- ✅ `PUT /api/tasks/:id` - Atualizar tarefa (Sprint 1) ✅
+- ✅ `DELETE /api/tasks/:id` - Deletar tarefa (Sprint 1) ✅
 - ✅ `PATCH /api/tasks` - Atualizar status/assignee
 - ✅ `GET /api/sprints` - Listar sprints
 - ✅ `GET /api/tags` - Listar tags
@@ -94,8 +97,9 @@ due_date, started_at, completed_at
 - ✅ `GET /api/auth/me` - Usuário autenticado com tenant
 
 **APIs Faltando**:
-- ❌ `POST /api/projects` - Criar projeto
-- ❌ `POST /api/tasks` - Criar tarefa
+- ❌ `POST /api/projects` - Criar projeto (Sprint 2)
+- ❌ `PUT /api/projects/:id` - Atualizar projeto (Sprint 2)
+- ❌ `DELETE /api/projects/:id` - Deletar projeto (Sprint 2)
 - ❌ `POST /api/sprints` - Criar sprint
 - ❌ `POST /api/task-comments` - Adicionar comentário
 - ❌ `POST /api/task-time-logs` - Registrar tempo
@@ -111,12 +115,15 @@ due_date, started_at, completed_at
 - ✅ Visualização de cards com avatar, tags, horas
 - ✅ Atualização otimista de status
 - ✅ Atribuir/remover assignee
+- ✅ Criar tarefas via modal (Sprint 1) ✅
+- ✅ Editar tarefas via modal (Sprint 1) ✅
+- ✅ Deletar tarefas com confirmação (Sprint 1) ✅
 
 **Projetos** (`/projetos`):
 - ✅ Lista de projetos em tabela
 - ✅ Status, datas, orçamento, % usado
 - ✅ Busca por nome/código
-- ❌ Criar/editar projeto
+- 🚀 Criar/editar projeto (Sprint 2 - em progresso)
 - ❌ Detalhes do projeto
 - ❌ Gantt chart
 - ❌ Timeline view
@@ -129,13 +136,13 @@ due_date, started_at, completed_at
 **O que funciona BEM:**
 - ✅ Kanban Board drag-and-drop (95%)
 - ✅ Multi-tenancy com RLS (90%)
+- ✅ **CRUD de Tarefas** - Completo (Sprint 1) ✅
 - ✅ Listagem de projetos/tarefas (70%)
 - ✅ Admin de usuários e convites (90%)
 - ✅ Autenticação e autorização (85%)
 
 **O que precisa URGENTE:**
-- 🔴 **CRUD de Tarefas** - Não dá pra criar/editar/deletar tarefas da UI (P0)
-- 🔴 **CRUD de Projetos** - Só visualiza lista, não cria/edita (P0)
+- 🚀 **CRUD de Projetos** - Em progresso (Sprint 2)
 - 🔴 **CRUD de Sprints** - Não tem UI de planejamento (P0)
 - 🔴 **Time Tracking** - Schema pronto, zero UI (P1)
 - 🔴 **Charts/Analytics** - Zero burndown/velocity/gantt (P0)
@@ -675,10 +682,10 @@ ${task.time_logs.map(t => `- ${t.hours}h by ${t.user.name}: ${t.description}`).j
 | # | Feature | Categoria | Status ERP Atual | Prioridade | Fase |
 |---|---------|-----------|------------------|------------|------|
 | **GESTÃO DE TAREFAS** |
-| 1 | Criar Tarefas | Tarefas | ❌ **0%** (sem UI) | 🔴 P0 | Fase 1 |
-| 2 | Editar Tarefas | Tarefas | ⚠️ **60%** (só status/assignee) | 🔴 P0 | Fase 1 |
-| 3 | Deletar Tarefas | Tarefas | ❌ **0%** | 🔴 P0 | Fase 1 |
-| 4 | Subtasks | Tarefas | ⚠️ **20%** (DB only) | 🔴 P0 | Fase 1 |
+| 1 | Criar Tarefas | Tarefas | ✅ **100%** (Sprint 1) | 🔴 P0 | Fase 1 |
+| 2 | Editar Tarefas | Tarefas | ✅ **100%** (Sprint 1) | 🔴 P0 | Fase 1 |
+| 3 | Deletar Tarefas | Tarefas | ✅ **100%** (Sprint 1) | 🔴 P0 | Fase 1 |
+| 4 | Subtasks | Tarefas | ⚠️ **30%** (DB + UI parcial) | 🔴 P0 | Fase 1 |
 | 5 | Dependências entre Tarefas | Tarefas | ❌ **0%** | 🔴 P0 | Fase 1 |
 | 6 | Priorização (P0/P1/P2/P3) | Tarefas | ✅ **100%** | 🔴 P0 | Fase 1 |
 | 7 | Assignee (Responsável) | Tarefas | ✅ **70%** | 🔴 P0 | Fase 1 |
@@ -709,7 +716,7 @@ ${task.time_logs.map(t => `- ${t.hours}h by ${t.user.name}: ${t.description}`).j
 | 29 | Marcos (Milestones) | Timeline | ❌ **0%** | 🔴 P0 | Fase 1 |
 | 30 | Timeline Visual | Timeline | ❌ **0%** | 🔴 P0 | Fase 1 |
 | **PROJETOS** |
-| 31 | Criar Projeto | Projetos | ❌ **0%** (sem UI) | 🔴 P0 | Fase 1 |
+| 31 | Criar Projeto | Projetos | 🚀 **20%** (Sprint 2 - em progresso) | 🔴 P0 | Fase 1 |
 | 32 | Dashboard de Projeto | Projetos | ⚠️ **50%** (lista só) | 🔴 P0 | Fase 1 |
 | 33 | Status de Projeto | Projetos | ✅ **100%** | 🔴 P0 | Fase 1 |
 | 34 | Progresso de Projeto | Projetos | ⚠️ **50%** (visualização) | 🔴 P0 | Fase 1 |
@@ -1140,27 +1147,28 @@ import { useVirtualizer } from '@tanstack/react-virtual';
 
 ## 📏 Métricas de Sucesso e KPIs
 
-### Status Atual Real do ERP (2025-12-03)
+### Status Atual Real do ERP (2025-12-05)
 
 | Categoria | Status | Comentário |
 |-----------|--------|------------|
 | **Database Schema** | ✅ 100% | Todas as tabelas criadas e relacionadas |
 | **Multi-Tenancy** | ✅ 90% | RLS policies completas em todas as tabelas |
 | **Autenticação** | ✅ 85% | Supabase Auth + RBAC funcionais |
-| **Kanban Board** | ✅ 95% | Drag-drop funcionando, falta criar tasks |
+| **Kanban Board** | ✅ 95% | Drag-drop funcionando + CRUD completo |
 | **Admin/Usuários** | ✅ 90% | Convites e acessos funcionais |
-| **CRUD Operations** | ❌ 20% | Maior gap - sem UI para criar/editar/deletar |
+| **CRUD Tarefas** | ✅ 100% | Sprint 1 finalizada - criar/editar/deletar tasks |
+| **CRUD Projetos** | 🚀 20% | Sprint 2 em progresso |
 | **Analytics/Charts** | ❌ 0% | Zero gráficos/relatórios |
 | **Features Únicas** | ❌ 0% | Todas as 9 features em 0% |
 | **Módulo Financeiro** | ❌ 10% | Schema pronto, zero funcionalidade |
 
-**Status Geral**: ~25-30% do MVP funcional
+**Status Geral**: ~35% do MVP funcional (Sprint 1 completa)
 
 ---
 
 ### KPIs para Medir Progresso
 
-1. **Feature Completeness**: % de features implementadas vs planejadas (Atual: 25%)
+1. **Feature Completeness**: % de features implementadas vs planejadas (Atual: 35% - Sprint 1 completa)
 2. **User Adoption**: # de usuários ativos diariamente (Quando lançar)
 3. **Task Velocity**: Média de tasks completadas por sprint (Quando sprint management funcionar)
 4. **Time to Completion**: Tempo médio para completar uma task (Quando time tracking funcionar)
@@ -1169,7 +1177,9 @@ import { useVirtualizer } from '@tanstack/react-virtual';
 
 ### Targets de Desenvolvimento
 
-- 🎯 **MVP (Fase 1)**: 50% das features críticas (faltam: CRUD de tarefas/projetos/sprints, charts, features únicas)
+- ✅ **Sprint 1**: CRUD de Tarefas completo (100% - finalizada em 2025-12-05)
+- 🚀 **Sprint 2**: CRUD de Projetos (20% - em progresso)
+- 🎯 **MVP (Fase 1)**: 50% das features críticas (próximo: CRUD projetos/sprints, charts, features únicas)
 - 🎯 **Beta (Fase 2)**: 80% das features (adicionar analytics, relatórios, notificações)
 - 🎯 **v1.0 (Fase 3)**: 100% das features core + 9 features únicas
 - 🎯 **v2.0 (Fase 4-6)**: 100% competitivo com Jira/Linear + diferencial das 9 features únicas
@@ -1225,36 +1235,47 @@ import { useVirtualizer } from '@tanstack/react-virtual';
 
 ## 📝 Próximos Passos
 
-### Imediatos (Esta Semana)
+### ✅ Sprint 1 - COMPLETA (2025-12-05)
 
-1. [ ] Implementar modal de criar tarefa
-2. [ ] API POST /api/tasks
-3. [ ] Botão "Nova Tarefa" funcional
-4. [ ] Modal de editar tarefa
-5. [ ] API PUT /api/tasks/:id
+1. [x] Implementar modal de criar tarefa
+2. [x] API POST /api/tasks
+3. [x] Botão "Nova Tarefa" funcional
+4. [x] Modal de editar tarefa
+5. [x] API PUT /api/tasks/:id
+6. [x] API DELETE /api/tasks/:id
+
+### 🚀 Imediatos (Esta Semana - Sprint 2)
+
+1. [ ] Implementar modal de criar projeto
+2. [ ] API POST /api/projects
+3. [ ] Botão "Novo Projeto" funcional
+4. [ ] Modal de editar projeto
+5. [ ] API PUT /api/projects/:id
+6. [ ] API DELETE /api/projects/:id
 
 ### Curto Prazo (Este Mês)
 
-1. [ ] Time tracking completo
-2. [ ] Comentários funcionais
-3. [ ] Sprint planning funcional
-4. [ ] Burndown chart
-5. [ ] Notificações básicas
-6. [ ] ADRs implementados (feature única)
+1. [ ] Sprint 3: CRUD Sprints completo
+2. [ ] Time tracking completo (Sprint 4)
+3. [ ] Comentários funcionais (Sprint 4)
+4. [ ] Sprint planning funcional
+5. [ ] Burndown chart (Sprint 5)
+6. [ ] Notificações básicas
 
 ### Médio Prazo (Próximos 3 Meses)
 
-1. [ ] Todas as features do MVP
-2. [ ] Analytics dashboard
-3. [ ] Gantt chart
-4. [ ] Relatórios PDF
-5. [ ] Mobile app funcional
+1. [ ] Todas as features do MVP (Sprints 1-6)
+2. [ ] Features Únicas: ADRs, Kaizen, Meeting Score
+3. [ ] Analytics dashboard
+4. [ ] Gantt chart
+5. [ ] Relatórios PDF
+6. [ ] Mobile app funcional
 6. [ ] 9 features únicas implementadas
 
 ---
 
-**Última Atualização**: 2025-12-03
-**Versão**: 3.0 (Realista - Status REAL do ERP sem referências externas)
+**Última Atualização**: 2025-12-05
+**Versão**: 3.1 (Sprint 1 Finalizada - Sprint 2 em Progresso)
 **Mantido por**: Equipe de Desenvolvimento ERP UzzAI
 
 ---

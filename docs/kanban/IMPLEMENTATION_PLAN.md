@@ -1,8 +1,13 @@
 # 🚀 Plano de Implementação - UzzAI ERP
 
 **Data**: 2025-12-05
+<<<<<<< HEAD
 **Status Atual**: 55% MVP | **Próximo Milestone**: 70% MVP Funcional
 **Prazo Estimado MVP**: 1-2 semanas
+=======
+**Status Atual**: 45% MVP | **Próximo Milestone**: 50% MVP Funcional
+**Prazo Estimado MVP**: 2-3 semanas
+>>>>>>> e14a2144b358425416219dcc49e76be76b968523
 
 ---
 
@@ -14,6 +19,7 @@
 | Multi-tenancy + RLS | ✅ 90% | Core pronto |
 | Kanban Board | ✅ 95% | Drag-drop funcional |
 | Admin/Usuários | ✅ 90% | Convites funcionais |
+<<<<<<< HEAD
 | **CRUD Tarefas** | ✅ **100%** | **COMPLETO** ✅ |
 | **CRUD Projetos** | ✅ **100%** | **COMPLETO** ✅ |
 | **CRUD Sprints** | 🔄 **0%** | **PRÓXIMO - SPRINT 3** |
@@ -21,6 +27,16 @@
 | Features Únicas | ❌ 0% | Não iniciado |
 
 **Progresso**: Sprints 1 e 2 completas! Iniciando Sprint 3 (CRUD Sprints)
+=======
+| **CRUD Tarefas** | ✅ **100%** | **COMPLETO (Sprint 1)** |
+| **CRUD Projetos** | ⚠️ **20%** | **EM PROGRESSO (Sprint 2)** |
+| **CRUD Sprints** | ❌ **0%** | **PRÓXIMO (Sprint 3)** |
+| Analytics/Charts | ❌ 0% | Não iniciado |
+| Features Únicas | ❌ 0% | Não iniciado |
+
+**Sprint Atual**: Sprint 2 - CRUD de Projetos
+**Progresso Geral**: 35% MVP Funcional
+>>>>>>> e14a2144b358425416219dcc49e76be76b968523
 
 ---
 
@@ -30,6 +46,7 @@
 
 ---
 
+<<<<<<< HEAD
 ### 📅 Sprint 1: CRUD de Tarefas (Semana 1) - ✅ **COMPLETO**
 
 **Arquivos modificados**:
@@ -42,36 +59,66 @@
 #### Tasks:
 
 - [x] **1.1 Modal Criar Tarefa** ✅
+=======
+### 📅 Sprint 1: CRUD de Tarefas (Semana 1) - **✅ COMPLETO**
+
+**Arquivos modificados**:
+- `src/app/(auth)/kanban/page.tsx` ✅
+- `src/app/api/tasks/route.ts` ✅
+- `src/components/tasks/` ✅ (criado)
+
+#### Tasks:
+
+- [x] **1.1 Modal Criar Tarefa** ✅ COMPLETO
+>>>>>>> e14a2144b358425416219dcc49e76be76b968523
   - [x] Criar `src/components/tasks/CreateTaskModal.tsx`
   - [x] Form: title, description, status, priority, type, assignee, project, sprint, due_date, estimated_hours
   - [x] Validação com Zod
   - [x] Botão "Nova Tarefa" no Kanban
 
+<<<<<<< HEAD
 - [x] **1.2 API POST /api/tasks** ✅
+=======
+- [x] **1.2 API POST /api/tasks** ✅ COMPLETO
+>>>>>>> e14a2144b358425416219dcc49e76be76b968523
   - [x] Endpoint POST em `src/app/api/tasks/route.ts`
   - [x] Validar tenant_id
   - [x] Gerar `code` automático (TASK-XXX)
   - [x] Inserir no DB
   - [x] Retornar task criada
 
+<<<<<<< HEAD
 - [x] **1.3 Modal Editar Tarefa** ✅
+=======
+- [x] **1.3 Modal Editar Tarefa** ✅ COMPLETO
+>>>>>>> e14a2144b358425416219dcc49e76be76b968523
   - [x] Criar `src/components/tasks/EditTaskModal.tsx`
   - [x] Reutilizar form do CreateTaskModal
   - [x] Pré-popular com dados existentes
   - [x] Abrir ao clicar no card do Kanban
 
+<<<<<<< HEAD
 - [x] **1.4 API PUT /api/tasks/:id** ✅
   - [x] Endpoint PUT em `src/app/api/tasks/[id]/route.ts`
+=======
+- [x] **1.4 API PUT /api/tasks/:id** ✅ COMPLETO
+  - [x] Endpoint PUT em `src/app/api/tasks/[id]/route.ts` (criado)
+>>>>>>> e14a2144b358425416219dcc49e76be76b968523
   - [x] Validar tenant_id ownership
   - [x] Update campos
   - [x] Retornar task atualizada
 
+<<<<<<< HEAD
 - [x] **1.5 Deletar Tarefa** ✅
+=======
+- [x] **1.5 Deletar Tarefa** ✅ COMPLETO
+>>>>>>> e14a2144b358425416219dcc49e76be76b968523
   - [x] Botão delete no modal de edição
   - [x] Confirmação (dialog)
   - [x] API DELETE /api/tasks/:id
   - [x] Remove do Kanban otimisticamente
 
+<<<<<<< HEAD
 - [x] **1.6 API DELETE /api/tasks/:id** ✅
   - [x] Endpoint DELETE em `src/app/api/tasks/[id]/route.ts`
   - [x] Validar tenant_id ownership
@@ -120,6 +167,58 @@
   - [x] Botão delete no modal
   - [x] Confirmação com AlertDialog
   - [x] API DELETE /api/projects/:id
+=======
+- [x] **1.6 API DELETE /api/tasks/:id** ✅ COMPLETO
+  - [x] Endpoint DELETE em `src/app/api/tasks/[id]/route.ts`
+  - [x] Validar tenant_id ownership
+  - [x] Soft delete (is_active = false) implementado
+  - [x] Retornar sucesso
+
+**Resultado**: ✅ Usuários podem criar, editar, deletar tasks via UI - **SPRINT 1 FINALIZADA**
+
+---
+
+### 📅 Sprint 2: CRUD de Projetos (Semana 1-2) - **🚀 EM PROGRESSO**
+
+**Arquivos a modificar**:
+- `src/app/(auth)/projetos/page.tsx`
+- `src/app/api/projects/route.ts` (adicionar POST)
+- `src/app/api/projects/[id]/route.ts` (criar PUT/DELETE)
+- `src/components/projects/` (criar)
+
+#### Tasks:
+
+- [ ] **2.1 Modal Criar Projeto**
+  - [ ] Criar `src/components/projects/CreateProjectModal.tsx`
+  - [ ] Form: code, name, description, status, priority, start_date, end_date, budget, client_name, owner_id
+  - [ ] Validação com Zod
+  - [ ] Botão "Novo Projeto" na página /projetos
+
+- [ ] **2.2 API POST /api/projects**
+  - [ ] Endpoint POST em `src/app/api/projects/route.ts`
+  - [ ] Validar tenant_id
+  - [ ] Gerar `code` automático (PROJ-XXX)
+  - [ ] Inserir projeto
+  - [ ] Retornar projeto criado
+
+- [ ] **2.3 Modal Editar Projeto**
+  - [ ] Criar `src/components/projects/EditProjectModal.tsx`
+  - [ ] Reutilizar form base do CreateProjectModal
+  - [ ] Abrir ao clicar na linha da tabela
+  - [ ] Pré-popular dados existentes
+
+- [ ] **2.4 API PUT /api/projects/:id**
+  - [ ] Criar `src/app/api/projects/[id]/route.ts`
+  - [ ] Validar tenant_id ownership
+  - [ ] Update projeto
+  - [ ] Retornar projeto atualizado
+
+- [ ] **2.5 Deletar Projeto**
+  - [ ] Botão delete no modal de edição
+  - [ ] Confirmação com aviso sobre tasks relacionadas
+  - [ ] API DELETE /api/projects/:id
+  - [ ] Atualizar lista após deleção
+>>>>>>> e14a2144b358425416219dcc49e76be76b968523
 
 - [x] **2.6 Página Detalhe do Projeto** ⏭️
   - [ ] Criar `src/app/(auth)/projetos/[id]/page.tsx`
@@ -439,9 +538,29 @@ CREATE TABLE meetings (
 ## 📈 Progresso Tracker
 
 ### Fase 1 - MVP Funcional (Target: Semana 3)
+<<<<<<< HEAD
 - [x] Sprint 1: CRUD Tarefas (6/6 tasks) ✅ **COMPLETO**
 - [x] Sprint 2: CRUD Projetos (5/6 tasks) ✅ **COMPLETO**
 - [ ] Sprint 3: CRUD Sprints (0/5 tasks) 🔄 **PRÓXIMO**
+=======
+- [x] **Sprint 1: CRUD Tarefas (6/6 tasks) ✅ COMPLETO**
+  - [x] Modal Criar Tarefa
+  - [x] API POST /api/tasks
+  - [x] Modal Editar Tarefa
+  - [x] API PUT /api/tasks/:id
+  - [x] Deletar Tarefa (UI + confirmação)
+  - [x] API DELETE /api/tasks/:id
+  
+- [ ] **Sprint 2: CRUD Projetos (0/6 tasks) 🚀 EM PROGRESSO**
+  - [ ] Modal Criar Projeto
+  - [ ] API POST /api/projects
+  - [ ] Modal Editar Projeto
+  - [ ] API PUT /api/projects/:id
+  - [ ] Deletar Projeto
+  - [ ] (Opcional) Página Detalhe do Projeto
+
+- [ ] Sprint 3: CRUD Sprints (0/5 tasks)
+>>>>>>> e14a2144b358425416219dcc49e76be76b968523
 - [ ] Sprint 4: Comentários + Time Logs (0/2 tasks)
 
 ### Fase 2 - Analytics (Target: Semana 5)
@@ -460,6 +579,7 @@ CREATE TABLE meetings (
 
 ## 🎯 Próximas Ações (AGORA)
 
+<<<<<<< HEAD
 **Sprint 3 - CRUD Sprints** (ordem de prioridade):
 
 1. 🔄 Sprint 3, Task 3.1: Criar `CreateSprintModal.tsx`
@@ -469,11 +589,28 @@ CREATE TABLE meetings (
 5. ⏳ Sprint 3, Task 3.4: Implementar `PUT /api/sprints/:id`
 6. ⏳ Sprint 3, Task 3.5: Implementar `DELETE /api/sprints/:id`
 7. ⏳ Integrar modals na página Kanban
+=======
+**Sprint 1 Status**: ✅ **FINALIZADA** (2025-12-05)
+
+**Sprint 2 - Em Progresso** (ordem de prioridade):
+
+1. 🚀 Sprint 2, Task 2.1: Criar `CreateProjectModal.tsx`
+2. 🚀 Sprint 2, Task 2.2: Implementar `POST /api/projects`
+3. 🚀 Testar criação de projeto via UI
+4. 🚀 Sprint 2, Task 2.3: Criar `EditProjectModal.tsx`
+5. 🚀 Sprint 2, Task 2.4: Implementar `PUT /api/projects/:id`
+6. 🚀 Sprint 2, Task 2.5: Implementar deleção de projeto
+7. 🚀 Continuar para Sprint 3 após conclusão...
+>>>>>>> e14a2144b358425416219dcc49e76be76b968523
 
 ---
 
 **Última Atualização**: 2025-12-05
+<<<<<<< HEAD
 **Versão**: 1.2
+=======
+**Versão**: 1.0
+>>>>>>> e14a2144b358425416219dcc49e76be76b968523
 **Mantido por**: Equipe de Desenvolvimento ERP UzzAI
 
 **🎉 Sprints 1 e 2 Completas!** 

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getTenantContext } from '@/lib/supabase/tenant';
@@ -43,12 +44,108 @@ export async function PUT(
       .single();
 
     if (fetchError || !existingProject) {
+=======
+import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@/lib/supabase/server';
+import { getTenantContext } from '@/lib/supabase/tenant';
+import { handleApiError } from '@/lib/api-errors';
+
+type RouteContext = {
+  params: Promise<{ id: string }>;
+};
+
+export async function GET(
+  request: NextRequest,
+  context: RouteContext
+) {
+  try {
+    const { id } = await context.params;
+    const { tenantId } = await getTenantContext();
+    
+    const supabase = await createClient();
+
+    const { data, error } = await supabase
+      .from('projects')
+      .select(`
+        *,
+        owner:users!projects_owner_id_fkey (
+          id,
+          full_name,
+          email,
+          avatar_url
+        ),
+        project_members (
+          id,
+          role,
+          user_id,
+          users:users!project_members_user_id_fkey (
+            id,
+            full_name,
+            email,
+            avatar_url
+          )
+        )
+      `)
+      .eq('id', id)
+      .eq('tenant_id', tenantId)
+      .single();
+
+    if (error) {
+      console.error('Error fetching project:', error);
+      return NextResponse.json(
+        { success: false, error: error.message },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({ success: true, data });
+  } catch (error) {
+    return handleApiError(error);
+  }
+}
+
+export async function PUT(
+  request: NextRequest,
+  context: RouteContext
+) {
+  try {
+    const { id } = await context.params;
+    const { tenantId } = await getTenantContext();
+    const supabase = await createClient();
+
+    // Parse request body
+    const body = await request.json();
+    const {
+      name,
+      description,
+      status,
+      priority,
+      start_date,
+      end_date,
+      budget,
+      client_name,
+      client_contact,
+      client_email,
+      owner_id,
+    } = body;
+
+    // Verify project exists and belongs to tenant
+    const { data: existing, error: fetchError } = await supabase
+      .from('projects')
+      .select('id, tenant_id')
+      .eq('id', id)
+      .eq('tenant_id', tenantId)
+      .single();
+
+    if (fetchError || !existing) {
+>>>>>>> e14a2144b358425416219dcc49e76be76b968523
       return NextResponse.json(
         { success: false, error: 'Projeto não encontrado' },
         { status: 404 }
       );
     }
 
+<<<<<<< HEAD
     // Update the project
     const { data: updatedProject, error: updateError } = await supabase
       .from('projects')
@@ -57,6 +154,26 @@ export async function PUT(
         updated_at: new Date().toISOString(),
       })
       .eq('id', projectId)
+=======
+    // Update project
+    const { data: project, error: updateError } = await supabase
+      .from('projects')
+      .update({
+        name,
+        description,
+        status,
+        priority,
+        start_date,
+        end_date,
+        budget,
+        client_name,
+        client_contact,
+        client_email,
+        owner_id: owner_id || null,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', id)
+>>>>>>> e14a2144b358425416219dcc49e76be76b968523
       .eq('tenant_id', tenantId)
       .select()
       .single();
@@ -69,6 +186,7 @@ export async function PUT(
       );
     }
 
+<<<<<<< HEAD
     return NextResponse.json({ success: true, data: updatedProject });
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -77,11 +195,16 @@ export async function PUT(
         { status: 400 }
       );
     }
+=======
+    return NextResponse.json({ success: true, data: project });
+  } catch (error) {
+>>>>>>> e14a2144b358425416219dcc49e76be76b968523
     return handleApiError(error);
   }
 }
 
 export async function DELETE(
+<<<<<<< HEAD
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -99,17 +222,44 @@ export async function DELETE(
       .single();
 
     if (fetchError || !existingProject) {
+=======
+  request: NextRequest,
+  context: RouteContext
+) {
+  try {
+    const { id } = await context.params;
+    const { tenantId } = await getTenantContext();
+    const supabase = await createClient();
+
+    // Verify project exists and belongs to tenant
+    const { data: existing, error: fetchError } = await supabase
+      .from('projects')
+      .select('id, tenant_id, name')
+      .eq('id', id)
+      .eq('tenant_id', tenantId)
+      .single();
+
+    if (fetchError || !existing) {
+>>>>>>> e14a2144b358425416219dcc49e76be76b968523
       return NextResponse.json(
         { success: false, error: 'Projeto não encontrado' },
         { status: 404 }
       );
     }
 
+<<<<<<< HEAD
     // Delete the project (CASCADE will handle related records)
     const { error: deleteError } = await supabase
       .from('projects')
       .delete()
       .eq('id', projectId)
+=======
+    // Delete project (CASCADE will handle related records)
+    const { error: deleteError } = await supabase
+      .from('projects')
+      .delete()
+      .eq('id', id)
+>>>>>>> e14a2144b358425416219dcc49e76be76b968523
       .eq('tenant_id', tenantId);
 
     if (deleteError) {
@@ -122,7 +272,11 @@ export async function DELETE(
 
     return NextResponse.json({ 
       success: true, 
+<<<<<<< HEAD
       message: 'Projeto excluído com sucesso' 
+=======
+      message: 'Projeto deletado com sucesso'
+>>>>>>> e14a2144b358425416219dcc49e76be76b968523
     });
   } catch (error) {
     return handleApiError(error);

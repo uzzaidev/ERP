@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Plus, Search, ExternalLink, Calendar, DollarSign, Users } from "lucide-react";
+import { Plus, Search, ExternalLink, Calendar, DollarSign, Users, Edit } from "lucide-react";
 import Link from "next/link";
-import { CreateProjectModal } from "@/components/projects";
+import { CreateProjectModal, EditProjectModal } from "@/components/projects";
 
 interface Project {
   id: string;
@@ -24,6 +24,7 @@ export default function ProjetosPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [editingProjectId, setEditingProjectId] = useState<string | null>(null);
 
   const fetchProjects = async () => {
     try {
@@ -221,9 +222,17 @@ export default function ProjetosPage() {
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center justify-end gap-2">
+                          <button
+                            onClick={() => setEditingProjectId(project.id)}
+                            className="rounded-lg border border-slate-700 bg-slate-800 p-2 text-slate-300 transition-colors hover:bg-slate-700 hover:text-white"
+                            title="Editar projeto"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </button>
                           <Link
                             href={`/projetos/${project.id}`}
                             className="rounded-lg border border-slate-700 bg-slate-800 p-2 text-slate-300 transition-colors hover:bg-slate-700 hover:text-white"
+                            title="Ver detalhes"
                           >
                             <ExternalLink className="h-4 w-4" />
                           </Link>
@@ -252,6 +261,16 @@ export default function ProjetosPage() {
         onOpenChange={setIsCreateModalOpen}
         onSuccess={fetchProjects}
       />
+
+      {/* Edit Project Modal */}
+      {editingProjectId && (
+        <EditProjectModal
+          open={!!editingProjectId}
+          onOpenChange={(open) => !open && setEditingProjectId(null)}
+          projectId={editingProjectId}
+          onSuccess={fetchProjects}
+        />
+      )}
     </div>
   );
 }

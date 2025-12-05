@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Plus, Search, ExternalLink, Calendar, DollarSign, Users } from "lucide-react";
+import { Plus, Search, ExternalLink, Calendar, DollarSign, Users, Pencil } from "lucide-react";
 import Link from "next/link";
+import { CreateProjectModal } from "@/components/projects/CreateProjectModal";
+import { EditProjectModal } from "@/components/projects/EditProjectModal";
 
 interface Project {
   id: string;
@@ -10,10 +12,16 @@ interface Project {
   name: string;
   description: string;
   status: string;
+  priority: string;
   start_date: string;
   end_date: string;
+  estimated_hours: number;
   budget: number;
-  spent_amount: number;
+  spent: number;
+  client_name?: string;
+  client_contact?: string;
+  client_email?: string;
+  owner_id?: string;
   project_members: Array<{ user_id: string; role: string }>;
   created_at: string;
 }
@@ -22,25 +30,41 @@ export default function ProjetosPage() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+
+  const fetchProjects = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('/api/projects');
+      const data = await response.json();
+      if (data.data) {
+        setProjects(data.data);
+      }
+    } catch (error) {
+      console.error('Error fetching projects:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    async function fetchProjects() {
-      try {
-        setLoading(true);
-        const response = await fetch('/api/projects');
-        const data = await response.json();
-        if (data.data) {
-          setProjects(data.data);
-        }
-      } catch (error) {
-        console.error('Error fetching projects:', error);
-      } finally {
-        setLoading(false);
-      }
-    }
-
     fetchProjects();
   }, []);
+
+  const handleCreateSuccess = () => {
+    fetchProjects();
+  };
+
+  const handleEditSuccess = () => {
+    fetchProjects();
+  };
+
+  const handleEditClick = (project: Project) => {
+    setSelectedProject(project);
+    setEditModalOpen(true);
+  };
 
   const filteredProjects = projects.filter(project =>
     project.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -95,7 +119,10 @@ export default function ProjetosPage() {
             Gerencie todos os projetos da empresa
           </p>
         </div>
-        <button className="flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2.5 font-medium text-white transition-colors hover:bg-emerald-700">
+        <button 
+          onClick={() => setCreateModalOpen(true)}
+          className="flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2.5 font-medium text-white transition-colors hover:bg-emerald-700"
+        >
           <Plus className="h-5 w-5" />
           Novo Projeto
         </button>
@@ -147,13 +174,14 @@ export default function ProjetosPage() {
               <tbody className="divide-y divide-slate-700/30">
                 {filteredProjects.map((project) => {
                   const budgetUsed = project.budget > 0 
-                    ? (project.spent_amount / project.budget) * 100 
+                    ? (project.spent / project.budget) * 100 
                     : 0;
 
                   return (
                     <tr 
                       key={project.id} 
-                      className="hover:bg-slate-800/30 transition-colors"
+                      className="hover:bg-slate-800/30 transition-colors cursor-pointer"
+                      onClick={() => handleEditClick(project)}
                     >
                       <td className="px-6 py-4">
                         <div>
@@ -192,7 +220,7 @@ export default function ProjetosPage() {
                         <div>
                           <div className="flex items-center gap-1.5 text-sm text-slate-300">
                             <DollarSign className="h-3.5 w-3.5 text-slate-400" />
-                            <span>{formatCurrency(project.spent_amount)}</span>
+                            <span>{formatCurrency(project.spent)}</span>
                             <span className="text-slate-500">/</span>
                             <span>{formatCurrency(project.budget)}</span>
                           </div>
@@ -216,8 +244,18 @@ export default function ProjetosPage() {
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center justify-end gap-2">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleEditClick(project);
+                            }}
+                            className="rounded-lg border border-slate-700 bg-slate-800 p-2 text-slate-300 transition-colors hover:bg-slate-700 hover:text-white"
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </button>
                           <Link
                             href={`/projetos/${project.id}`}
+                            onClick={(e) => e.stopPropagation()}
                             className="rounded-lg border border-slate-700 bg-slate-800 p-2 text-slate-300 transition-colors hover:bg-slate-700 hover:text-white"
                           >
                             <ExternalLink className="h-4 w-4" />
@@ -240,6 +278,20 @@ export default function ProjetosPage() {
           )}
         </div>
       )}
+
+      {/* Modals */}
+      <CreateProjectModal
+        open={createModalOpen}
+        onOpenChange={setCreateModalOpen}
+        onSuccess={handleCreateSuccess}
+      />
+
+      <EditProjectModal
+        open={editModalOpen}
+        onOpenChange={setEditModalOpen}
+        project={selectedProject}
+        onSuccess={handleEditSuccess}
+      />
     </div>
   );
 }

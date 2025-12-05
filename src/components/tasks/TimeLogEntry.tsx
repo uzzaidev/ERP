@@ -66,7 +66,7 @@ export function TimeLogEntry({ taskId, onTimeLogged }: TimeLogEntryProps) {
 
     const hoursNum = parseFloat(hours);
     if (isNaN(hoursNum) || hoursNum <= 0) {
-      setError("Horas devem ser maior que 0");
+      setError("Horas deve ser maior que 0");
       return;
     }
 

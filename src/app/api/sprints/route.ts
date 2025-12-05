@@ -10,7 +10,10 @@ const createSprintSchema = z.object({
   goal: z.string().optional(),
   start_date: z.string().min(1, 'Data de início é obrigatória'),
   end_date: z.string().min(1, 'Data de término é obrigatória'),
-  project_id: z.string().uuid().optional(),
+  project_id: z.preprocess(
+    (val) => val === '' ? undefined : val,
+    z.string().uuid().optional()
+  ),
   status: z.enum(['planned', 'active', 'completed']).default('planned'),
 });
 

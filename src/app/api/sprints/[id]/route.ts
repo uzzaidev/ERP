@@ -7,10 +7,22 @@ import { z } from 'zod';
 // Validation schema for updating a sprint
 const updateSprintSchema = z.object({
   name: z.string().min(1, 'Nome é obrigatório').optional(),
-  goal: z.string().optional(),
-  start_date: z.string().optional(),
-  end_date: z.string().optional(),
-  project_id: z.string().uuid().optional().nullable(),
+  goal: z.preprocess(
+    (val) => val === '' ? undefined : val,
+    z.string().optional()
+  ),
+  start_date: z.preprocess(
+    (val) => val === '' ? undefined : val,
+    z.string().optional()
+  ),
+  end_date: z.preprocess(
+    (val) => val === '' ? undefined : val,
+    z.string().optional()
+  ),
+  project_id: z.preprocess(
+    (val) => val === '' ? undefined : val,
+    z.string().uuid().optional().nullable()
+  ),
   status: z.enum(['planned', 'active', 'completed']).optional(),
 });
 

@@ -77,7 +77,7 @@ export default function KanbanPage() {
             created_at: string;
             updated_at: string;
             assignee?: { id: string; full_name: string; email: string; avatar_url?: string };
-            task_tags?: Array<{ tag?: { name: string } }>;
+            task_tags?: Array<{ tag?: { id: string; name: string; color: string } }>;
           }) => ({
             id: task.code || task.id,
             title: task.title,
@@ -93,7 +93,7 @@ export default function KanbanPage() {
             priority: task.priority,
             estimatedHours: task.estimated_hours || 0,
             completedHours: task.completed_hours || 0,
-            tags: task.task_tags?.map((tt) => tt.tag?.name).filter(Boolean) || [],
+            tags: task.task_tags?.map((tt) => tt.tag).filter((tag): tag is { id: string; name: string; color: string } => tag !== undefined) || [],
             comments: [],
             createdAt: task.created_at,
             updatedAt: task.updated_at,
@@ -258,7 +258,7 @@ export default function KanbanPage() {
             created_at: string;
             updated_at: string;
             assignee?: { id: string; full_name: string; email: string; avatar_url?: string };
-            task_tags?: Array<{ tag?: { name: string } }>;
+            task_tags?: Array<{ tag?: { id: string; name: string; color: string } }>;
           }) => ({
             id: task.code || task.id,
             title: task.title,
@@ -274,7 +274,7 @@ export default function KanbanPage() {
             priority: task.priority,
             estimatedHours: task.estimated_hours || 0,
             completedHours: task.completed_hours || 0,
-            tags: task.task_tags?.map((tt) => tt.tag?.name).filter(Boolean) || [],
+            tags: task.task_tags?.map((tt) => tt.tag).filter((tag): tag is { id: string; name: string; color: string } => tag !== undefined) || [],
             comments: [],
             createdAt: task.created_at,
             updatedAt: task.updated_at,
@@ -320,7 +320,7 @@ export default function KanbanPage() {
             created_at: string;
             updated_at: string;
             assignee?: { id: string; full_name: string; email: string; avatar_url?: string };
-            task_tags?: Array<{ tag?: { name: string } }>;
+            task_tags?: Array<{ tag?: { id: string; name: string; color: string } }>;
           }) => ({
             id: task.code || task.id,
             title: task.title,
@@ -336,7 +336,7 @@ export default function KanbanPage() {
             priority: task.priority,
             estimatedHours: task.estimated_hours || 0,
             completedHours: task.completed_hours || 0,
-            tags: task.task_tags?.map((tt) => tt.tag?.name).filter(Boolean) || [],
+            tags: task.task_tags?.map((tt) => tt.tag).filter((tag): tag is { id: string; name: string; color: string } => tag !== undefined) || [],
             comments: [],
             createdAt: task.created_at,
             updatedAt: task.updated_at,

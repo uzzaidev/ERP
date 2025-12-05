@@ -62,11 +62,6 @@ export const navigation: NavGroup[] = [
         icon: Calendar,
       },
       {
-        title: "Acoes",
-        href: "/acoes",
-        icon: CheckSquare,
-      },
-      {
         title: "Bullet Journal",
         href: "/bullet-journal",
         icon: BookOpen,

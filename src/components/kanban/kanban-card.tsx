@@ -76,18 +76,35 @@ export const KanbanCard = memo(function KanbanCard({ card, onAssigneeChange }: K
 
         {/* Card Content */}
         <div className="flex-1" onClick={handleCardClick}>
-          {/* Priority Badge & Tags */}
-          <div className="mb-3 flex items-center justify-between">
+          {/* Priority Badge */}
+          <div className="mb-2">
             <span className={`rounded-full border px-2 py-0.5 text-xs font-medium ${priorityColors[card.priority]}`}>
               {card.priority}
             </span>
-            {card.tags.length > 0 && (
-              <span className="text-xs text-slate-500">+{card.tags.length}</span>
-            )}
           </div>
 
           {/* Title */}
           <h3 className="mb-2 font-medium text-white line-clamp-2">{card.title}</h3>
+
+          {/* Tags */}
+          {card.tags.length > 0 && (
+            <div className="mb-3 flex flex-wrap gap-1">
+              {card.tags.map((tag) => (
+                <span
+                  key={tag.id}
+                  className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium"
+                  style={{
+                    backgroundColor: tag.color + "20",
+                    color: tag.color,
+                    borderColor: tag.color,
+                    borderWidth: "1px",
+                  }}
+                >
+                  {tag.name}
+                </span>
+              ))}
+            </div>
+          )}
 
           {/* Description Preview */}
           {card.description && (

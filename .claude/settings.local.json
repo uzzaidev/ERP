@@ -5,7 +5,9 @@
       "mcp__byterover-mcp__byterover-store-knowledge",
       "WebFetch(domain:vercel.link)",
       "Bash(pnpm view:*)",
-      "Bash(pnpm install:*)"
+      "Bash(pnpm install:*)",
+      "Bash(ls:*)",
+      "Bash(pnpm build:*)"
     ],
     "deny": [],
     "ask": []

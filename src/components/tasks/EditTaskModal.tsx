@@ -14,8 +14,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { TaskComments } from "./TaskComments";
-import { TimeLogEntry } from "./TimeLogEntry";
+import { TagSelector } from "@/components/tags/TagSelector";
 
 // Task edit schema
 const editTaskSchema = z.object({
@@ -86,13 +85,13 @@ export function EditTaskModal({
   const [sprints, setSprints] = useState<Sprint[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [task, setTask] = useState<Task | null>(null);
-  const [completedHours, setCompletedHours] = useState<number>(0);
+  const [taskTags, setTaskTags] = useState<Array<{id: string; name: string; color: string}>>([]);
 
   const {
     register,
-    handleSubmit,
     formState: { errors },
     reset,
+    watch,
   } = useForm<EditTaskFormData>({
     resolver: zodResolver(editTaskSchema),
   });
@@ -123,20 +122,26 @@ export function EditTaskModal({
         due_date: task.due_date ? task.due_date.split('T')[0] : "",
         estimated_hours: task.estimated_hours || 0,
       });
-      // Initialize completed hours from task data
-      setCompletedHours(task.completed_hours || 0);
     }
   }, [task, reset]);
 
   const fetchTaskDetails = async () => {
     if (!taskId) return;
-    
+
     setIsLoading(true);
     try {
       const response = await fetch(`/api/tasks/${taskId}`);
       const data = await response.json();
       if (data.success && data.data) {
         setTask(data.data);
+        // Extract tags from task_tags relation
+        if (data.data.task_tags) {
+          type TagType = { id: string; name: string; color: string };
+          const tags = data.data.task_tags
+            .map((tt: { tag?: TagType }) => tt.tag)
+            .filter((tag: TagType | undefined): tag is TagType => tag !== undefined);
+          setTaskTags(tags);
+        }
       }
     } catch (error) {
       console.error("Error fetching task:", error);
@@ -181,9 +186,28 @@ export function EditTaskModal({
     }
   };
 
-  const onSubmit = async (data: EditTaskFormData) => {
+  const handleSaveTask = async () => {
     if (!taskId) return;
-    
+
+    const data = {
+      title: watch("title"),
+      description: watch("description"),
+      status: watch("status"),
+      priority: watch("priority"),
+      task_type: watch("task_type"),
+      assignee_id: watch("assignee_id"),
+      project_id: watch("project_id"),
+      sprint_id: watch("sprint_id"),
+      due_date: watch("due_date"),
+      estimated_hours: watch("estimated_hours"),
+    };
+
+    // Validate title
+    if (!data.title || data.title.trim().length === 0) {
+      alert("Título é obrigatório");
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       const response = await fetch(`/api/tasks/${taskId}`, {
@@ -214,7 +238,7 @@ export function EditTaskModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-card border-border">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-card border-border">
         <DialogHeader>
           <div className="flex items-center justify-between">
             <DialogTitle className="text-xl font-semibold text-card-foreground">
@@ -234,7 +258,7 @@ export function EditTaskModal({
             <div className="text-muted-foreground">Carregando...</div>
           </div>
         ) : (
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mt-4">
+          <div className="space-y-4 mt-4">
             {/* Title */}
             <div>
               <Label htmlFor="title" className="text-card-foreground">
@@ -404,24 +428,18 @@ export function EditTaskModal({
                   className="mt-1 bg-background border-input text-foreground"
                   placeholder="0"
                 />
-                {completedHours > 0 && (
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    Horas trabalhadas: {completedHours.toFixed(1)}h
-                  </p>
-                )}
               </div>
             </div>
 
-            {/* Comments & Time Tracking Sections */}
-            {taskId && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-border">
-                <TaskComments taskId={taskId} />
-                <TimeLogEntry 
-                  taskId={taskId} 
-                  onTimeLogged={(totalHours) => setCompletedHours(totalHours)}
-                />
-              </div>
-            )}
+            {/* Tags Section */}
+            <div className="pt-2">
+              <Label className="text-card-foreground mb-2 block">Tags</Label>
+              <TagSelector
+                taskId={taskId || undefined}
+                selectedTags={taskTags}
+                onTagsChange={setTaskTags}
+              />
+            </div>
 
             {/* Action Buttons */}
             <div className="flex justify-end gap-3 pt-4 border-t border-border">
@@ -435,14 +453,15 @@ export function EditTaskModal({
                 Cancelar
               </Button>
               <Button
-                type="submit"
+                type="button"
+                onClick={handleSaveTask}
                 disabled={isSubmitting || isLoading}
                 className="bg-primary text-primary-foreground hover:bg-primary/90"
               >
                 {isSubmitting ? "Salvando..." : "Salvar Alterações"}
               </Button>
             </div>
-          </form>
+          </div>
         )}
       </DialogContent>
     </Dialog>

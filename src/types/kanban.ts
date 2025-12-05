@@ -13,7 +13,11 @@ export interface KanbanCard {
   priority: "low" | "medium" | "high" | "critical";
   estimatedHours: number;
   completedHours: number;
-  tags: string[];
+  tags: Array<{
+    id: string;
+    name: string;
+    color: string;
+  }>;
   comments: KanbanComment[];
   createdAt: string;
   updatedAt: string;

@@ -7,18 +7,48 @@ import { z } from 'zod';
 // Validation schema for updating a project
 const updateProjectSchema = z.object({
   name: z.string().min(1, 'Nome é obrigatório').optional(),
-  description: z.string().optional(),
+  description: z.preprocess(
+    (val) => val === '' ? undefined : val,
+    z.string().optional()
+  ),
   status: z.enum(['active', 'on_hold', 'completed', 'cancelled']).optional(),
   priority: z.enum(['low', 'medium', 'high', 'critical']).optional(),
-  start_date: z.string().optional(),
-  end_date: z.string().optional(),
-  estimated_hours: z.number().optional(),
-  budget: z.number().optional(),
-  spent: z.number().optional(),
-  client_name: z.string().optional(),
-  client_contact: z.string().optional(),
-  client_email: z.string().email().optional().or(z.literal('')),
-  owner_id: z.string().uuid().optional(),
+  start_date: z.preprocess(
+    (val) => val === '' ? undefined : val,
+    z.string().optional()
+  ),
+  end_date: z.preprocess(
+    (val) => val === '' ? undefined : val,
+    z.string().optional()
+  ),
+  estimated_hours: z.preprocess(
+    (val) => val === '' || val === null ? undefined : Number(val),
+    z.number().optional()
+  ),
+  budget: z.preprocess(
+    (val) => val === '' || val === null ? undefined : Number(val),
+    z.number().optional()
+  ),
+  spent: z.preprocess(
+    (val) => val === '' || val === null ? undefined : Number(val),
+    z.number().optional()
+  ),
+  client_name: z.preprocess(
+    (val) => val === '' ? undefined : val,
+    z.string().optional()
+  ),
+  client_contact: z.preprocess(
+    (val) => val === '' ? undefined : val,
+    z.string().optional()
+  ),
+  client_email: z.preprocess(
+    (val) => val === '' ? undefined : val,
+    z.string().email().optional()
+  ),
+  owner_id: z.preprocess(
+    (val) => val === '' ? undefined : val,
+    z.string().uuid().optional()
+  ),
 });
 
 type RouteContext = {

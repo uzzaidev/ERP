@@ -147,10 +147,16 @@ export function KanbanCardModal({ onAssigneeChange, onEditClick }: KanbanCardMod
                 <div className="flex flex-wrap gap-2">
                   {selectedCard.tags.map((tag) => (
                     <span
-                      key={tag}
-                      className="rounded-full bg-muted px-2 py-1 text-xs text-muted-foreground"
+                      key={tag.id}
+                      className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                      style={{
+                        backgroundColor: tag.color + "20",
+                        color: tag.color,
+                        borderColor: tag.color,
+                        borderWidth: "1px",
+                      }}
                     >
-                      {tag}
+                      {tag.name}
                     </span>
                   ))}
                   {selectedCard.tags.length === 0 && (

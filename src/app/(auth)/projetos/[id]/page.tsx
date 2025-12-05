@@ -1,19 +1,22 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { 
-  ArrowLeft, 
-  Settings, 
+import {
+  ArrowLeft,
+  Settings,
   Calendar,
   DollarSign,
   Users,
   CheckCircle2,
   Clock,
   AlertCircle,
-  User
+  User,
+  UserPlus,
+  X
 } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { AddProjectMemberModal } from "@/components/projects/AddProjectMemberModal";
 
 interface ProjectMember {
   id: string;
@@ -71,6 +74,7 @@ export default function ProjetoDetailPage() {
   const [project, setProject] = useState<Project | null>(null);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showAddMemberModal, setShowAddMemberModal] = useState(false);
 
   const fetchProjectData = useCallback(async () => {
     try {
@@ -104,6 +108,30 @@ export default function ProjetoDetailPage() {
       fetchProjectTasks();
     }
   }, [id, fetchProjectData, fetchProjectTasks]);
+
+  const handleRemoveMember = async (memberId: string) => {
+    if (!confirm("Tem certeza que deseja remover este membro do projeto?")) {
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `/api/projects/${id}/members?member_id=${memberId}`,
+        { method: "DELETE" }
+      );
+
+      if (!response.ok) {
+        const result = await response.json();
+        throw new Error(result.error || "Erro ao remover membro");
+      }
+
+      // Refresh project data
+      fetchProjectData();
+    } catch (error) {
+      console.error("Error removing member:", error);
+      alert(error instanceof Error ? error.message : "Erro ao remover membro");
+    }
+  };
 
   if (loading) {
     return (
@@ -417,21 +445,37 @@ export default function ProjetoDetailPage() {
 
           {/* Team Members */}
           <div className="rounded-xl border border-slate-700/50 bg-slate-900/30 p-6">
-            <h3 className="text-sm font-medium text-slate-400 mb-4">
-              Equipe ({project.project_members.length})
-            </h3>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-sm font-medium text-slate-400">
+                Equipe ({project.project_members.length})
+              </h3>
+              <button
+                onClick={() => setShowAddMemberModal(true)}
+                className="flex items-center gap-1 rounded-lg bg-emerald-500/20 px-2 py-1 text-xs font-medium text-emerald-400 hover:bg-emerald-500/30 transition-colors"
+              >
+                <UserPlus className="h-3.5 w-3.5" />
+                Adicionar
+              </button>
+            </div>
             <div className="space-y-3">
               {project.project_members.map((member) => (
-                <div key={member.id} className="flex items-center justify-between">
+                <div key={member.id} className="flex items-center justify-between group">
                   <div className="flex items-center gap-3">
                     <div className="h-8 w-8 rounded-full bg-blue-500/20 flex items-center justify-center">
                       <User className="h-4 w-4 text-blue-400" />
                     </div>
                     <div>
                       <p className="text-sm text-slate-200">{member.users.full_name}</p>
-                      <p className="text-xs text-slate-500">{member.role}</p>
+                      <p className="text-xs text-slate-500">{member.role || "Sem função"}</p>
                     </div>
                   </div>
+                  <button
+                    onClick={() => handleRemoveMember(member.id)}
+                    className="opacity-0 group-hover:opacity-100 rounded p-1 text-red-400 hover:bg-red-500/20 transition-all"
+                    title="Remover membro"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
                 </div>
               ))}
               {project.project_members.length === 0 && (
@@ -468,6 +512,16 @@ export default function ProjetoDetailPage() {
           </div>
         </div>
       </div>
+
+      {/* Add Member Modal */}
+      <AddProjectMemberModal
+        open={showAddMemberModal}
+        onOpenChange={setShowAddMemberModal}
+        projectId={id}
+        onSuccess={() => {
+          fetchProjectData();
+        }}
+      />
     </div>
   );
 }

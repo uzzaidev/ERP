@@ -1,5 +1,4 @@
-<<<<<<< HEAD
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getTenantContext } from '@/lib/supabase/tenant';
 import { handleApiError } from '@/lib/api-errors';
@@ -21,34 +20,6 @@ const updateProjectSchema = z.object({
   client_email: z.string().email().optional().or(z.literal('')),
   owner_id: z.string().uuid().optional(),
 });
-
-export async function PUT(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  try {
-    const { tenantId } = await getTenantContext();
-    const supabase = await createClient();
-    const { id: projectId } = await params;
-
-    // Parse and validate request body
-    const body = await request.json();
-    const validatedData = updateProjectSchema.parse(body);
-
-    // First, verify the project exists and belongs to the tenant
-    const { data: existingProject, error: fetchError } = await supabase
-      .from('projects')
-      .select('id')
-      .eq('id', projectId)
-      .eq('tenant_id', tenantId)
-      .single();
-
-    if (fetchError || !existingProject) {
-=======
-import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
-import { getTenantContext } from '@/lib/supabase/tenant';
-import { handleApiError } from '@/lib/api-errors';
 
 type RouteContext = {
   params: Promise<{ id: string }>;
@@ -109,43 +80,29 @@ export async function PUT(
   context: RouteContext
 ) {
   try {
-    const { id } = await context.params;
     const { tenantId } = await getTenantContext();
     const supabase = await createClient();
+    const { id: projectId } = await context.params;
 
-    // Parse request body
+    // Parse and validate request body
     const body = await request.json();
-    const {
-      name,
-      description,
-      status,
-      priority,
-      start_date,
-      end_date,
-      budget,
-      client_name,
-      client_contact,
-      client_email,
-      owner_id,
-    } = body;
+    const validatedData = updateProjectSchema.parse(body);
 
-    // Verify project exists and belongs to tenant
-    const { data: existing, error: fetchError } = await supabase
+    // First, verify the project exists and belongs to the tenant
+    const { data: existingProject, error: fetchError } = await supabase
       .from('projects')
-      .select('id, tenant_id')
-      .eq('id', id)
+      .select('id')
+      .eq('id', projectId)
       .eq('tenant_id', tenantId)
       .single();
 
-    if (fetchError || !existing) {
->>>>>>> e14a2144b358425416219dcc49e76be76b968523
+    if (fetchError || !existingProject) {
       return NextResponse.json(
         { success: false, error: 'Projeto não encontrado' },
         { status: 404 }
       );
     }
 
-<<<<<<< HEAD
     // Update the project
     const { data: updatedProject, error: updateError } = await supabase
       .from('projects')
@@ -154,26 +111,6 @@ export async function PUT(
         updated_at: new Date().toISOString(),
       })
       .eq('id', projectId)
-=======
-    // Update project
-    const { data: project, error: updateError } = await supabase
-      .from('projects')
-      .update({
-        name,
-        description,
-        status,
-        priority,
-        start_date,
-        end_date,
-        budget,
-        client_name,
-        client_contact,
-        client_email,
-        owner_id: owner_id || null,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', id)
->>>>>>> e14a2144b358425416219dcc49e76be76b968523
       .eq('tenant_id', tenantId)
       .select()
       .single();
@@ -186,7 +123,6 @@ export async function PUT(
       );
     }
 
-<<<<<<< HEAD
     return NextResponse.json({ success: true, data: updatedProject });
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -195,23 +131,18 @@ export async function PUT(
         { status: 400 }
       );
     }
-=======
-    return NextResponse.json({ success: true, data: project });
-  } catch (error) {
->>>>>>> e14a2144b358425416219dcc49e76be76b968523
     return handleApiError(error);
   }
 }
 
 export async function DELETE(
-<<<<<<< HEAD
-  request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  request: NextRequest,
+  context: RouteContext
 ) {
   try {
     const { tenantId } = await getTenantContext();
     const supabase = await createClient();
-    const { id: projectId } = await params;
+    const { id: projectId } = await context.params;
 
     // First, verify the project exists and belongs to the tenant
     const { data: existingProject, error: fetchError } = await supabase
@@ -222,44 +153,17 @@ export async function DELETE(
       .single();
 
     if (fetchError || !existingProject) {
-=======
-  request: NextRequest,
-  context: RouteContext
-) {
-  try {
-    const { id } = await context.params;
-    const { tenantId } = await getTenantContext();
-    const supabase = await createClient();
-
-    // Verify project exists and belongs to tenant
-    const { data: existing, error: fetchError } = await supabase
-      .from('projects')
-      .select('id, tenant_id, name')
-      .eq('id', id)
-      .eq('tenant_id', tenantId)
-      .single();
-
-    if (fetchError || !existing) {
->>>>>>> e14a2144b358425416219dcc49e76be76b968523
       return NextResponse.json(
         { success: false, error: 'Projeto não encontrado' },
         { status: 404 }
       );
     }
 
-<<<<<<< HEAD
     // Delete the project (CASCADE will handle related records)
     const { error: deleteError } = await supabase
       .from('projects')
       .delete()
       .eq('id', projectId)
-=======
-    // Delete project (CASCADE will handle related records)
-    const { error: deleteError } = await supabase
-      .from('projects')
-      .delete()
-      .eq('id', id)
->>>>>>> e14a2144b358425416219dcc49e76be76b968523
       .eq('tenant_id', tenantId);
 
     if (deleteError) {
@@ -272,11 +176,7 @@ export async function DELETE(
 
     return NextResponse.json({ 
       success: true, 
-<<<<<<< HEAD
       message: 'Projeto excluído com sucesso' 
-=======
-      message: 'Projeto deletado com sucesso'
->>>>>>> e14a2144b358425416219dcc49e76be76b968523
     });
   } catch (error) {
     return handleApiError(error);

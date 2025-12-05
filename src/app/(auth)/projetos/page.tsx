@@ -1,16 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-<<<<<<< HEAD
 import { Plus, Search, ExternalLink, Calendar, DollarSign, Users, Pencil } from "lucide-react";
 import Link from "next/link";
 import { CreateProjectModal } from "@/components/projects/CreateProjectModal";
 import { EditProjectModal } from "@/components/projects/EditProjectModal";
-=======
-import { Plus, Search, ExternalLink, Calendar, DollarSign, Users, Edit } from "lucide-react";
-import Link from "next/link";
-import { CreateProjectModal, EditProjectModal } from "@/components/projects";
->>>>>>> e14a2144b358425416219dcc49e76be76b968523
 
 interface Project {
   id: string;
@@ -36,14 +30,9 @@ export default function ProjetosPage() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-<<<<<<< HEAD
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
-=======
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [editingProjectId, setEditingProjectId] = useState<string | null>(null);
->>>>>>> e14a2144b358425416219dcc49e76be76b968523
 
   const fetchProjects = async () => {
     try {
@@ -131,11 +120,7 @@ export default function ProjetosPage() {
           </p>
         </div>
         <button 
-<<<<<<< HEAD
           onClick={() => setCreateModalOpen(true)}
-=======
-          onClick={() => setIsCreateModalOpen(true)}
->>>>>>> e14a2144b358425416219dcc49e76be76b968523
           className="flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2.5 font-medium text-white transition-colors hover:bg-emerald-700"
         >
           <Plus className="h-5 w-5" />
@@ -260,7 +245,6 @@ export default function ProjetosPage() {
                       <td className="px-6 py-4">
                         <div className="flex items-center justify-end gap-2">
                           <button
-<<<<<<< HEAD
                             onClick={(e) => {
                               e.stopPropagation();
                               handleEditClick(project);
@@ -268,13 +252,6 @@ export default function ProjetosPage() {
                             className="rounded-lg border border-slate-700 bg-slate-800 p-2 text-slate-300 transition-colors hover:bg-slate-700 hover:text-white"
                           >
                             <Pencil className="h-4 w-4" />
-=======
-                            onClick={() => setEditingProjectId(project.id)}
-                            className="rounded-lg border border-slate-700 bg-slate-800 p-2 text-slate-300 transition-colors hover:bg-slate-700 hover:text-white"
-                            title="Editar projeto"
-                          >
-                            <Edit className="h-4 w-4" />
->>>>>>> e14a2144b358425416219dcc49e76be76b968523
                           </button>
                           <Link
                             href={`/projetos/${project.id}`}
@@ -303,7 +280,6 @@ export default function ProjetosPage() {
         </div>
       )}
 
-<<<<<<< HEAD
       {/* Modals */}
       <CreateProjectModal
         open={createModalOpen}
@@ -317,24 +293,6 @@ export default function ProjetosPage() {
         project={selectedProject}
         onSuccess={handleEditSuccess}
       />
-=======
-      {/* Create Project Modal */}
-      <CreateProjectModal
-        open={isCreateModalOpen}
-        onOpenChange={setIsCreateModalOpen}
-        onSuccess={fetchProjects}
-      />
-
-      {/* Edit Project Modal */}
-      {editingProjectId && (
-        <EditProjectModal
-          open={!!editingProjectId}
-          onOpenChange={(open) => !open && setEditingProjectId(null)}
-          projectId={editingProjectId}
-          onSuccess={fetchProjects}
-        />
-      )}
->>>>>>> e14a2144b358425416219dcc49e76be76b968523
     </div>
   );
 }

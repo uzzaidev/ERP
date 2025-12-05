@@ -60,8 +60,7 @@ export async function GET() {
   }
 }
 
-<<<<<<< HEAD
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     const { tenantId, userId } = await getTenantContext();
     const supabase = await createClient();
@@ -81,79 +80,19 @@ export async function POST(request: Request) {
       console.error('Error counting projects:', countError);
       return NextResponse.json(
         { success: false, error: countError.message },
-=======
-export async function POST(request: NextRequest) {
-  try {
-    // Get tenant context from authenticated session
-    const { tenantId, userId } = await getTenantContext();
-    const supabase = await createClient();
-
-    // Parse request body
-    const body = await request.json();
-    const {
-      name,
-      description,
-      status = 'planning',
-      priority = 'medium',
-      start_date,
-      end_date,
-      budget,
-      client_name,
-      client_contact,
-      client_email,
-      owner_id,
-    } = body;
-
-    // Validate required fields
-    if (!name) {
-      return NextResponse.json(
-        { success: false, error: 'Nome do projeto é obrigatório' },
-        { status: 400 }
-      );
-    }
-
-    // Get the highest project code number for this tenant
-    const { data: existingProjects, error: fetchError } = await supabase
-      .from('projects')
-      .select('code')
-      .eq('tenant_id', tenantId)
-      .order('code', { ascending: false })
-      .limit(1);
-
-    if (fetchError) {
-      console.error('Error fetching existing projects:', fetchError);
-      return NextResponse.json(
-        { success: false, error: 'Erro ao gerar código do projeto' },
->>>>>>> e14a2144b358425416219dcc49e76be76b968523
         { status: 500 }
       );
     }
 
-<<<<<<< HEAD
     const nextNumber = (count || 0) + 1;
     const code = `PROJ-${String(nextNumber).padStart(3, '0')}`;
 
     // Create the project
-=======
-    // Generate next project code
-    let nextNumber = 1;
-    if (existingProjects && existingProjects.length > 0) {
-      const lastCode = existingProjects[0].code;
-      const match = lastCode.match(/PROJ-(\d+)/);
-      if (match) {
-        nextNumber = parseInt(match[1], 10) + 1;
-      }
-    }
-    const code = `PROJ-${String(nextNumber).padStart(3, '0')}`;
-
-    // Create project
->>>>>>> e14a2144b358425416219dcc49e76be76b968523
     const { data: project, error: insertError } = await supabase
       .from('projects')
       .insert({
         tenant_id: tenantId,
         code,
-<<<<<<< HEAD
         name: validatedData.name,
         description: validatedData.description,
         status: validatedData.status,
@@ -166,19 +105,6 @@ export async function POST(request: NextRequest) {
         client_contact: validatedData.client_contact,
         client_email: validatedData.client_email,
         owner_id: validatedData.owner_id || userId,
-=======
-        name,
-        description,
-        status,
-        priority,
-        start_date,
-        end_date,
-        budget,
-        client_name,
-        client_contact,
-        client_email,
-        owner_id: owner_id || null,
->>>>>>> e14a2144b358425416219dcc49e76be76b968523
         created_by: userId,
       })
       .select()
@@ -194,15 +120,12 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, data: project }, { status: 201 });
   } catch (error) {
-<<<<<<< HEAD
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { success: false, error: 'Dados inválidos', details: error.errors },
         { status: 400 }
       );
     }
-=======
->>>>>>> e14a2144b358425416219dcc49e76be76b968523
     return handleApiError(error);
   }
 }

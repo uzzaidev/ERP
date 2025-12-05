@@ -2,7 +2,10 @@
   "permissions": {
     "allow": [
       "Bash(pnpm run build:*)",
-      "mcp__byterover-mcp__byterover-store-knowledge"
+      "mcp__byterover-mcp__byterover-store-knowledge",
+      "WebFetch(domain:vercel.link)",
+      "Bash(pnpm view:*)",
+      "Bash(pnpm install:*)"
     ],
     "deny": [],
     "ask": []

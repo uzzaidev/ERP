@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useMemo, useState, useCallback } from "react";
-import { Plus } from "lucide-react";
+import { Plus, Calendar } from "lucide-react";
 import { DndContext, DragEndEvent, DragStartEvent, PointerSensor, useSensor, useSensors, DragOverlay } from "@dnd-kit/core";
 import { KanbanColumn, KanbanFilters, KanbanCardModal, KanbanCard as KanbanCardComponent } from "@/components/kanban";
 import { CreateTaskModal, EditTaskModal } from "@/components/tasks";
+import { CreateSprintModal, EditSprintModal } from "@/components/sprints";
 import { useKanbanStore } from "@/lib/stores";
 import type { KanbanCard } from "@/types/kanban";
 
@@ -15,6 +16,10 @@ export default function KanbanPage() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
+  const [isCreateSprintModalOpen, setIsCreateSprintModalOpen] = useState(false);
+  const [isEditSprintModalOpen, setIsEditSprintModalOpen] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [editingSprintId, setEditingSprintId] = useState<string | null>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -348,6 +353,23 @@ export default function KanbanPage() {
     fetchTasks();
   }, [setCards]);
 
+  const handleSprintUpdated = useCallback(() => {
+    // Reload sprints after update/creation
+    const fetchSprints = async () => {
+      try {
+        const sprintsRes = await fetch('/api/sprints');
+        const sprintsData = await sprintsRes.json();
+        if (sprintsData.data) {
+          setSprints(sprintsData.data);
+        }
+      } catch (error) {
+        console.error('Error fetching sprints:', error);
+      }
+    };
+    
+    fetchSprints();
+  }, [setSprints]);
+
   const columns = [
     { title: "Backlog", status: "backlog" as const },
     { title: "A Fazer", status: "todo" as const },
@@ -364,13 +386,22 @@ export default function KanbanPage() {
           <h1 className="text-2xl font-semibold text-white">Kanban Board</h1>
           <p className="mt-1 text-sm text-slate-400">Gerencie suas tarefas e sprints</p>
         </div>
-        <button 
-          onClick={() => setIsCreateModalOpen(true)}
-          className="flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2.5 font-medium text-white transition-colors hover:bg-emerald-700"
-        >
-          <Plus className="h-5 w-5" />
-          Nova Tarefa
-        </button>
+        <div className="flex gap-3">
+          <button 
+            onClick={() => setIsCreateSprintModalOpen(true)}
+            className="flex items-center gap-2 rounded-lg bg-purple-600 px-4 py-2.5 font-medium text-white transition-colors hover:bg-purple-700"
+          >
+            <Calendar className="h-5 w-5" />
+            Nova Sprint
+          </button>
+          <button 
+            onClick={() => setIsCreateModalOpen(true)}
+            className="flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2.5 font-medium text-white transition-colors hover:bg-emerald-700"
+          >
+            <Plus className="h-5 w-5" />
+            Nova Tarefa
+          </button>
+        </div>
       </div>
 
       {/* Filters */}
@@ -430,6 +461,21 @@ export default function KanbanPage() {
         onOpenChange={setIsEditModalOpen}
         taskId={editingTaskId}
         onSuccess={handleTaskUpdated}
+      />
+      
+      {/* Create Sprint Modal */}
+      <CreateSprintModal 
+        open={isCreateSprintModalOpen}
+        onOpenChange={setIsCreateSprintModalOpen}
+        onSuccess={handleSprintUpdated}
+      />
+      
+      {/* Edit Sprint Modal */}
+      <EditSprintModal 
+        open={isEditSprintModalOpen}
+        onOpenChange={setIsEditSprintModalOpen}
+        sprintId={editingSprintId}
+        onSuccess={handleSprintUpdated}
       />
     </div>
   );

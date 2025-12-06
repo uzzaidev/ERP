@@ -97,8 +97,8 @@ export function EditKaizenModal({
       setValue("context", kaizen.context || "");
       setValue("goldenRule", kaizen.goldenRule || "");
       setValue("application", kaizen.application || "");
-      setValue("relatedProjectId", kaizen.relatedProjectId || "");
-      setValue("relatedTaskId", kaizen.relatedTaskId || "");
+      setValue("relatedProjectId", kaizen.relatedProjectId || undefined);
+      setValue("relatedTaskId", kaizen.relatedTaskId || undefined);
       
       // Load learning arrays
       setDoItems(kaizen.learning?.do || []);
@@ -137,6 +137,9 @@ export function EditKaizenModal({
       const payload = {
         ...data,
         learning,
+        // Ensure relatedProjectId is either a valid UUID or undefined, never empty string
+        relatedProjectId: data.relatedProjectId || undefined,
+        relatedTaskId: data.relatedTaskId || undefined,
       };
 
       const response = await fetch(`/api/kaizens/${kaizen.id}`, {

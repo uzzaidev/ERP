@@ -112,10 +112,16 @@ export function CreateMeetingModal({
     try {
       setIsSubmitting(true);
 
+      const payload = {
+        ...data,
+        // Ensure relatedProjectId is either a valid UUID or undefined, never empty string
+        relatedProjectId: data.relatedProjectId || undefined,
+      };
+
       const response = await fetch("/api/meetings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify(payload),
       });
 
       const result = await response.json();

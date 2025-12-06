@@ -108,7 +108,7 @@ export function EditMeetingModal({
       setValue("kaizensCount", meeting.kaizensCount);
       setValue("blockersCount", meeting.blockersCount);
       setValue("notes", meeting.notes || "");
-      setValue("relatedProjectId", meeting.relatedProjectId || "");
+      setValue("relatedProjectId", meeting.relatedProjectId || undefined);
       
       fetchProjects();
     }
@@ -132,10 +132,16 @@ export function EditMeetingModal({
     try {
       setIsSubmitting(true);
 
+      const payload = {
+        ...data,
+        // Ensure relatedProjectId is either a valid UUID or undefined, never empty string
+        relatedProjectId: data.relatedProjectId || undefined,
+      };
+
       const response = await fetch(`/api/meetings/${meeting.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify(payload),
       });
 
       const result = await response.json();

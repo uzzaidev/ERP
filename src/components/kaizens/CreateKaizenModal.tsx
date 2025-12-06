@@ -111,6 +111,9 @@ export function CreateKaizenModal({
       const payload = {
         ...data,
         learning,
+        // Ensure relatedProjectId is either a valid UUID or undefined, never empty string
+        relatedProjectId: data.relatedProjectId || undefined,
+        relatedTaskId: data.relatedTaskId || undefined,
       };
 
       const response = await fetch("/api/kaizens", {

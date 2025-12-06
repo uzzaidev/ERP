@@ -71,6 +71,7 @@ export default function ConfiguracoesPage() {
   const [cancelError, setCancelError] = useState('');
   
   const [copiedUrl, setCopiedUrl] = useState(false);
+  const [copiedId, setCopiedId] = useState(false);
 
   useEffect(() => {
     fetchUserData();
@@ -252,6 +253,14 @@ export default function ConfiguracoesPage() {
     }
   };
 
+  const copyTenantId = () => {
+    if (inviteInfo?.tenant_id) {
+      navigator.clipboard.writeText(inviteInfo.tenant_id);
+      setCopiedId(true);
+      setTimeout(() => setCopiedId(false), 2000);
+    }
+  };
+
   if (loading) {
     return (
       <div className="p-8">
@@ -401,6 +410,27 @@ export default function ConfiguracoesPage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
+                  <Label>ID da Empresa</Label>
+                  <div className="flex gap-2">
+                    <Input value={inviteInfo.tenant_id} disabled className="font-mono text-sm" />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={copyTenantId}
+                      className="shrink-0"
+                    >
+                      {copiedId ? (
+                        <Check className="h-4 w-4" />
+                      ) : (
+                        <Copy className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    ID único da empresa. Compartilhe com novos usuários para registro.
+                  </p>
+                </div>
+                <div className="space-y-2">
                   <Label>Nome da Empresa</Label>
                   <Input value={inviteInfo.tenant_name} disabled />
                 </div>
@@ -509,7 +539,7 @@ export default function ConfiguracoesPage() {
                         .map((invitation) => (
                           <div
                             key={invitation.id}
-                            className="flex items-center justify-between p-3 border rounded"
+                            className="flex items-center justify-between p-3 border border-border rounded-lg bg-card"
                           >
                             <div className="flex-1">
                               <p className="font-medium">{invitation.email}</p>

@@ -12,11 +12,12 @@ import {
   YAxis,
   CartesianGrid,
   Legend,
-  ResponsiveContainer,
 } from "recharts";
 import {
+  ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
+  type ChartConfig,
 } from "@/components/ui/chart";
 import {
   ChartControls,
@@ -54,6 +55,21 @@ const DEFAULT_METRICS: ChartMetric[] = [
   { key: "completed", label: "Concluído", color: "#10b981", enabled: true },
   { key: "velocity", label: "Velocidade %", color: "#8b5cf6", enabled: false },
 ];
+
+const chartConfig = {
+  planned: {
+    label: "Planejado",
+    color: "#94a3b8",
+  },
+  completed: {
+    label: "Concluído",
+    color: "#10b981",
+  },
+  velocity: {
+    label: "Velocidade %",
+    color: "#8b5cf6",
+  },
+} satisfies ChartConfig;
 
 export function VelocityChart({ projectId, limit = 6 }: VelocityChartProps) {
   const [loading, setLoading] = useState(false);
@@ -299,9 +315,9 @@ export function VelocityChart({ projectId, limit = 6 }: VelocityChartProps) {
             )}
 
             {/* Chart */}
-            <ResponsiveContainer width="100%" height={chartHeight}>
+            <ChartContainer config={chartConfig} style={{ height: chartHeight }}>
               {renderChart()}
-            </ResponsiveContainer>
+            </ChartContainer>
           </>
         )}
       </CardContent>

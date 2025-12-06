@@ -12,11 +12,12 @@ import {
   YAxis,
   CartesianGrid,
   Legend,
-  ResponsiveContainer,
 } from "recharts";
 import {
+  ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
+  type ChartConfig,
 } from "@/components/ui/chart";
 import {
   ChartControls,
@@ -59,6 +60,21 @@ const DEFAULT_METRICS: ChartMetric[] = [
   { key: "actual", label: "Real", color: "#8b5cf6", enabled: true },
   { key: "completed", label: "Concluído", color: "#10b981", enabled: false },
 ];
+
+const chartConfig = {
+  ideal: {
+    label: "Ideal",
+    color: "#94a3b8",
+  },
+  actual: {
+    label: "Real",
+    color: "#8b5cf6",
+  },
+  completed: {
+    label: "Concluído",
+    color: "#10b981",
+  },
+} satisfies ChartConfig;
 
 export function BurndownChart({
   sprintId,
@@ -308,9 +324,9 @@ export function BurndownChart({
             </div>
 
             {/* Chart */}
-            <ResponsiveContainer width="100%" height={chartHeight}>
+            <ChartContainer config={chartConfig} style={{ height: chartHeight }}>
               {renderChart()}
-            </ResponsiveContainer>
+            </ChartContainer>
           </>
         )}
       </CardContent>

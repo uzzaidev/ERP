@@ -71,27 +71,35 @@ export async function GET(
       
       // Calculate ideal remaining hours
       const idealRemaining = Math.max(0, totalHours - (dayIndex * dailyIdealBurn));
-      
-      // Calculate actual remaining hours (tasks not completed by this date)
-      const completedByDate = tasks?.filter(task => {
-        if (task.status === 'done' && task.completed_at) {
-          const completedDate = new Date(task.completed_at);
-          return completedDate <= currentDateObj;
-        }
-        return false;
-      }) || [];
 
-      const completedHours = completedByDate.reduce(
-        (sum, task) => sum + (task.estimated_hours || 0),
-        0
-      );
-      const actualRemaining = Math.max(0, totalHours - completedHours);
+      // Calculate actual completed hours by this date
+      let completedHoursByDate = 0;
+      const isLastPoint = currentDateObj.toISOString().split('T')[0] === currentDate.toISOString().split('T')[0];
+
+      tasks?.forEach(task => {
+        if (task.status === 'done' && task.completed_at) {
+          // For done tasks, count completed_hours if completed by this date
+          const completedDate = new Date(task.completed_at);
+          completedDate.setHours(0, 0, 0, 0);
+          const compareDate = new Date(currentDateObj);
+          compareDate.setHours(23, 59, 59, 999);
+
+          if (completedDate <= compareDate) {
+            completedHoursByDate += task.completed_hours || task.estimated_hours || 0;
+          }
+        } else if (isLastPoint) {
+          // For in-progress/todo tasks, count completed_hours only on the last point (today)
+          completedHoursByDate += task.completed_hours || 0;
+        }
+      });
+
+      const actualRemaining = Math.max(0, totalHours - completedHoursByDate);
 
       burndownData.push({
         date: dateStr,
         ideal: Math.round(idealRemaining * 100) / 100,
         actual: Math.round(actualRemaining * 100) / 100,
-        completed: Math.round(completedHours * 100) / 100,
+        completed: Math.round(completedHoursByDate * 100) / 100,
       });
 
       // Move to next day
@@ -123,6 +131,10 @@ export async function GET(
       }
     }
 
+    // Calculate total completed hours (from all tasks, not just done)
+    const totalCompletedHours = tasks?.reduce((sum, task) =>
+      sum + (task.completed_hours || 0), 0) || 0;
+
     return NextResponse.json({
       success: true,
       data: {
@@ -135,15 +147,13 @@ export async function GET(
           status: sprint.status,
         },
         totalHours,
-        completedHours: tasks?.reduce((sum, task) => 
-          task.status === 'done' ? sum + (task.estimated_hours || 0) : sum, 0) || 0,
+        completedHours: totalCompletedHours,
         burndownData,
         metrics: {
           totalTasks: tasks?.length || 0,
           completedTasks: tasks?.filter(t => t.status === 'done').length || 0,
-          progressPercentage: totalHours > 0 
-            ? Math.round(((tasks?.reduce((sum, task) => 
-                task.status === 'done' ? sum + (task.estimated_hours || 0) : sum, 0) || 0) / totalHours) * 100)
+          progressPercentage: totalHours > 0
+            ? Math.round((totalCompletedHours / totalHours) * 100)
             : 0,
         },
       },

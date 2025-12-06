@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X, Clock, User, MessageSquare, Send, Tag } from "lucide-react";
 import { useKanbanStore } from "@/lib/stores";
 import type { KanbanCard } from "@/types/kanban";
@@ -14,6 +14,13 @@ export function KanbanCardModal({ onAssigneeChange, onEditClick }: KanbanCardMod
   const { selectedCard, isCardModalOpen, closeCardModal, updateCard, addComment, updateTimeTracking, users } = useKanbanStore();
   const [newComment, setNewComment] = useState("");
   const [completedHours, setCompletedHours] = useState(selectedCard?.completedHours || 0);
+
+  // Sync completedHours with selectedCard when it changes
+  useEffect(() => {
+    if (selectedCard) {
+      setCompletedHours(selectedCard.completedHours || 0);
+    }
+  }, [selectedCard?.id, selectedCard?.completedHours]);
 
   if (!isCardModalOpen || !selectedCard) return null;
 

@@ -264,27 +264,31 @@
 
 ---
 
-### 📅 Sprint 6: Velocity + Dashboard (Semana 4-5) - **P0**
+### 📅 Sprint 6: Velocity + Dashboard (Semana 4-5) - ✅ **COMPLETO**
 
 #### Tasks:
 
-- [ ] **6.1 Velocity Chart**
-  - [ ] Criar `src/components/charts/VelocityChart.tsx`
-  - [ ] Calcular story points completados por sprint (últimas 5 sprints)
-  - [ ] API GET /api/analytics/velocity
+- [x] **6.1 Velocity Chart** ✅
+  - [x] Criar `src/components/charts/VelocityChart.tsx`
+  - [x] Calcular story points completados por sprint (últimas 5 sprints)
+  - [x] API GET /api/analytics/velocity
+  - [x] Já implementado na Sprint 5
 
-- [ ] **6.2 Dashboard Executivo Melhorado**
-  - [ ] Atualizar `/dashboard`
-  - [ ] Cards: tasks completed, velocity média, sprint progress
-  - [ ] Gráficos: burndown, velocity
-  - [ ] Recent activity feed funcional
+- [x] **6.2 Dashboard Executivo Melhorado** ✅
+  - [x] Atualizar `/dashboard`
+  - [x] Cards: tasks completed, velocity média, sprint progress
+  - [x] Gráficos: burndown, velocity integrados
+  - [x] Recent activity feed funcional com dados reais
+  - [x] Alertas baseados em sprint ativa
+  - [x] Card de progresso da sprint ativa
 
-- [ ] **6.3 Relatório PDF de Sprint** (Opcional)
-  - [ ] Usar react-pdf/renderer
-  - [ ] Gerar PDF com: sprint goal, tasks completed, burndown, retrospective
-  - [ ] Botão "Export PDF" na sprint
+- [x] **6.3 Relatório PDF de Sprint** ✅
+  - [x] Usar react-pdf/renderer
+  - [x] Gerar PDF com: sprint goal, tasks completed, burndown, retrospective
+  - [x] Botão "Export PDF" na página performance
+  - [x] Componentes criados: SprintReportPDF e ExportSprintPDF
 
-**Resultado**: Dashboard com analytics funcionais
+**Resultado**: ✅ Dashboard com analytics funcionais - **SPRINT 6 COMPLETA!**
 
 ---
 
@@ -487,7 +491,7 @@ CREATE TABLE meetings (
 
 ### Fase 2 - Analytics (Target: Semana 5)
 - [x] Sprint 5: Burndown Chart (5/5 tasks) ✅ **COMPLETO**
-- [ ] Sprint 6: Velocity + Dashboard (0/3 tasks)
+- [x] Sprint 6: Velocity + Dashboard (3/3 tasks) ✅ **COMPLETO**
 
 ### Fase 3 - Features Únicas (Target: Semana 8)
 - [ ] Sprint 7: ADRs (0/4 tasks)
@@ -501,31 +505,40 @@ CREATE TABLE meetings (
 
 ## 🎯 Próximas Ações (AGORA)
 
-**✅ Sprint 5 - COMPLETO!** Burndown e Velocity Charts implementados com sucesso!
+**✅ Sprint 6 - COMPLETO!** Dashboard Executivo com Velocity Charts e Export PDF implementados com sucesso!
 
-**Sprint 6 - Velocity + Dashboard** (próximo):
+**Fase 2 - Analytics: 100% COMPLETA!** 🎉
 
-1. 🔄 Sprint 6, Task 6.2: Atualizar Dashboard Executivo
-   - Atualizar `/dashboard`
-   - Cards: tasks completed, velocity média, sprint progress
-   - Gráficos: burndown, velocity
-   - Recent activity feed funcional
+**Sprint 7 - ADRs (Architecture Decision Records)** (próximo):
+
+1. 🔄 Sprint 7, Task 7.1: Database Migration
+   - Criar tabela `decisions`
+   - Adicionar RLS policies
    
-2. 🔄 Sprint 6, Task 6.3: Relatório PDF de Sprint (Opcional)
-   - Usar react-pdf/renderer
-   - Gerar PDF com: sprint goal, tasks completed, burndown, retrospective
-   - Botão "Export PDF" na sprint
+2. 🔄 Sprint 7, Task 7.2: ADR CRUD UI
+   - Página `/decisoes` (nova)
+   - Lista de decisões
+   - Modal criar decisão
+   - Form completo com todos campos
+   
+3. 🔄 Sprint 7, Task 7.3: ADR APIs
+   - GET /api/decisions
+   - POST /api/decisions
+   - PUT /api/decisions/:id
+   - DELETE /api/decisions/:id
 
 ---
 
 **Última Atualização**: 2025-12-06
-**Versão**: 1.4
+**Versão**: 1.5
 **Mantido por**: Equipe de Desenvolvimento ERP UzzAI
 
-**🎉 Sprints 1, 2, 3, 4 e 5 Completas!** 
+**🎉 Fase 2 - Analytics: 100% COMPLETA!** 
 - ✅ CRUD de Tarefas totalmente funcional
 - ✅ CRUD de Projetos totalmente funcional
 - ✅ CRUD de Sprints totalmente funcional
 - ✅ Comentários + Time Logs funcionais
 - ✅ Burndown & Velocity Charts com customização completa
-- 🚀 Sprint 6 próxima: Dashboard Executivo Melhorado
+- ✅ Dashboard Executivo com métricas reais e analytics
+- ✅ Export PDF de Sprint com relatório completo
+- 🚀 Sprint 7 próxima: ADRs (Architecture Decision Records)

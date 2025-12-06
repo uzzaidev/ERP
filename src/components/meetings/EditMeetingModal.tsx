@@ -108,7 +108,7 @@ export function EditMeetingModal({
       setValue("kaizensCount", meeting.kaizensCount);
       setValue("blockersCount", meeting.blockersCount);
       setValue("notes", meeting.notes || "");
-      setValue("relatedProjectId", meeting.relatedProjectId || undefined);
+      setValue("relatedProjectId", meeting.relatedProjectId || "none");
       
       fetchProjects();
     }

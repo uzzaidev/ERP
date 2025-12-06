@@ -97,7 +97,7 @@ export function EditKaizenModal({
       setValue("context", kaizen.context || "");
       setValue("goldenRule", kaizen.goldenRule || "");
       setValue("application", kaizen.application || "");
-      setValue("relatedProjectId", kaizen.relatedProjectId || undefined);
+      setValue("relatedProjectId", kaizen.relatedProjectId || "none");
       setValue("relatedTaskId", kaizen.relatedTaskId || undefined);
       
       // Load learning arrays

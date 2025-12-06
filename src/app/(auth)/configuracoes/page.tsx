@@ -401,6 +401,26 @@ export default function ConfiguracoesPage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
+                  <Label>ID da Empresa</Label>
+                  <div className="flex gap-2">
+                    <Input value={inviteInfo.tenant_id} disabled className="font-mono text-sm" />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => {
+                        navigator.clipboard.writeText(inviteInfo.tenant_id);
+                        alert('ID copiado para a área de transferência!');
+                      }}
+                      className="shrink-0"
+                    >
+                      <Copy className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    ID único da empresa. Compartilhe com novos usuários para registro.
+                  </p>
+                </div>
+                <div className="space-y-2">
                   <Label>Nome da Empresa</Label>
                   <Input value={inviteInfo.tenant_name} disabled />
                 </div>

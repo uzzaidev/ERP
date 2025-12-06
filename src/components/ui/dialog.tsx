@@ -59,7 +59,7 @@ const DialogContent = React.forwardRef<
       {/* Dialog */}
       <div
         ref={ref}
-        className={`relative z-50 w-full max-w-lg rounded-lg bg-card border border-border p-6 shadow-2xl ${className}`}
+        className={`relative z-50 w-full max-w-lg rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 p-6 shadow-2xl ${className}`}
         {...props}
       >
         {children}
@@ -86,7 +86,7 @@ const DialogTitle = React.forwardRef<
 >(({ className = '', ...props }, ref) => (
   <h2
     ref={ref}
-    className={`text-lg font-semibold leading-none tracking-tight text-card-foreground ${className}`}
+    className={`text-lg font-semibold leading-none tracking-tight text-slate-900 dark:text-slate-100 ${className}`}
     {...props}
   />
 ));
@@ -98,7 +98,7 @@ const DialogDescription = React.forwardRef<
 >(({ className = '', ...props }, ref) => (
   <p
     ref={ref}
-    className={`text-sm text-muted-foreground ${className}`}
+    className={`text-sm text-slate-600 dark:text-slate-400 ${className}`}
     {...props}
   />
 ));

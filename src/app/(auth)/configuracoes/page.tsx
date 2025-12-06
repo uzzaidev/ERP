@@ -539,7 +539,7 @@ export default function ConfiguracoesPage() {
                         .map((invitation) => (
                           <div
                             key={invitation.id}
-                            className="flex items-center justify-between p-3 border rounded"
+                            className="flex items-center justify-between p-3 border border-border rounded-lg bg-card"
                           >
                             <div className="flex-1">
                               <p className="font-medium">{invitation.email}</p>

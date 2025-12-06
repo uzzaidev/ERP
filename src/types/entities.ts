@@ -568,3 +568,54 @@ export interface Kaizen {
   createdAt: string;
   updatedAt: string;
 }
+
+// ============================================
+// MEETINGS (Meeting Effectiveness Score System)
+// ============================================
+
+// Meeting
+export interface Meeting {
+  id: string;
+  tenantId: string;
+  code: string; // MTG-YYYY-MM-DD-NNN or MTG-YYYY-MM-DD-PROJECT-NNN
+  title: string;
+  date: string; // ISO date string
+  
+  // Participants
+  participants?: string[]; // Array of user IDs
+  
+  // Meeting Outputs (counts)
+  decisionsCount: number;
+  actionsCount: number;
+  kaizensCount: number;
+  blockersCount: number;
+  
+  // Effectiveness Score (auto-calculated)
+  effectivenessScore?: number;
+  
+  // Content
+  notes?: string;
+  
+  // Relationships
+  relatedProjectId?: string;
+  relatedProject?: {
+    id: string;
+    code: string;
+    name: string;
+  };
+  
+  // Metadata
+  createdBy?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// Meeting Effectiveness Score Color/Level
+export type MeetingEffectivenessLevel = "excellent" | "good" | "fair" | "poor";
+
+export interface MeetingEffectivenessInfo {
+  score: number;
+  level: MeetingEffectivenessLevel;
+  color: string;
+  label: string;
+}

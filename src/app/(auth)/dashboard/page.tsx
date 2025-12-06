@@ -33,6 +33,15 @@ interface DashboardStats {
   } | null;
 }
 
+interface Sprint {
+  id: string;
+  code: string;
+  name: string;
+  start_date: string;
+  end_date: string;
+  status: string;
+}
+
 interface RecentActivity {
   id: string;
   title: string;
@@ -61,6 +70,8 @@ export default function DashboardPage() {
   const [activities, setActivities] = useState<RecentActivity[]>([]);
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [loading, setLoading] = useState(true);
+  const [sprints, setSprints] = useState<Sprint[]>([]);
+  const [selectedSprintId, setSelectedSprintId] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchStats() {
@@ -98,19 +109,31 @@ export default function DashboardPage() {
         const velocityData = await velocityRes.json();
         const avgVelocity = velocityData.success ? velocityData.data.metrics.avgVelocity : 0;
 
-        // Buscar sprint ativa
+        // Buscar sprints (mesma lógica da página performance)
         const sprintsRes = await fetch('/api/sprints');
         const sprintsData = await sprintsRes.json();
-        const sprints = sprintsData.data || [];
-        const activeSprint = sprints.find((s: { status: string }) => s.status === 'active');
+        const sprintsList = sprintsData.data || [];
+        setSprints(sprintsList);
+
+        // Encontrar sprint ativa ou mais recente (mesma lógica da página performance)
+        const activeSprint = sprintsList.find((s: Sprint) => s.status === 'active');
+        let selectedSprint = null;
+        
+        if (activeSprint) {
+          selectedSprint = activeSprint;
+          setSelectedSprintId(activeSprint.id);
+        } else if (sprintsList.length > 0) {
+          selectedSprint = sprintsList[0];
+          setSelectedSprintId(sprintsList[0].id);
+        }
 
         let sprintStats = null;
         let sprintProgress = 0;
 
-        if (activeSprint) {
+        if (selectedSprint) {
           // Buscar tasks da sprint ativa
           const sprintTasks = allTasks.filter((t: { sprint_id: string }) => 
-            t.sprint_id === activeSprint.id
+            t.sprint_id === selectedSprint.id
           );
           const sprintCompleted = sprintTasks.filter((t: { status: string }) => 
             t.status === 'done'
@@ -119,14 +142,14 @@ export default function DashboardPage() {
             ? Math.round((sprintCompleted / sprintTasks.length) * 100) 
             : 0;
 
-          const endDate = new Date(activeSprint.end_date);
+          const endDate = new Date(selectedSprint.end_date);
           const now = new Date();
           const daysRemaining = Math.ceil((endDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
 
           sprintStats = {
-            id: activeSprint.id,
-            name: activeSprint.name,
-            endDate: activeSprint.end_date,
+            id: selectedSprint.id,
+            name: selectedSprint.name,
+            endDate: selectedSprint.end_date,
             daysRemaining,
           };
 
@@ -135,7 +158,7 @@ export default function DashboardPage() {
           if (daysRemaining <= 2 && daysRemaining >= 0) {
             newAlerts.push({
               id: 'sprint-ending',
-              title: `Sprint "${activeSprint.name}" termina em ${daysRemaining} dia${daysRemaining !== 1 ? 's' : ''}`,
+              title: `Sprint "${selectedSprint.name}" termina em ${daysRemaining} dia${daysRemaining !== 1 ? 's' : ''}`,
               tone: 'warning',
             });
           }
@@ -338,8 +361,12 @@ export default function DashboardPage() {
           </TabsContent>
 
           <TabsContent value="burndown">
-            {stats.activeSprint ? (
-              <BurndownChart sprintId={stats.activeSprint.id} />
+            {selectedSprintId ? (
+              <BurndownChart 
+                sprintId={selectedSprintId} 
+                sprints={sprints}
+                onSprintChange={setSelectedSprintId}
+              />
             ) : (
               <Card className="border-slate-700/50 bg-slate-900/40">
                 <CardContent className="flex items-center justify-center h-[300px]">

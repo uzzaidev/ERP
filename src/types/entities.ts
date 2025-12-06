@@ -256,8 +256,8 @@ export interface Action {
   updatedAt: string;
 }
 
-// Decisao
-export interface Decision {
+// Decisao (Meeting Decision - legacy)
+export interface MeetingDecision {
   id: string;
   tenantId: string; // Added for multi-tenancy
   publicId: string;
@@ -508,7 +508,11 @@ export interface Decision {
   // Relationships
   relatedTaskIds?: string[];
   relatedProjectId?: string;
-  relatedProject?: Project;
+  relatedProject?: {
+    id: string;
+    code: string;
+    name: string;
+  };
   
   // Status & Priority
   status: DecisionStatus;

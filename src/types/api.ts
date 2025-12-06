@@ -77,3 +77,63 @@ export interface MeetingIngestRequest {
     createActions?: boolean;
   };
 }
+
+// ============================================
+// USER MANAGEMENT API TYPES
+// ============================================
+
+// Update profile request
+export interface UpdateProfileRequest {
+  full_name?: string;
+  phone?: string;
+  avatar_url?: string;
+}
+
+// Update profile response
+export interface UpdateProfileResponse {
+  success: boolean;
+  data?: {
+    id: string;
+    full_name: string;
+    email: string;
+    phone?: string;
+    avatar_url?: string;
+    tenant_id: string;
+  };
+  error?: string;
+}
+
+// Change password request
+export interface ChangePasswordRequest {
+  current_password: string;
+  new_password: string;
+}
+
+// Change password response
+export interface ChangePasswordResponse {
+  success: boolean;
+  message?: string;
+  error?: string;
+}
+
+// Tenant invite code response
+export interface TenantInviteCodeResponse {
+  success: boolean;
+  data?: {
+    tenant_id: string;
+    tenant_name: string;
+    tenant_slug: string;
+    invite_url: string;
+    plan: string;
+    status: string;
+  };
+  error?: string;
+}
+
+// Cancel invitation response
+export interface CancelInvitationResponse {
+  success: boolean;
+  message?: string;
+  error?: string;
+}
+

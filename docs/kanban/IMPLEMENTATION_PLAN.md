@@ -21,7 +21,7 @@
 | Analytics/Charts | ❌ 0% | Não iniciado |
 | Features Únicas | ❌ 0% | Não iniciado |
 
-**Progresso**: Sprints 1, 2, 3 e 4 completas! 🎉 Iniciando Sprint 5 (Burndown Chart)
+**Progresso**: Sprints 1, 2, 3, 4 e 5 completas! 🎉 Iniciando Sprint 6 (Velocity + Dashboard)
 
 ---
 
@@ -223,26 +223,44 @@
 
 ---
 
-### 📅 Sprint 5: Burndown Chart (Semana 4) - **P0**
+### 📅 Sprint 5: Burndown Chart (Semana 4) - ✅ **COMPLETO**
 
 #### Tasks:
 
-- [ ] **5.1 Burndown Chart Component**
-  - [ ] Criar `src/components/charts/BurndownChart.tsx`
-  - [ ] Usar Chart.js ou Recharts
-  - [ ] Calcular ideal line vs actual line
-  - [ ] API GET /api/sprints/:id/burndown
+- [x] **5.1 Burndown Chart Component** ✅
+  - [x] Criar `src/components/charts/BurndownChart.tsx`
+  - [x] Usar Recharts (shadcn-style)
+  - [x] Calcular ideal line vs actual line
+  - [x] API GET /api/sprints/:id/burndown
+  - [x] Componente totalmente customizável (métricas, cores, formato)
 
-- [ ] **5.2 API Burndown Data**
-  - [ ] Criar `src/app/api/sprints/[id]/burndown/route.ts`
-  - [ ] Calcular story points ou horas por dia
-  - [ ] Retornar dados para gráfico
+- [x] **5.2 API Burndown Data** ✅
+  - [x] Criar `src/app/api/sprints/[id]/burndown/route.ts`
+  - [x] Calcular story points ou horas por dia
+  - [x] Retornar dados para gráfico
+  - [x] Incluir métricas e progresso
 
-- [ ] **5.3 Mostrar no Kanban**
-  - [ ] Adicionar tab "Analytics" no Kanban
-  - [ ] Mostrar burndown do sprint ativo
+- [x] **5.3 Integração na Página Performance** ✅
+  - [x] Atualizar `/performance` com charts
+  - [x] Mostrar burndown do sprint ativo
+  - [x] Seletor de sprints
+  - [x] Tabs para organização (Velocidade/Burndown)
 
-**Resultado**: Burndown chart funcional
+- [x] **5.4 Velocity Chart Component** ✅
+  - [x] Criar `src/components/charts/VelocityChart.tsx`
+  - [x] Calcular velocidade das últimas sprints
+  - [x] API GET /api/analytics/velocity
+  - [x] Métricas: média planejado, concluído, velocidade
+
+- [x] **5.5 Chart Controls** ✅
+  - [x] Componente `ChartControls` para customização
+  - [x] Seleção de métricas (mostrar/ocultar)
+  - [x] Seleção de cores
+  - [x] Tipo de gráfico (linha/barra/área)
+  - [x] Ajuste de altura
+  - [x] Export para CSV
+
+**Resultado**: ✅ Burndown e Velocity charts funcionais com customização completa - **SPRINT 5 COMPLETA!**
 
 ---
 
@@ -468,7 +486,7 @@ CREATE TABLE meetings (
 - [x] Sprint 4: Comentários + Time Logs (2/2 tasks) ✅ **COMPLETO**
 
 ### Fase 2 - Analytics (Target: Semana 5)
-- [ ] Sprint 5: Burndown Chart (0/3 tasks)
+- [x] Sprint 5: Burndown Chart (5/5 tasks) ✅ **COMPLETO**
 - [ ] Sprint 6: Velocity + Dashboard (0/3 tasks)
 
 ### Fase 3 - Features Únicas (Target: Semana 8)
@@ -483,35 +501,31 @@ CREATE TABLE meetings (
 
 ## 🎯 Próximas Ações (AGORA)
 
-**✅ Sprint 4 - COMPLETO!** Comentários e Time Logs implementados com sucesso!
+**✅ Sprint 5 - COMPLETO!** Burndown e Velocity Charts implementados com sucesso!
 
-**Sprint 5 - Burndown Chart** (próximo):
+**Sprint 6 - Velocity + Dashboard** (próximo):
 
-1. 🔄 Sprint 5, Task 5.1: Implementar Burndown Chart Component
-   - Criar `src/components/charts/BurndownChart.tsx`
-   - Usar Chart.js ou Recharts
-   - Calcular ideal line vs actual line
-   - API GET `/api/sprints/:id/burndown`
+1. 🔄 Sprint 6, Task 6.2: Atualizar Dashboard Executivo
+   - Atualizar `/dashboard`
+   - Cards: tasks completed, velocity média, sprint progress
+   - Gráficos: burndown, velocity
+   - Recent activity feed funcional
    
-2. 🔄 Sprint 5, Task 5.2: Criar API Burndown Data
-   - Criar `src/app/api/sprints/[id]/burndown/route.ts`
-   - Calcular story points ou horas por dia
-   - Retornar dados para gráfico
-
-3. 🔄 Sprint 5, Task 5.3: Mostrar no Kanban
-   - Adicionar tab "Analytics" no Kanban
-   - Mostrar burndown do sprint ativo
+2. 🔄 Sprint 6, Task 6.3: Relatório PDF de Sprint (Opcional)
+   - Usar react-pdf/renderer
+   - Gerar PDF com: sprint goal, tasks completed, burndown, retrospective
+   - Botão "Export PDF" na sprint
 
 ---
 
-**Última Atualização**: 2025-12-05
-**Versão**: 1.3
+**Última Atualização**: 2025-12-06
+**Versão**: 1.4
 **Mantido por**: Equipe de Desenvolvimento ERP UzzAI
 
-**🎉 Sprints 1, 2 e 3 Completas!** 
+**🎉 Sprints 1, 2, 3, 4 e 5 Completas!** 
 - ✅ CRUD de Tarefas totalmente funcional
 - ✅ CRUD de Projetos totalmente funcional
 - ✅ CRUD de Sprints totalmente funcional
-- 🚀 Sprint 4 iniciando: Comentários + Time Logs
-- ✅ CRUD de Projetos totalmente funcional
-- 🚀 Sprint 3 iniciando: CRUD de Sprints
+- ✅ Comentários + Time Logs funcionais
+- ✅ Burndown & Velocity Charts com customização completa
+- 🚀 Sprint 6 próxima: Dashboard Executivo Melhorado

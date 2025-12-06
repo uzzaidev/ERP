@@ -4,7 +4,7 @@
 
 // Status comuns
 export type ActionStatus = "open" | "in_progress" | "done" | "canceled" | "blocked";
-export type Priority = "high" | "medium" | "low";
+export type Priority = "low" | "medium" | "high" | "critical";
 export type ProjectStatus = "planning" | "active" | "on_hold" | "completed" | "canceled";
 export type TenantPlan = "trial" | "basic" | "professional" | "enterprise";
 export type TenantStatus = "active" | "suspended" | "cancelled";

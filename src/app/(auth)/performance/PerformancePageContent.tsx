@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Gauge } from "lucide-react";
 import { BurndownChart, VelocityChart } from "@/components/charts";
+import { ExportSprintPDF } from "@/components/sprints";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface Sprint {
@@ -43,22 +44,32 @@ export default function PerformancePageContent() {
     }
   };
 
+  const activeSprintData = sprints.find(s => s.id === activeSprint);
+
   return (
     <div className="container mx-auto p-6 space-y-6">
       {/* Header */}
       <div className="space-y-2">
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-purple-100 dark:bg-purple-900/20 rounded-lg">
-            <Gauge className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-purple-100 dark:bg-purple-900/20 rounded-lg">
+              <Gauge className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold tracking-tight">
+                Performance & Analytics
+              </h1>
+              <p className="text-muted-foreground">
+                Métricas e indicadores para tomada de decisão
+              </p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">
-              Performance & Analytics
-            </h1>
-            <p className="text-muted-foreground">
-              Métricas e indicadores para tomada de decisão
-            </p>
-          </div>
+          {activeSprintData && (
+            <ExportSprintPDF 
+              sprintId={activeSprintData.id}
+              sprintCode={activeSprintData.code}
+            />
+          )}
         </div>
       </div>
 

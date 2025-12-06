@@ -12,7 +12,7 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { tenantId, userId } = await getTenantContext();
+    const { tenantId } = await getTenantContext();
     const supabase = await createClient();
     const { id } = await params;
     

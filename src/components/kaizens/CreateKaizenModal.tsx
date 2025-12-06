@@ -22,6 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { KaizenCategory } from "@/types/entities";
 
 // Kaizen creation schema
 const createKaizenSchema = z.object({
@@ -153,16 +154,6 @@ export function CreateKaizenModal({
     setItems(items.filter((_, i) => i !== index));
   };
 
-  const getCategoryLabel = (category: string) => {
-    const labels: Record<string, string> = {
-      technical: "Técnico",
-      process: "Processo",
-      strategic: "Estratégico",
-      cultural: "Cultural",
-    };
-    return labels[category] || category;
-  };
-
   const getCategoryColor = (category: string) => {
     const colors: Record<string, string> = {
       technical: "text-blue-400",
@@ -199,7 +190,7 @@ export function CreateKaizenModal({
             <Label htmlFor="category">Categoria *</Label>
             <Select
               value={selectedCategory}
-              onValueChange={(value) => setValue("category", value as any)}
+              onValueChange={(value) => setValue("category", value as KaizenCategory)}
             >
               <SelectTrigger>
                 <SelectValue />

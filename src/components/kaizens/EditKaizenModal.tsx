@@ -32,7 +32,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { KaizenImprovement as Kaizen } from "@/types/entities";
+import { KaizenImprovement as Kaizen, KaizenCategory } from "@/types/entities";
 
 // Kaizen edit schema
 const editKaizenSchema = z.object({
@@ -255,7 +255,7 @@ export function EditKaizenModal({
               <Label htmlFor="category">Categoria *</Label>
               <Select
                 value={selectedCategory}
-                onValueChange={(value) => setValue("category", value as any)}
+                onValueChange={(value) => setValue("category", value as KaizenCategory)}
               >
                 <SelectTrigger>
                   <SelectValue />

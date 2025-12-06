@@ -525,3 +525,46 @@ export interface Decision {
   approvedAt?: string;
   approvedBy?: string;
 }
+
+// ============================================
+// KAIZENS (Continuous Improvement System)
+// ============================================
+
+export type KaizenCategory = "technical" | "process" | "strategic" | "cultural";
+
+// Kaizen Learning (structured learning)
+export interface KaizenLearning {
+  do?: string[]; // Things to do
+  avoid?: string[]; // Things to avoid
+  adjust?: string[]; // Things to adjust
+}
+
+// Kaizen
+export interface Kaizen {
+  id: string;
+  tenantId: string;
+  code: string; // K-T-001, K-P-002, K-S-003, K-C-004
+  title: string;
+  
+  // Category & Content
+  category: KaizenCategory;
+  context?: string;
+  learning?: KaizenLearning;
+  goldenRule?: string;
+  application?: string;
+  
+  // Relationships
+  relatedTaskId?: string;
+  relatedMeetingId?: string;
+  relatedProjectId?: string;
+  relatedProject?: {
+    id: string;
+    code: string;
+    name: string;
+  };
+  
+  // Metadata
+  createdBy?: string;
+  createdAt: string;
+  updatedAt: string;
+}

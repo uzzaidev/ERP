@@ -20,7 +20,7 @@ export function KanbanCardModal({ onAssigneeChange, onEditClick }: KanbanCardMod
     if (selectedCard) {
       setCompletedHours(selectedCard.completedHours || 0);
     }
-  }, [selectedCard?.id, selectedCard?.completedHours]);
+  }, [selectedCard]);
 
   if (!isCardModalOpen || !selectedCard) return null;
 

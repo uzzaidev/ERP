@@ -525,3 +525,97 @@ export interface Decision {
   approvedAt?: string;
   approvedBy?: string;
 }
+
+// ============================================
+// KAIZEN IMPROVEMENTS (New System - Sprint 8)
+// ============================================
+
+export type KaizenCategory = "technical" | "process" | "strategic" | "cultural";
+
+// Kaizen Learning (structured learning)
+export interface KaizenLearning {
+  do?: string[]; // Things to do
+  avoid?: string[]; // Things to avoid
+  adjust?: string[]; // Things to adjust
+}
+
+// Kaizen Improvement
+export interface KaizenImprovement {
+  id: string;
+  tenantId: string;
+  code: string; // K-T-001, K-P-002, K-S-003, K-C-004
+  title: string;
+  
+  // Category & Content
+  category: KaizenCategory;
+  context?: string;
+  learning?: KaizenLearning;
+  goldenRule?: string;
+  application?: string;
+  
+  // Relationships
+  relatedTaskId?: string;
+  relatedMeetingId?: string;
+  relatedProjectId?: string;
+  relatedProject?: {
+    id: string;
+    code: string;
+    name: string;
+  };
+  
+  // Metadata
+  createdBy?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// ============================================
+// MEETINGS (Meeting Effectiveness Score System - Sprint 9)
+// ============================================
+
+// Meeting with Effectiveness Score
+export interface MeetingEffectiveness {
+  id: string;
+  tenantId: string;
+  code: string; // MTG-YYYY-MM-DD-NNN or MTG-YYYY-MM-DD-PROJECT-NNN
+  title: string;
+  date: string; // ISO date string
+  
+  // Participants
+  participants?: string[]; // Array of user IDs
+  
+  // Meeting Outputs (counts)
+  decisionsCount: number;
+  actionsCount: number;
+  kaizensCount: number;
+  blockersCount: number;
+  
+  // Effectiveness Score (auto-calculated)
+  effectivenessScore?: number;
+  
+  // Content
+  notes?: string;
+  
+  // Relationships
+  relatedProjectId?: string;
+  relatedProject?: {
+    id: string;
+    code: string;
+    name: string;
+  };
+  
+  // Metadata
+  createdBy?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// Meeting Effectiveness Score Color/Level
+export type MeetingEffectivenessLevel = "excellent" | "good" | "fair" | "poor";
+
+export interface MeetingEffectivenessInfo {
+  score: number;
+  level: MeetingEffectivenessLevel;
+  color: string;
+  label: string;
+}

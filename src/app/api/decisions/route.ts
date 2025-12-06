@@ -50,32 +50,36 @@ export async function GET(request: NextRequest) {
     }
     
     // Transform to camelCase for frontend
-    const decisions: Decision[] = (data || []).map((d: any) => ({
-      id: d.id,
-      tenantId: d.tenant_id,
-      code: d.code,
-      title: d.title,
-      context: d.context,
-      decision: d.decision,
-      alternatives: d.alternatives,
-      consequences: d.consequences,
-      impact: d.impact,
-      stakeholders: d.stakeholders,
-      relatedTaskIds: d.related_task_ids,
-      relatedProjectId: d.related_project_id,
-      relatedProject: d.related_project ? {
-        id: d.related_project.id,
-        code: d.related_project.code,
-        name: d.related_project.name,
-      } : undefined,
-      status: d.status,
-      priority: d.priority,
-      createdBy: d.created_by,
-      createdAt: d.created_at,
-      updatedAt: d.updated_at,
-      approvedAt: d.approved_at,
-      approvedBy: d.approved_by,
-    }));
+    const decisions: Decision[] = (data || []).map((d: Record<string, unknown>) => {
+      const relatedProject = d.related_project as { id: string; code: string; name: string } | null;
+      
+      return {
+        id: d.id as string,
+        tenantId: d.tenant_id as string,
+        code: d.code as string,
+        title: d.title as string,
+        context: d.context as string | undefined,
+        decision: d.decision as string | undefined,
+        alternatives: d.alternatives as Decision['alternatives'],
+        consequences: d.consequences as Decision['consequences'],
+        impact: d.impact as Decision['impact'],
+        stakeholders: d.stakeholders as Decision['stakeholders'],
+        relatedTaskIds: d.related_task_ids as string[] | undefined,
+        relatedProjectId: d.related_project_id as string | undefined,
+        relatedProject: relatedProject ? {
+          id: relatedProject.id,
+          code: relatedProject.code,
+          name: relatedProject.name,
+        } : undefined,
+        status: d.status as Decision['status'],
+        priority: d.priority as Decision['priority'],
+        createdBy: d.created_by as string | undefined,
+        createdAt: d.created_at as string,
+        updatedAt: d.updated_at as string,
+        approvedAt: d.approved_at as string | undefined,
+        approvedBy: d.approved_by as string | undefined,
+      };
+    });
     
     return NextResponse.json({ success: true, data: decisions });
   } catch (error) {

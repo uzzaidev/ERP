@@ -129,7 +129,7 @@ export async function PUT(
     } = body;
     
     // Build update object (only include provided fields)
-    const updateData: any = {};
+    const updateData: Record<string, unknown> = {};
     if (title !== undefined) updateData.title = title;
     if (context !== undefined) updateData.context = context;
     if (decision !== undefined) updateData.decision = decision;

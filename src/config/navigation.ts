@@ -15,6 +15,7 @@ import {
   Settings,
   Brain,
   ScrollText,
+  Lightbulb,
   type LucideIcon,
 } from "lucide-react";
 
@@ -71,6 +72,11 @@ export const navigation: NavGroup[] = [
         title: "Decisoes (ADRs)",
         href: "/decisoes",
         icon: ScrollText,
+      },
+      {
+        title: "Kaizens",
+        href: "/kaizens",
+        icon: Lightbulb,
       },
       {
         title: "Equipe",

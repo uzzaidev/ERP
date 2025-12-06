@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Plus, Search, Lightbulb } from "lucide-react";
+import { Plus, Search, Lightbulb, Wrench, Settings, Target, Sparkles, CheckCircle, XCircle, RefreshCw, FileText } from "lucide-react";
 import { CreateKaizenModal } from "@/components/kaizens/CreateKaizenModal";
 import { EditKaizenModal } from "@/components/kaizens/EditKaizenModal";
 import { KaizenImprovement as Kaizen } from "@/types/entities";
@@ -68,13 +68,13 @@ export default function KaizensPage() {
   );
 
   const getCategoryIcon = (category: string) => {
-    const icons: Record<string, string> = {
-      technical: "🔧",
-      process: "⚙️",
-      strategic: "🎯",
-      cultural: "🌟",
+    const icons: Record<string, React.ComponentType<{ className?: string }>> = {
+      technical: Wrench,
+      process: Settings,
+      strategic: Target,
+      cultural: Sparkles,
     };
-    return icons[category] || "📝";
+    return icons[category] || FileText;
   };
 
   const getCategoryLabel = (category: string) => {
@@ -137,7 +137,7 @@ export default function KaizensPage() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="bg-slate-800/50 border border-blue-500/30 rounded-lg p-4">
           <div className="flex items-center gap-2 mb-2">
-            <span className="text-2xl">🔧</span>
+            <Wrench className="h-6 w-6 text-blue-400" />
             <span className="text-gray-400 text-sm">Técnico</span>
           </div>
           <div className="text-2xl font-bold text-blue-300">{stats.technical}</div>
@@ -145,7 +145,7 @@ export default function KaizensPage() {
         
         <div className="bg-slate-800/50 border border-green-500/30 rounded-lg p-4">
           <div className="flex items-center gap-2 mb-2">
-            <span className="text-2xl">⚙️</span>
+            <Settings className="h-6 w-6 text-green-400" />
             <span className="text-gray-400 text-sm">Processo</span>
           </div>
           <div className="text-2xl font-bold text-green-300">{stats.process}</div>
@@ -153,7 +153,7 @@ export default function KaizensPage() {
         
         <div className="bg-slate-800/50 border border-purple-500/30 rounded-lg p-4">
           <div className="flex items-center gap-2 mb-2">
-            <span className="text-2xl">🎯</span>
+            <Target className="h-6 w-6 text-purple-400" />
             <span className="text-gray-400 text-sm">Estratégico</span>
           </div>
           <div className="text-2xl font-bold text-purple-300">{stats.strategic}</div>
@@ -161,7 +161,7 @@ export default function KaizensPage() {
         
         <div className="bg-slate-800/50 border border-orange-500/30 rounded-lg p-4">
           <div className="flex items-center gap-2 mb-2">
-            <span className="text-2xl">🌟</span>
+            <Sparkles className="h-6 w-6 text-orange-400" />
             <span className="text-gray-400 text-sm">Cultural</span>
           </div>
           <div className="text-2xl font-bold text-orange-300">{stats.cultural}</div>
@@ -186,10 +186,26 @@ export default function KaizensPage() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Todas as categorias</SelectItem>
-            <SelectItem value="technical">🔧 Técnico</SelectItem>
-            <SelectItem value="process">⚙️ Processo</SelectItem>
-            <SelectItem value="strategic">🎯 Estratégico</SelectItem>
-            <SelectItem value="cultural">🌟 Cultural</SelectItem>
+            <SelectItem value="technical">
+              <span className="flex items-center gap-2">
+                <Wrench className="h-4 w-4" /> Técnico
+              </span>
+            </SelectItem>
+            <SelectItem value="process">
+              <span className="flex items-center gap-2">
+                <Settings className="h-4 w-4" /> Processo
+              </span>
+            </SelectItem>
+            <SelectItem value="strategic">
+              <span className="flex items-center gap-2">
+                <Target className="h-4 w-4" /> Estratégico
+              </span>
+            </SelectItem>
+            <SelectItem value="cultural">
+              <span className="flex items-center gap-2">
+                <Sparkles className="h-4 w-4" /> Cultural
+              </span>
+            </SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -209,75 +225,78 @@ export default function KaizensPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredKaizens.map((kaizen) => (
-            <div
-              key={kaizen.id}
-              onClick={() => handleEditClick(kaizen)}
-              className="bg-slate-800/50 border border-slate-700/50 rounded-lg p-4 cursor-pointer hover:border-slate-600 transition-colors"
-            >
-              {/* Header */}
-              <div className="flex items-start justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  <span className="text-2xl">{getCategoryIcon(kaizen.category)}</span>
-                  <span className="text-sm text-gray-400 font-mono">{kaizen.code}</span>
-                </div>
-                <span className={`px-2 py-1 rounded-md text-xs font-medium border ${getCategoryColor(kaizen.category)}`}>
-                  {getCategoryLabel(kaizen.category)}
-                </span>
-              </div>
-
-              {/* Title */}
-              <h3 className="text-lg font-semibold mb-2 line-clamp-2">
-                {kaizen.title}
-              </h3>
-
-              {/* Golden Rule */}
-              {kaizen.goldenRule && (
-                <div className="mb-3">
-                  <div className="flex items-start gap-2 text-sm text-yellow-400/80">
-                    <span className="flex-shrink-0">💡</span>
-                    <p className="line-clamp-2">{kaizen.goldenRule}</p>
+          {filteredKaizens.map((kaizen) => {
+            const IconComponent = getCategoryIcon(kaizen.category);
+            return (
+              <div
+                key={kaizen.id}
+                onClick={() => handleEditClick(kaizen)}
+                className="bg-slate-800/50 border border-slate-700/50 rounded-lg p-4 cursor-pointer hover:border-slate-600 transition-colors"
+              >
+                {/* Header */}
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <IconComponent className="h-6 w-6" />
+                    <span className="text-sm text-gray-400 font-mono">{kaizen.code}</span>
                   </div>
+                  <span className={`px-2 py-1 rounded-md text-xs font-medium border ${getCategoryColor(kaizen.category)}`}>
+                    {getCategoryLabel(kaizen.category)}
+                  </span>
                 </div>
-              )}
 
-              {/* Learning Summary */}
-              {kaizen.learning && (
-                <div className="space-y-1 text-xs text-gray-400">
-                  {kaizen.learning.do && kaizen.learning.do.length > 0 && (
-                    <div className="flex items-center gap-1">
-                      <span className="text-green-400">✅</span>
-                      <span>{kaizen.learning.do.length} fazer</span>
+                {/* Title */}
+                <h3 className="text-lg font-semibold mb-2 line-clamp-2">
+                  {kaizen.title}
+                </h3>
+
+                {/* Golden Rule */}
+                {kaizen.goldenRule && (
+                  <div className="mb-3">
+                    <div className="flex items-start gap-2 text-sm text-yellow-400/80">
+                      <Lightbulb className="h-4 w-4 flex-shrink-0 mt-0.5" />
+                      <p className="line-clamp-2">{kaizen.goldenRule}</p>
                     </div>
-                  )}
-                  {kaizen.learning.avoid && kaizen.learning.avoid.length > 0 && (
-                    <div className="flex items-center gap-1">
-                      <span className="text-red-400">❌</span>
-                      <span>{kaizen.learning.avoid.length} evitar</span>
-                    </div>
-                  )}
-                  {kaizen.learning.adjust && kaizen.learning.adjust.length > 0 && (
-                    <div className="flex items-center gap-1">
-                      <span className="text-blue-400">🔄</span>
-                      <span>{kaizen.learning.adjust.length} ajustar</span>
-                    </div>
-                  )}
+                  </div>
+                )}
+
+                {/* Learning Summary */}
+                {kaizen.learning && (
+                  <div className="space-y-1 text-xs text-gray-400">
+                    {kaizen.learning.do && kaizen.learning.do.length > 0 && (
+                      <div className="flex items-center gap-1">
+                        <CheckCircle className="h-3 w-3 text-green-400" />
+                        <span>{kaizen.learning.do.length} fazer</span>
+                      </div>
+                    )}
+                    {kaizen.learning.avoid && kaizen.learning.avoid.length > 0 && (
+                      <div className="flex items-center gap-1">
+                        <XCircle className="h-3 w-3 text-red-400" />
+                        <span>{kaizen.learning.avoid.length} evitar</span>
+                      </div>
+                    )}
+                    {kaizen.learning.adjust && kaizen.learning.adjust.length > 0 && (
+                      <div className="flex items-center gap-1">
+                        <RefreshCw className="h-3 w-3 text-blue-400" />
+                        <span>{kaizen.learning.adjust.length} ajustar</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Related Project */}
+                {kaizen.relatedProject && (
+                  <div className="mt-3 pt-3 border-t border-slate-700/50 text-xs text-gray-400">
+                    <span className="font-medium">Projeto:</span> {kaizen.relatedProject.code}
+                  </div>
+                )}
+
+                {/* Footer */}
+                <div className="mt-3 pt-3 border-t border-slate-700/50 text-xs text-gray-500">
+                  {new Date(kaizen.createdAt).toLocaleDateString('pt-BR')}
                 </div>
-              )}
-
-              {/* Related Project */}
-              {kaizen.relatedProject && (
-                <div className="mt-3 pt-3 border-t border-slate-700/50 text-xs text-gray-400">
-                  <span className="font-medium">Projeto:</span> {kaizen.relatedProject.code}
-                </div>
-              )}
-
-              {/* Footer */}
-              <div className="mt-3 pt-3 border-t border-slate-700/50 text-xs text-gray-500">
-                {new Date(kaizen.createdAt).toLocaleDateString('pt-BR')}
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 

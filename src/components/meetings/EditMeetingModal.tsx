@@ -73,6 +73,7 @@ export function EditMeetingModal({
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [projects, setProjects] = useState<Project[]>([]);
   const [previewScore, setPreviewScore] = useState(0);
+  const [isFormReady, setIsFormReady] = useState(false);
 
   const {
     register,
@@ -101,18 +102,28 @@ export function EditMeetingModal({
   // Load meeting data when modal opens or meeting changes
   useEffect(() => {
     if (open && meeting) {
-      setValue("title", meeting.title);
-      setValue("date", meeting.date);
-      setValue("decisionsCount", meeting.decisionsCount);
-      setValue("actionsCount", meeting.actionsCount);
-      setValue("kaizensCount", meeting.kaizensCount);
-      setValue("blockersCount", meeting.blockersCount);
-      setValue("notes", meeting.notes || "");
-      setValue("relatedProjectId", meeting.relatedProjectId || "");
+      setIsFormReady(false);
+      
+      // Use reset to properly initialize all form values at once
+      reset({
+        title: meeting.title,
+        date: meeting.date,
+        decisionsCount: meeting.decisionsCount,
+        actionsCount: meeting.actionsCount,
+        kaizensCount: meeting.kaizensCount,
+        blockersCount: meeting.blockersCount,
+        notes: meeting.notes || "",
+        relatedProjectId: meeting.relatedProjectId || "none",
+      });
       
       fetchProjects();
+      
+      // Mark form as ready after reset
+      setIsFormReady(true);
+    } else {
+      setIsFormReady(false);
     }
-  }, [open, meeting, setValue]);
+  }, [open, meeting, reset]);
 
   const fetchProjects = async () => {
     try {
@@ -132,10 +143,16 @@ export function EditMeetingModal({
     try {
       setIsSubmitting(true);
 
+      const payload = {
+        ...data,
+        // Ensure relatedProjectId is either a valid UUID or undefined, never empty string
+        relatedProjectId: data.relatedProjectId || undefined,
+      };
+
       const response = await fetch(`/api/meetings/${meeting.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify(payload),
       });
 
       const result = await response.json();
@@ -204,7 +221,12 @@ export function EditMeetingModal({
             </div>
           </DialogHeader>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          {!isFormReady ? (
+            <div className="py-12 text-center text-gray-400">
+              Carregando...
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             {/* Title */}
             <div className="space-y-2">
               <Label htmlFor="title">Título *</Label>
@@ -235,14 +257,14 @@ export function EditMeetingModal({
             <div className="space-y-2">
               <Label htmlFor="relatedProjectId">Projeto Relacionado</Label>
               <Select
-                value={watch("relatedProjectId") || ""}
-                onValueChange={(value) => setValue("relatedProjectId", value || undefined)}
+                value={watch("relatedProjectId") || "none"}
+                onValueChange={(value) => setValue("relatedProjectId", value === "none" ? undefined : value)}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Selecione um projeto (opcional)" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Nenhum</SelectItem>
+                  <SelectItem value="none">Nenhum</SelectItem>
                   {projects.map((project) => (
                     <SelectItem key={project.id} value={project.id}>
                       {project.code} - {project.name}
@@ -339,6 +361,7 @@ export function EditMeetingModal({
               </Button>
             </div>
           </form>
+          )}
         </DialogContent>
       </Dialog>
 

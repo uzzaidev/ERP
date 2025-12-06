@@ -70,6 +70,7 @@ export function EditKaizenModal({
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [projects, setProjects] = useState<Project[]>([]);
+  const [isFormReady, setIsFormReady] = useState(false);
   
   // Learning arrays
   const [doItems, setDoItems] = useState<string[]>([]);
@@ -92,13 +93,18 @@ export function EditKaizenModal({
   // Load kaizen data when modal opens or kaizen changes
   useEffect(() => {
     if (open && kaizen) {
-      setValue("title", kaizen.title);
-      setValue("category", kaizen.category);
-      setValue("context", kaizen.context || "");
-      setValue("goldenRule", kaizen.goldenRule || "");
-      setValue("application", kaizen.application || "");
-      setValue("relatedProjectId", kaizen.relatedProjectId || "");
-      setValue("relatedTaskId", kaizen.relatedTaskId || "");
+      setIsFormReady(false);
+      
+      // Use reset to properly initialize all form values at once
+      reset({
+        title: kaizen.title,
+        category: kaizen.category,
+        context: kaizen.context || "",
+        goldenRule: kaizen.goldenRule || "",
+        application: kaizen.application || "",
+        relatedProjectId: kaizen.relatedProjectId || "none",
+        relatedTaskId: kaizen.relatedTaskId || undefined,
+      });
       
       // Load learning arrays
       setDoItems(kaizen.learning?.do || []);
@@ -106,8 +112,13 @@ export function EditKaizenModal({
       setAdjustItems(kaizen.learning?.adjust || []);
       
       fetchProjects();
+      
+      // Mark form as ready after reset
+      setIsFormReady(true);
+    } else {
+      setIsFormReady(false);
     }
-  }, [open, kaizen, setValue]);
+  }, [open, kaizen, reset]);
 
   const fetchProjects = async () => {
     try {
@@ -137,6 +148,9 @@ export function EditKaizenModal({
       const payload = {
         ...data,
         learning,
+        // Ensure relatedProjectId is either a valid UUID or undefined, never empty string
+        relatedProjectId: data.relatedProjectId || undefined,
+        relatedTaskId: data.relatedTaskId || undefined,
       };
 
       const response = await fetch(`/api/kaizens/${kaizen.id}`, {
@@ -236,7 +250,12 @@ export function EditKaizenModal({
             </div>
           </DialogHeader>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          {!isFormReady ? (
+            <div className="py-12 text-center text-gray-400">
+              Carregando...
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             {/* Title */}
             <div className="space-y-2">
               <Label htmlFor="title">Título *</Label>
@@ -424,14 +443,14 @@ export function EditKaizenModal({
             <div className="space-y-2">
               <Label htmlFor="relatedProjectId">Projeto Relacionado</Label>
               <Select
-                value={watch("relatedProjectId") || ""}
-                onValueChange={(value) => setValue("relatedProjectId", value || undefined)}
+                value={watch("relatedProjectId") || "none"}
+                onValueChange={(value) => setValue("relatedProjectId", value === "none" ? undefined : value)}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Selecione um projeto (opcional)" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Nenhum</SelectItem>
+                  <SelectItem value="none">Nenhum</SelectItem>
                   {projects.map((project) => (
                     <SelectItem key={project.id} value={project.id}>
                       {project.code} - {project.name}
@@ -456,6 +475,7 @@ export function EditKaizenModal({
               </Button>
             </div>
           </form>
+          )}
         </DialogContent>
       </Dialog>
 

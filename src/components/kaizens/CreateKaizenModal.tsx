@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Plus, X } from "lucide-react";
+import { Plus, X, Wrench, Settings, Target, Sparkles } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -111,6 +111,9 @@ export function CreateKaizenModal({
       const payload = {
         ...data,
         learning,
+        // Ensure relatedProjectId is either a valid UUID or undefined, never empty string
+        relatedProjectId: data.relatedProjectId || undefined,
+        relatedTaskId: data.relatedTaskId || undefined,
       };
 
       const response = await fetch("/api/kaizens", {
@@ -197,23 +200,23 @@ export function CreateKaizenModal({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="technical">
-                  <span className={getCategoryColor("technical")}>
-                    🔧 Técnico
+                  <span className={`flex items-center gap-2 ${getCategoryColor("technical")}`}>
+                    <Wrench className="h-4 w-4" /> Técnico
                   </span>
                 </SelectItem>
                 <SelectItem value="process">
-                  <span className={getCategoryColor("process")}>
-                    ⚙️ Processo
+                  <span className={`flex items-center gap-2 ${getCategoryColor("process")}`}>
+                    <Settings className="h-4 w-4" /> Processo
                   </span>
                 </SelectItem>
                 <SelectItem value="strategic">
-                  <span className={getCategoryColor("strategic")}>
-                    🎯 Estratégico
+                  <span className={`flex items-center gap-2 ${getCategoryColor("strategic")}`}>
+                    <Target className="h-4 w-4" /> Estratégico
                   </span>
                 </SelectItem>
                 <SelectItem value="cultural">
-                  <span className={getCategoryColor("cultural")}>
-                    🌟 Cultural
+                  <span className={`flex items-center gap-2 ${getCategoryColor("cultural")}`}>
+                    <Sparkles className="h-4 w-4" /> Cultural
                   </span>
                 </SelectItem>
               </SelectContent>
@@ -365,14 +368,14 @@ export function CreateKaizenModal({
           <div className="space-y-2">
             <Label htmlFor="relatedProjectId">Projeto Relacionado</Label>
             <Select
-              value={watch("relatedProjectId") || ""}
-              onValueChange={(value) => setValue("relatedProjectId", value || undefined)}
+              value={watch("relatedProjectId") || "none"}
+              onValueChange={(value) => setValue("relatedProjectId", value === "none" ? undefined : value)}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Selecione um projeto (opcional)" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Nenhum</SelectItem>
+                <SelectItem value="none">Nenhum</SelectItem>
                 {projects.map((project) => (
                   <SelectItem key={project.id} value={project.id}>
                     {project.code} - {project.name}

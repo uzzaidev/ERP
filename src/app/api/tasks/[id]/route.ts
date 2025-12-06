@@ -177,6 +177,94 @@ export async function PUT(
   }
 }
 
+export async function PATCH(
+  request: NextRequest,
+  context: RouteContext
+) {
+  try {
+    const { id } = await context.params;
+    const { tenantId } = await getTenantContext();
+
+    const supabase = await createClient();
+    const body = await request.json();
+
+    // First, verify the task belongs to the user's tenant
+    const { data: existingTask, error: fetchError } = await supabase
+      .from('tasks')
+      .select('tenant_id')
+      .eq('id', id)
+      .single();
+
+    if (fetchError || !existingTask) {
+      return NextResponse.json(
+        { success: false, error: 'Task not found' },
+        { status: 404 }
+      );
+    }
+
+    if (existingTask.tenant_id !== tenantId) {
+      return NextResponse.json(
+        { success: false, error: 'Access denied' },
+        { status: 403 }
+      );
+    }
+
+    // Build update object for partial updates
+    const updateData: Record<string, unknown> = {
+      updated_at: new Date().toISOString(),
+    };
+
+    if (body.status !== undefined) updateData.status = body.status;
+    if (body.priority !== undefined) updateData.priority = body.priority;
+    if (body.assignee_id !== undefined) updateData.assignee_id = body.assignee_id || null;
+    if (body.completed_hours !== undefined) updateData.completed_hours = body.completed_hours;
+    if (body.title !== undefined) updateData.title = body.title;
+    if (body.description !== undefined) updateData.description = body.description;
+    if (body.due_date !== undefined) updateData.due_date = body.due_date || null;
+    if (body.estimated_hours !== undefined) updateData.estimated_hours = body.estimated_hours;
+
+    // Update task
+    const { data, error } = await supabase
+      .from('tasks')
+      .update(updateData)
+      .eq('id', id)
+      .eq('tenant_id', tenantId)
+      .select(`
+        *,
+        project:projects (
+          id,
+          code,
+          name
+        ),
+        sprint:sprints (
+          id,
+          name,
+          start_date,
+          end_date
+        ),
+        assignee:users!tasks_assignee_id_fkey (
+          id,
+          full_name,
+          email,
+          avatar_url
+        )
+      `)
+      .single();
+
+    if (error) {
+      console.error('Error updating task:', error);
+      return NextResponse.json(
+        { success: false, error: error.message },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({ success: true, data });
+  } catch (error) {
+    return handleApiError(error);
+  }
+}
+
 export async function DELETE(
   request: NextRequest,
   context: RouteContext
@@ -184,7 +272,7 @@ export async function DELETE(
   try {
     const { id } = await context.params;
     const { tenantId } = await getTenantContext();
-    
+
     const supabase = await createClient();
 
     // First, verify the task belongs to the user's tenant

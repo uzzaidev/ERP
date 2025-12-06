@@ -43,6 +43,17 @@ export async function GET(request: NextRequest) {
             name,
             color
           )
+        ),
+        task_comments (
+          id,
+          author_id,
+          content,
+          created_at,
+          author:users!task_comments_author_id_fkey (
+            id,
+            full_name,
+            email
+          )
         )
       `)
       .eq('tenant_id', tenantId);
@@ -194,7 +205,7 @@ export async function PATCH(request: NextRequest) {
     const supabase = await createClient();
     const body = await request.json();
     
-    const { id, status, assignee_id } = body;
+    const { id, status, assignee_id, completed_hours } = body;
 
     if (!id) {
       return NextResponse.json(
@@ -224,9 +235,10 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    const updateData: { status?: string; assignee_id?: string | null } = {};
+    const updateData: { status?: string; assignee_id?: string | null; completed_hours?: number } = {};
     if (status !== undefined) updateData.status = status;
     if (assignee_id !== undefined) updateData.assignee_id = assignee_id;
+    if (completed_hours !== undefined) updateData.completed_hours = completed_hours;
 
     const { data, error } = await supabase
       .from('tasks')

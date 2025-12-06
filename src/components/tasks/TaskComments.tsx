@@ -47,7 +47,7 @@ export function TaskComments({ taskId }: TaskCommentsProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!newComment.trim()) return;
 
     setIsSubmitting(true);

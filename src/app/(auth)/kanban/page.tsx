@@ -78,6 +78,13 @@ export default function KanbanPage() {
             updated_at: string;
             assignee?: { id: string; full_name: string; email: string; avatar_url?: string };
             task_tags?: Array<{ tag?: { id: string; name: string; color: string } }>;
+            task_comments?: Array<{
+              id: string;
+              author_id: string;
+              content: string;
+              created_at: string;
+              author?: { id: string; full_name: string; email: string };
+            }>;
           }) => ({
             id: task.code || task.id,
             title: task.title,
@@ -94,7 +101,13 @@ export default function KanbanPage() {
             estimatedHours: task.estimated_hours || 0,
             completedHours: task.completed_hours || 0,
             tags: task.task_tags?.map((tt) => tt.tag).filter((tag): tag is { id: string; name: string; color: string } => tag !== undefined) || [],
-            comments: [],
+            comments: task.task_comments?.map((comment) => ({
+              id: comment.id,
+              author: comment.author || { id: comment.author_id, full_name: 'Usuário', email: '' },
+              content: comment.content,
+              mentions: [],
+              createdAt: comment.created_at,
+            })) || [],
             createdAt: task.created_at,
             updatedAt: task.updated_at,
             dbId: task.id, // Store database ID for updates
@@ -259,6 +272,13 @@ export default function KanbanPage() {
             updated_at: string;
             assignee?: { id: string; full_name: string; email: string; avatar_url?: string };
             task_tags?: Array<{ tag?: { id: string; name: string; color: string } }>;
+            task_comments?: Array<{
+              id: string;
+              author_id: string;
+              content: string;
+              created_at: string;
+              author?: { id: string; full_name: string; email: string };
+            }>;
           }) => ({
             id: task.code || task.id,
             title: task.title,
@@ -275,7 +295,13 @@ export default function KanbanPage() {
             estimatedHours: task.estimated_hours || 0,
             completedHours: task.completed_hours || 0,
             tags: task.task_tags?.map((tt) => tt.tag).filter((tag): tag is { id: string; name: string; color: string } => tag !== undefined) || [],
-            comments: [],
+            comments: task.task_comments?.map((comment) => ({
+              id: comment.id,
+              author: comment.author || { id: comment.author_id, full_name: 'Usuário', email: '' },
+              content: comment.content,
+              mentions: [],
+              createdAt: comment.created_at,
+            })) || [],
             createdAt: task.created_at,
             updatedAt: task.updated_at,
             dbId: task.id,
@@ -321,6 +347,13 @@ export default function KanbanPage() {
             updated_at: string;
             assignee?: { id: string; full_name: string; email: string; avatar_url?: string };
             task_tags?: Array<{ tag?: { id: string; name: string; color: string } }>;
+            task_comments?: Array<{
+              id: string;
+              author_id: string;
+              content: string;
+              created_at: string;
+              author?: { id: string; full_name: string; email: string };
+            }>;
           }) => ({
             id: task.code || task.id,
             title: task.title,
@@ -337,7 +370,13 @@ export default function KanbanPage() {
             estimatedHours: task.estimated_hours || 0,
             completedHours: task.completed_hours || 0,
             tags: task.task_tags?.map((tt) => tt.tag).filter((tag): tag is { id: string; name: string; color: string } => tag !== undefined) || [],
-            comments: [],
+            comments: task.task_comments?.map((comment) => ({
+              id: comment.id,
+              author: comment.author || { id: comment.author_id, full_name: 'Usuário', email: '' },
+              content: comment.content,
+              mentions: [],
+              createdAt: comment.created_at,
+            })) || [],
             createdAt: task.created_at,
             updatedAt: task.updated_at,
             dbId: task.id,

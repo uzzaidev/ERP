@@ -17,18 +17,18 @@ export function KanbanCardModal({ onAssigneeChange, onEditClick }: KanbanCardMod
 
   if (!isCardModalOpen || !selectedCard) return null;
 
-  const handleAddComment = () => {
+  const handleAddComment = async () => {
     if (!newComment.trim()) return;
-    
+
     // Extract mentions (@username)
     const mentions = newComment.match(/@(\w+)/g)?.map(m => m.substring(1)) || [];
-    
-    addComment(selectedCard.id, newComment, mentions);
+
+    await addComment(selectedCard.id, newComment, mentions);
     setNewComment("");
   };
 
-  const handleUpdateTime = () => {
-    updateTimeTracking(selectedCard.id, completedHours);
+  const handleUpdateTime = async () => {
+    await updateTimeTracking(selectedCard.id, completedHours);
   };
 
   const handleAssigneeSelect = (userId: string) => {

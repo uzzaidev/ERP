@@ -36,6 +36,7 @@ export async function GET(
       .from('task_comments')
       .select(`
         id,
+        tenant_id,
         task_id,
         author_id,
         content,
@@ -61,7 +62,20 @@ export async function GET(
       );
     }
 
-    return NextResponse.json({ success: true, data: comments });
+    // Transform to camelCase for frontend
+    const transformedComments = comments.map(comment => ({
+      id: comment.id,
+      tenantId: comment.tenant_id,
+      taskId: comment.task_id,
+      authorId: comment.author_id,
+      author: Array.isArray(comment.author) ? comment.author[0] : comment.author,
+      content: comment.content,
+      mentions: comment.mentions,
+      createdAt: comment.created_at,
+      updatedAt: comment.updated_at,
+    }));
+
+    return NextResponse.json({ success: true, data: transformedComments });
   } catch (error) {
     return handleApiError(error);
   }
@@ -118,6 +132,7 @@ export async function POST(
       })
       .select(`
         id,
+        tenant_id,
         task_id,
         author_id,
         content,
@@ -141,7 +156,20 @@ export async function POST(
       );
     }
 
-    return NextResponse.json({ success: true, data: comment }, { status: 201 });
+    // Transform to camelCase for frontend
+    const transformedComment = {
+      id: comment.id,
+      tenantId: comment.tenant_id,
+      taskId: comment.task_id,
+      authorId: comment.author_id,
+      author: Array.isArray(comment.author) ? comment.author[0] : comment.author,
+      content: comment.content,
+      mentions: comment.mentions,
+      createdAt: comment.created_at,
+      updatedAt: comment.updated_at,
+    };
+
+    return NextResponse.json({ success: true, data: transformedComment }, { status: 201 });
   } catch (error) {
     return handleApiError(error);
   }

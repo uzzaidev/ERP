@@ -235,14 +235,14 @@ export function EditMeetingModal({
             <div className="space-y-2">
               <Label htmlFor="relatedProjectId">Projeto Relacionado</Label>
               <Select
-                value={watch("relatedProjectId") || ""}
-                onValueChange={(value) => setValue("relatedProjectId", value || undefined)}
+                value={watch("relatedProjectId") || "none"}
+                onValueChange={(value) => setValue("relatedProjectId", value === "none" ? undefined : value)}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Selecione um projeto (opcional)" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Nenhum</SelectItem>
+                  <SelectItem value="none">Nenhum</SelectItem>
                   {projects.map((project) => (
                     <SelectItem key={project.id} value={project.id}>
                       {project.code} - {project.name}

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Plus, Search, Lightbulb } from "lucide-react";
 import { CreateKaizenModal } from "@/components/kaizens/CreateKaizenModal";
 import { EditKaizenModal } from "@/components/kaizens/EditKaizenModal";
-import { Kaizen } from "@/types/entities";
+import { KaizenImprovement as Kaizen } from "@/types/entities";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {

@@ -527,7 +527,7 @@ export interface Decision {
 }
 
 // ============================================
-// KAIZENS (Continuous Improvement System)
+// KAIZEN IMPROVEMENTS (New System - Sprint 8)
 // ============================================
 
 export type KaizenCategory = "technical" | "process" | "strategic" | "cultural";
@@ -539,8 +539,8 @@ export interface KaizenLearning {
   adjust?: string[]; // Things to adjust
 }
 
-// Kaizen
-export interface Kaizen {
+// Kaizen Improvement
+export interface KaizenImprovement {
   id: string;
   tenantId: string;
   code: string; // K-T-001, K-P-002, K-S-003, K-C-004
@@ -570,11 +570,11 @@ export interface Kaizen {
 }
 
 // ============================================
-// MEETINGS (Meeting Effectiveness Score System)
+// MEETINGS (Meeting Effectiveness Score System - Sprint 9)
 // ============================================
 
-// Meeting
-export interface Meeting {
+// Meeting with Effectiveness Score
+export interface MeetingEffectiveness {
   id: string;
   tenantId: string;
   code: string; // MTG-YYYY-MM-DD-NNN or MTG-YYYY-MM-DD-PROJECT-NNN

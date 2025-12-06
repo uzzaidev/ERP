@@ -32,7 +32,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Kaizen } from "@/types/entities";
+import { KaizenImprovement as Kaizen } from "@/types/entities";
 
 // Kaizen edit schema
 const editKaizenSchema = z.object({

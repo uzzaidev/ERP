@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getTenantContext } from '@/lib/supabase/tenant';
-import { Meeting } from '@/types/entities';
+import { MeetingEffectiveness as Meeting } from '@/types/entities';
 
 /**
  * PUT /api/meetings/:id

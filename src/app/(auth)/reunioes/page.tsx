@@ -5,7 +5,7 @@ import { Plus, Calendar, Search, TrendingUp, Users } from "lucide-react";
 import { CreateMeetingModal } from "@/components/meetings/CreateMeetingModal";
 import { EditMeetingModal } from "@/components/meetings/EditMeetingModal";
 import { EffectivenessScore } from "@/components/meetings/EffectivenessScore";
-import { Meeting } from "@/types/entities";
+import { MeetingEffectiveness as Meeting } from "@/types/entities";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 

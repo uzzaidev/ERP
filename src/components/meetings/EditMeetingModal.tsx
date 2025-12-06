@@ -32,7 +32,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Meeting } from "@/types/entities";
+import { MeetingEffectiveness as Meeting } from "@/types/entities";
 import { EffectivenessScore } from "./EffectivenessScore";
 
 // Meeting edit schema

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getTenantContext } from '@/lib/supabase/tenant';
-import { Kaizen } from '@/types/entities';
+import { KaizenImprovement as Kaizen } from '@/types/entities';
 
 /**
  * PUT /api/kaizens/:id

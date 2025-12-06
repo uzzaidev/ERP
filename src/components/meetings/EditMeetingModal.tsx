@@ -73,6 +73,7 @@ export function EditMeetingModal({
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [projects, setProjects] = useState<Project[]>([]);
   const [previewScore, setPreviewScore] = useState(0);
+  const [isFormReady, setIsFormReady] = useState(false);
 
   const {
     register,
@@ -101,6 +102,8 @@ export function EditMeetingModal({
   // Load meeting data when modal opens or meeting changes
   useEffect(() => {
     if (open && meeting) {
+      setIsFormReady(false);
+      
       // Use reset to properly initialize all form values at once
       reset({
         title: meeting.title,
@@ -114,6 +117,11 @@ export function EditMeetingModal({
       });
       
       fetchProjects();
+      
+      // Mark form as ready after reset
+      setIsFormReady(true);
+    } else {
+      setIsFormReady(false);
     }
   }, [open, meeting, reset]);
 
@@ -213,7 +221,12 @@ export function EditMeetingModal({
             </div>
           </DialogHeader>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          {!isFormReady ? (
+            <div className="py-12 text-center text-gray-400">
+              Carregando...
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             {/* Title */}
             <div className="space-y-2">
               <Label htmlFor="title">Título *</Label>
@@ -348,6 +361,7 @@ export function EditMeetingModal({
               </Button>
             </div>
           </form>
+          )}
         </DialogContent>
       </Dialog>
 

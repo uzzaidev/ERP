@@ -70,6 +70,7 @@ export function EditKaizenModal({
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [projects, setProjects] = useState<Project[]>([]);
+  const [isFormReady, setIsFormReady] = useState(false);
   
   // Learning arrays
   const [doItems, setDoItems] = useState<string[]>([]);
@@ -92,6 +93,8 @@ export function EditKaizenModal({
   // Load kaizen data when modal opens or kaizen changes
   useEffect(() => {
     if (open && kaizen) {
+      setIsFormReady(false);
+      
       // Use reset to properly initialize all form values at once
       reset({
         title: kaizen.title,
@@ -109,6 +112,11 @@ export function EditKaizenModal({
       setAdjustItems(kaizen.learning?.adjust || []);
       
       fetchProjects();
+      
+      // Mark form as ready after reset
+      setIsFormReady(true);
+    } else {
+      setIsFormReady(false);
     }
   }, [open, kaizen, reset]);
 
@@ -242,7 +250,12 @@ export function EditKaizenModal({
             </div>
           </DialogHeader>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          {!isFormReady ? (
+            <div className="py-12 text-center text-gray-400">
+              Carregando...
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             {/* Title */}
             <div className="space-y-2">
               <Label htmlFor="title">Título *</Label>
@@ -462,6 +475,7 @@ export function EditKaizenModal({
               </Button>
             </div>
           </form>
+          )}
         </DialogContent>
       </Dialog>
 

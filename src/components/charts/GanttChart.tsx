@@ -4,6 +4,11 @@ import { useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar, Clock } from "lucide-react";
 
+// Constants
+const MILLISECONDS_PER_DAY = 1000 * 60 * 60 * 24;
+const DEFAULT_TASK_DURATION_DAYS = 7;
+const DATE_RANGE_PADDING_PERCENT = 0.05;
+
 interface GanttTask {
   id: string;
   code: string;
@@ -50,22 +55,34 @@ export function GanttChart({ tasks, projectStartDate, projectEndDate }: GanttCha
     if (projectStartDate) dates.push(new Date(projectStartDate));
     if (projectEndDate) dates.push(new Date(projectEndDate));
     
-    tasksWithDates.forEach(task => {
-      if (task.started_at) dates.push(new Date(task.started_at));
-      if (task.due_date) dates.push(new Date(task.due_date));
-    });
+    // Use reduce for single-pass min/max calculation
+    const { minTime, maxTime } = tasksWithDates.reduce((acc, task) => {
+      if (task.started_at) {
+        const startTime = new Date(task.started_at).getTime();
+        dates.push(new Date(task.started_at));
+        acc.minTime = Math.min(acc.minTime, startTime);
+        acc.maxTime = Math.max(acc.maxTime, startTime);
+      }
+      if (task.due_date) {
+        const dueTime = new Date(task.due_date).getTime();
+        dates.push(new Date(task.due_date));
+        acc.minTime = Math.min(acc.minTime, dueTime);
+        acc.maxTime = Math.max(acc.maxTime, dueTime);
+      }
+      return acc;
+    }, { minTime: Infinity, maxTime: -Infinity });
 
-    const minDate = new Date(Math.min(...dates.map(d => d.getTime())));
-    const maxDate = new Date(Math.max(...dates.map(d => d.getTime())));
+    const minDate = new Date(minTime);
+    const maxDate = new Date(maxTime);
     
-    // Add 5% padding on each side
+    // Add padding on each side
     const range = maxDate.getTime() - minDate.getTime();
-    const padding = range * 0.05;
+    const padding = range * DATE_RANGE_PADDING_PERCENT;
     
     const start = new Date(minDate.getTime() - padding);
     const end = new Date(maxDate.getTime() + padding);
     
-    const days = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+    const days = Math.ceil((end.getTime() - start.getTime()) / MILLISECONDS_PER_DAY);
 
     return {
       startDate: start,
@@ -77,10 +94,12 @@ export function GanttChart({ tasks, projectStartDate, projectEndDate }: GanttCha
   // Calculate task bar position and width
   const getTaskPosition = (task: GanttTask) => {
     const taskStart = task.started_at ? new Date(task.started_at) : new Date();
-    const taskEnd = task.due_date ? new Date(task.due_date) : new Date(taskStart.getTime() + 7 * 24 * 60 * 60 * 1000); // Default 7 days if no end date
+    const taskEnd = task.due_date 
+      ? new Date(task.due_date) 
+      : new Date(taskStart.getTime() + DEFAULT_TASK_DURATION_DAYS * MILLISECONDS_PER_DAY);
 
-    const startOffset = Math.max(0, (taskStart.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
-    const duration = (taskEnd.getTime() - taskStart.getTime()) / (1000 * 60 * 60 * 24);
+    const startOffset = Math.max(0, (taskStart.getTime() - startDate.getTime()) / MILLISECONDS_PER_DAY);
+    const duration = (taskEnd.getTime() - taskStart.getTime()) / MILLISECONDS_PER_DAY;
     
     const leftPercent = (startOffset / totalDays) * 100;
     const widthPercent = (duration / totalDays) * 100;

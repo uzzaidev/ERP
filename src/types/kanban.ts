@@ -23,6 +23,7 @@ export interface KanbanCard {
   updatedAt: string;
   dbId?: string; // Database UUID for API updates
   projectId?: string; // Project UUID for filtering
+  relatedDecisionIds?: string[]; // Array of decision UUIDs
 }
 
 export interface KanbanComment {

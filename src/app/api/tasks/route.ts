@@ -106,6 +106,7 @@ export async function POST(request: NextRequest) {
       sprint_id,
       due_date,
       estimated_hours = 0,
+      related_decision_ids,
     } = body;
 
     // Validate required fields
@@ -150,6 +151,7 @@ export async function POST(request: NextRequest) {
       due_date: due_date || null,
       estimated_hours: estimated_hours || 0,
       completed_hours: 0,
+      related_decision_ids: related_decision_ids || null,
     };
 
     // Insert task into database

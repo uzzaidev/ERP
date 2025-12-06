@@ -91,6 +91,7 @@ export async function PUT(
       sprint_id,
       due_date,
       estimated_hours,
+      related_decision_ids,
     } = body;
 
     // First, verify the task belongs to the user's tenant
@@ -129,6 +130,7 @@ export async function PUT(
     if (sprint_id !== undefined) updateData.sprint_id = sprint_id || null;
     if (due_date !== undefined) updateData.due_date = due_date || null;
     if (estimated_hours !== undefined) updateData.estimated_hours = estimated_hours;
+    if (related_decision_ids !== undefined) updateData.related_decision_ids = related_decision_ids || null;
 
     // Update task
     const { data, error } = await supabase

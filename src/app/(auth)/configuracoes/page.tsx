@@ -71,6 +71,7 @@ export default function ConfiguracoesPage() {
   const [cancelError, setCancelError] = useState('');
   
   const [copiedUrl, setCopiedUrl] = useState(false);
+  const [copiedId, setCopiedId] = useState(false);
 
   useEffect(() => {
     fetchUserData();
@@ -252,6 +253,14 @@ export default function ConfiguracoesPage() {
     }
   };
 
+  const copyTenantId = () => {
+    if (inviteInfo?.tenant_id) {
+      navigator.clipboard.writeText(inviteInfo.tenant_id);
+      setCopiedId(true);
+      setTimeout(() => setCopiedId(false), 2000);
+    }
+  };
+
   if (loading) {
     return (
       <div className="p-8">
@@ -407,13 +416,14 @@ export default function ConfiguracoesPage() {
                     <Button
                       type="button"
                       variant="outline"
-                      onClick={() => {
-                        navigator.clipboard.writeText(inviteInfo.tenant_id);
-                        alert('ID copiado para a área de transferência!');
-                      }}
+                      onClick={copyTenantId}
                       className="shrink-0"
                     >
-                      <Copy className="h-4 w-4" />
+                      {copiedId ? (
+                        <Check className="h-4 w-4" />
+                      ) : (
+                        <Copy className="h-4 w-4" />
+                      )}
                     </Button>
                   </div>
                   <p className="text-xs text-muted-foreground">

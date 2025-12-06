@@ -92,13 +92,16 @@ export function EditKaizenModal({
   // Load kaizen data when modal opens or kaizen changes
   useEffect(() => {
     if (open && kaizen) {
-      setValue("title", kaizen.title);
-      setValue("category", kaizen.category);
-      setValue("context", kaizen.context || "");
-      setValue("goldenRule", kaizen.goldenRule || "");
-      setValue("application", kaizen.application || "");
-      setValue("relatedProjectId", kaizen.relatedProjectId || "none");
-      setValue("relatedTaskId", kaizen.relatedTaskId || undefined);
+      // Use reset to properly initialize all form values at once
+      reset({
+        title: kaizen.title,
+        category: kaizen.category,
+        context: kaizen.context || "",
+        goldenRule: kaizen.goldenRule || "",
+        application: kaizen.application || "",
+        relatedProjectId: kaizen.relatedProjectId || "none",
+        relatedTaskId: kaizen.relatedTaskId || undefined,
+      });
       
       // Load learning arrays
       setDoItems(kaizen.learning?.do || []);
@@ -107,7 +110,7 @@ export function EditKaizenModal({
       
       fetchProjects();
     }
-  }, [open, kaizen, setValue]);
+  }, [open, kaizen, reset]);
 
   const fetchProjects = async () => {
     try {

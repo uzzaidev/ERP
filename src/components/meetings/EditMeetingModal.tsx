@@ -101,18 +101,21 @@ export function EditMeetingModal({
   // Load meeting data when modal opens or meeting changes
   useEffect(() => {
     if (open && meeting) {
-      setValue("title", meeting.title);
-      setValue("date", meeting.date);
-      setValue("decisionsCount", meeting.decisionsCount);
-      setValue("actionsCount", meeting.actionsCount);
-      setValue("kaizensCount", meeting.kaizensCount);
-      setValue("blockersCount", meeting.blockersCount);
-      setValue("notes", meeting.notes || "");
-      setValue("relatedProjectId", meeting.relatedProjectId || "none");
+      // Use reset to properly initialize all form values at once
+      reset({
+        title: meeting.title,
+        date: meeting.date,
+        decisionsCount: meeting.decisionsCount,
+        actionsCount: meeting.actionsCount,
+        kaizensCount: meeting.kaizensCount,
+        blockersCount: meeting.blockersCount,
+        notes: meeting.notes || "",
+        relatedProjectId: meeting.relatedProjectId || "none",
+      });
       
       fetchProjects();
     }
-  }, [open, meeting, setValue]);
+  }, [open, meeting, reset]);
 
   const fetchProjects = async () => {
     try {

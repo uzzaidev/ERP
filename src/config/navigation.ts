@@ -14,6 +14,7 @@ import {
   FileText,
   Settings,
   Brain,
+  ScrollText,
   type LucideIcon,
 } from "lucide-react";
 
@@ -65,6 +66,11 @@ export const navigation: NavGroup[] = [
         title: "Bullet Journal",
         href: "/bullet-journal",
         icon: BookOpen,
+      },
+      {
+        title: "Decisoes (ADRs)",
+        href: "/decisoes",
+        icon: ScrollText,
       },
       {
         title: "Equipe",

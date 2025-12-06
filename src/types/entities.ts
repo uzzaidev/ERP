@@ -4,7 +4,7 @@
 
 // Status comuns
 export type ActionStatus = "open" | "in_progress" | "done" | "canceled" | "blocked";
-export type Priority = "high" | "medium" | "low";
+export type Priority = "low" | "medium" | "high" | "critical";
 export type ProjectStatus = "planning" | "active" | "on_hold" | "completed" | "canceled";
 export type TenantPlan = "trial" | "basic" | "professional" | "enterprise";
 export type TenantStatus = "active" | "suspended" | "cancelled";
@@ -256,8 +256,8 @@ export interface Action {
   updatedAt: string;
 }
 
-// Decisao
-export interface Decision {
+// Decisao (Meeting Decision - legacy)
+export interface MeetingDecision {
   id: string;
   tenantId: string; // Added for multi-tenancy
   publicId: string;
@@ -449,4 +449,79 @@ export interface TimeLog {
   description?: string;
   loggedDate: string;
   createdAt: string;
+}
+
+// ============================================
+// DECISIONS (ADRs - Architecture Decision Records)
+// ============================================
+
+export type DecisionStatus = "draft" | "approved" | "implemented" | "deprecated" | "superseded";
+
+// Decision Alternative (considered option)
+export interface DecisionAlternative {
+  option: string;
+  pros: string[];
+  cons: string[];
+}
+
+// Decision Consequences
+export interface DecisionConsequences {
+  benefits: string[];
+  trade_offs: string[];
+  reversibility?: string;
+}
+
+// Decision Impact Assessment
+export interface DecisionImpact {
+  cost?: string;
+  timeline?: string;
+  quality?: string;
+  technical_debt?: string;
+}
+
+// Decision Stakeholders
+export interface DecisionStakeholders {
+  decided_by?: string;
+  consulted: string[];
+  informed: string[];
+}
+
+// Decision (ADR)
+export interface Decision {
+  id: string;
+  tenantId: string;
+  code: string; // D-2025-001, D-2025-002
+  title: string;
+  
+  // Context & Decision
+  context?: string;
+  decision?: string;
+  
+  // Analysis
+  alternatives?: DecisionAlternative[];
+  consequences?: DecisionConsequences;
+  impact?: DecisionImpact;
+  
+  // Stakeholders
+  stakeholders?: DecisionStakeholders;
+  
+  // Relationships
+  relatedTaskIds?: string[];
+  relatedProjectId?: string;
+  relatedProject?: {
+    id: string;
+    code: string;
+    name: string;
+  };
+  
+  // Status & Priority
+  status: DecisionStatus;
+  priority: Priority;
+  
+  // Metadata
+  createdBy?: string;
+  createdAt: string;
+  updatedAt: string;
+  approvedAt?: string;
+  approvedBy?: string;
 }

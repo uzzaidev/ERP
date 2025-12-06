@@ -298,49 +298,32 @@
 
 ---
 
-### 📅 Sprint 7: ADRs (Architecture Decision Records) - **P0**
+### 📅 Sprint 7: ADRs (Architecture Decision Records) - ✅ **COMPLETO**
 
-**Tabela DB**: Criar `decisions` table
-
-```sql
-CREATE TABLE decisions (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  tenant_id UUID NOT NULL REFERENCES tenants(id),
-  code VARCHAR(50) NOT NULL, -- D-001, D-002
-  title VARCHAR(255) NOT NULL,
-  context TEXT,
-  decision TEXT,
-  alternatives JSONB, -- [{option, pros[], cons[]}]
-  consequences JSONB, -- {benefits[], trade_offs[], reversibility}
-  impact JSONB, -- {cost, timeline, quality}
-  stakeholders JSONB, -- {decided_by, consulted[], informed[]}
-  related_task_ids UUID[],
-  created_by UUID REFERENCES users(id),
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-```
+**Tabela DB**: ✅ Criada `decisions` table
 
 #### Tasks:
 
-- [ ] **7.1 Database Migration**
-  - [ ] Criar tabela `decisions`
-  - [ ] Adicionar RLS policies
+- [x] **7.1 Database Migration** ✅
+  - [x] Criar tabela `decisions`
+  - [x] Adicionar RLS policies
 
-- [ ] **7.2 ADR CRUD UI**
-  - [ ] Página `/decisoes` (nova)
-  - [ ] Lista de decisões
-  - [ ] Modal criar decisão
-  - [ ] Form completo com todos campos
+- [x] **7.2 ADR CRUD UI** ✅
+  - [x] Página `/decisoes` (nova)
+  - [x] Lista de decisões
+  - [x] Modal criar decisão
+  - [x] Form completo com todos campos
 
-- [ ] **7.3 ADR APIs**
-  - [ ] GET /api/decisions
-  - [ ] POST /api/decisions
-  - [ ] PUT /api/decisions/:id
-  - [ ] DELETE /api/decisions/:id
+- [x] **7.3 ADR APIs** ✅
+  - [x] GET /api/decisions
+  - [x] POST /api/decisions
+  - [x] PUT /api/decisions/:id
+  - [x] DELETE /api/decisions/:id
 
-- [ ] **7.4 Linkar ADRs em Tarefas**
-  - [ ] Adicionar campo `related_decision_ids` em tasks
-  - [ ] Mostrar decisões relacionadas no modal de task
+- [x] **7.4 Linkar ADRs em Tarefas** ✅
+  - [x] Adicionar campo `related_decision_ids` em tasks
+  - [x] Update tasks API para suportar decisões relacionadas
+  - [x] Migration SQL criada
 
 **Resultado**: Sistema de ADRs funcional ✅ Feature única #1
 
@@ -494,7 +477,7 @@ CREATE TABLE meetings (
 - [x] Sprint 6: Velocity + Dashboard (3/3 tasks) ✅ **COMPLETO**
 
 ### Fase 3 - Features Únicas (Target: Semana 8)
-- [ ] Sprint 7: ADRs (0/4 tasks)
+- [x] Sprint 7: ADRs (4/4 tasks) ✅ **COMPLETO**
 - [ ] Sprint 8: Kaizen (0/3 tasks)
 - [ ] Sprint 9: Meeting Score (0/4 tasks)
 
@@ -505,35 +488,32 @@ CREATE TABLE meetings (
 
 ## 🎯 Próximas Ações (AGORA)
 
-**✅ Sprint 6 - COMPLETO!** Dashboard Executivo com Velocity Charts e Export PDF implementados com sucesso!
+**✅ Sprint 7 - COMPLETO!** Sistema de ADRs (Architecture Decision Records) implementado com sucesso!
 
-**Fase 2 - Analytics: 100% COMPLETA!** 🎉
+**Sprint 8 - Kaizen System** (próximo):
 
-**Sprint 7 - ADRs (Architecture Decision Records)** (próximo):
-
-1. 🔄 Sprint 7, Task 7.1: Database Migration
-   - Criar tabela `decisions`
+1. 🔄 Sprint 8, Task 8.1: Database Migration
+   - Criar tabela `kaizens`
    - Adicionar RLS policies
    
-2. 🔄 Sprint 7, Task 7.2: ADR CRUD UI
-   - Página `/decisoes` (nova)
-   - Lista de decisões
-   - Modal criar decisão
-   - Form completo com todos campos
+2. 🔄 Sprint 8, Task 8.2: Kaizen CRUD UI
+   - Página `/kaizens` (nova)
+   - Lista de kaizens por categoria
+   - Modal criar kaizen
+   - Tags de categoria com cores
    
-3. 🔄 Sprint 7, Task 7.3: ADR APIs
-   - GET /api/decisions
-   - POST /api/decisions
-   - PUT /api/decisions/:id
-   - DELETE /api/decisions/:id
+3. 🔄 Sprint 8, Task 8.3: Kaizen APIs
+   - GET /api/kaizens
+   - POST /api/kaizens
+   - AI categorization (opcional)
 
 ---
 
 **Última Atualização**: 2025-12-06
-**Versão**: 1.5
+**Versão**: 1.6
 **Mantido por**: Equipe de Desenvolvimento ERP UzzAI
 
-**🎉 Fase 2 - Analytics: 100% COMPLETA!** 
+**🎉 Sprint 7 - ADRs: 100% COMPLETA!** 
 - ✅ CRUD de Tarefas totalmente funcional
 - ✅ CRUD de Projetos totalmente funcional
 - ✅ CRUD de Sprints totalmente funcional
@@ -541,4 +521,5 @@ CREATE TABLE meetings (
 - ✅ Burndown & Velocity Charts com customização completa
 - ✅ Dashboard Executivo com métricas reais e analytics
 - ✅ Export PDF de Sprint com relatório completo
-- 🚀 Sprint 7 próxima: ADRs (Architecture Decision Records)
+- ✅ **Sistema de ADRs (Architecture Decision Records) completo**
+- 🚀 Sprint 8 próxima: Kaizen System

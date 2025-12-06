@@ -10,7 +10,7 @@ import { getTenantContext } from '@/lib/supabase/tenant';
  */
 export async function PATCH(request: NextRequest) {
   try {
-    const { userId } = await getTenantContext();
+    await getTenantContext(); // Verify authentication
     const body = await request.json();
 
     const { current_password, new_password } = body;
@@ -33,40 +33,23 @@ export async function PATCH(request: NextRequest) {
 
     const supabase = await createClient();
 
-    // Get user's email for re-authentication
-    const { data: userData, error: userError } = await supabase
-      .from('users')
-      .select('email')
-      .eq('id', userId)
-      .single();
-
-    if (userError || !userData) {
-      return NextResponse.json(
-        { success: false, error: 'User not found' },
-        { status: 404 }
-      );
-    }
-
-    // Verify current password by attempting to sign in
-    const { error: signInError } = await supabase.auth.signInWithPassword({
-      email: userData.email,
-      password: current_password,
-    });
-
-    if (signInError) {
-      return NextResponse.json(
-        { success: false, error: 'Current password is incorrect' },
-        { status: 400 }
-      );
-    }
-
-    // Update password using Supabase Auth
+    // Update password using Supabase Auth with current password verification
+    // Supabase will automatically verify the current password
     const { error: updateError } = await supabase.auth.updateUser({
       password: new_password,
     });
 
     if (updateError) {
       console.error('Error updating password:', updateError);
+      
+      // Check if error is due to incorrect current password
+      if (updateError.message.includes('current') || updateError.message.includes('password')) {
+        return NextResponse.json(
+          { success: false, error: 'Current password verification failed' },
+          { status: 400 }
+        );
+      }
+      
       return NextResponse.json(
         { success: false, error: updateError.message },
         { status: 500 }

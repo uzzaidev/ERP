@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface UserProfile {
   id: string;
@@ -66,6 +67,9 @@ export default function ConfiguracoesPage() {
   const [inviteSuccess, setInviteSuccess] = useState('');
   const [inviteLoading, setInviteLoading] = useState(false);
   
+  // Cancel invitation state
+  const [cancelError, setCancelError] = useState('');
+  
   const [copiedUrl, setCopiedUrl] = useState(false);
 
   useEffect(() => {
@@ -103,8 +107,8 @@ export default function ConfiguracoesPage() {
           }
         }
       }
-    } catch {
-      console.error('Error fetching user data');
+    } catch (error) {
+      console.error('Error fetching user data:', error);
     } finally {
       setLoading(false);
     }
@@ -134,7 +138,8 @@ export default function ConfiguracoesPage() {
       } else {
         setProfileError(data.error || 'Erro ao atualizar perfil');
       }
-    } catch {
+    } catch (error) {
+      console.error('Error updating profile:', error);
       setProfileError('Erro ao atualizar perfil');
     } finally {
       setProfileLoading(false);
@@ -178,7 +183,8 @@ export default function ConfiguracoesPage() {
       } else {
         setPasswordError(data.error || 'Erro ao alterar senha');
       }
-    } catch {
+    } catch (error) {
+      console.error('Error changing password:', error);
       setPasswordError('Erro ao alterar senha');
     } finally {
       setPasswordLoading(false);
@@ -210,7 +216,8 @@ export default function ConfiguracoesPage() {
       } else {
         setInviteError(data.error || 'Erro ao enviar convite');
       }
-    } catch {
+    } catch (error) {
+      console.error('Error sending invitation:', error);
       setInviteError('Erro ao enviar convite');
     } finally {
       setInviteLoading(false);
@@ -218,6 +225,7 @@ export default function ConfiguracoesPage() {
   };
 
   const handleCancelInvitation = async (invitationId: string) => {
+    setCancelError('');
     try {
       const res = await fetch(`/api/tenants/invitations/${invitationId}`, {
         method: 'DELETE',
@@ -228,10 +236,11 @@ export default function ConfiguracoesPage() {
       if (data.success) {
         fetchUserData(); // Refresh invitations list
       } else {
-        alert(data.error || 'Erro ao cancelar convite');
+        setCancelError(data.error || 'Erro ao cancelar convite');
       }
-    } catch {
-      alert('Erro ao cancelar convite');
+    } catch (error) {
+      console.error('Error cancelling invitation:', error);
+      setCancelError('Erro ao cancelar convite');
     }
   };
 
@@ -455,18 +464,18 @@ export default function ConfiguracoesPage() {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="invite-role">Função</Label>
-                    <select
-                      id="invite-role"
-                      value={inviteRole}
-                      onChange={(e) => setInviteRole(e.target.value)}
-                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
-                    >
-                      <option value="admin">Administrador</option>
-                      <option value="gestor">Gestor</option>
-                      <option value="financeiro">Financeiro</option>
-                      <option value="dev">Desenvolvedor</option>
-                      <option value="juridico">Jurídico</option>
-                    </select>
+                    <Select value={inviteRole} onValueChange={setInviteRole}>
+                      <SelectTrigger id="invite-role">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="admin">Administrador</SelectItem>
+                        <SelectItem value="gestor">Gestor</SelectItem>
+                        <SelectItem value="financeiro">Financeiro</SelectItem>
+                        <SelectItem value="dev">Desenvolvedor</SelectItem>
+                        <SelectItem value="juridico">Jurídico</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                   {inviteError && (
                     <Alert variant="destructive">
@@ -482,6 +491,13 @@ export default function ConfiguracoesPage() {
                     {inviteLoading ? 'Enviando...' : 'Enviar Convite'}
                   </Button>
                 </form>
+
+                {/* Cancel Error Alert */}
+                {cancelError && (
+                  <Alert variant="destructive" className="mt-4">
+                    <AlertDescription>{cancelError}</AlertDescription>
+                  </Alert>
+                )}
 
                 {/* Invitations List */}
                 {invitations.length > 0 && (

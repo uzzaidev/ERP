@@ -14,7 +14,7 @@ export async function PATCH(request: NextRequest) {
     const { full_name, phone, avatar_url } = body;
 
     // Validate at least one field is being updated
-    if (!full_name && !phone && avatar_url === undefined) {
+    if (!full_name && !phone && avatar_url == null) {
       return NextResponse.json(
         { success: false, error: 'At least one field must be provided for update' },
         { status: 400 }
@@ -30,7 +30,7 @@ export async function PATCH(request: NextRequest) {
 
     if (full_name) updateData.full_name = full_name;
     if (phone !== undefined) updateData.phone = phone;
-    if (avatar_url !== undefined) updateData.avatar_url = avatar_url;
+    if (avatar_url != null) updateData.avatar_url = avatar_url;
 
     // Update user profile
     const { data, error } = await supabase

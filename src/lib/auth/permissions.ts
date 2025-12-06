@@ -8,18 +8,19 @@ export async function hasRole(userId: string, tenantId: string, roleName: string
 
   const { data, error } = await supabase
     .from('user_roles')
-    .select('role:roles(name)')
+    .select('role:roles!inner(name)')
     .eq('user_id', userId)
-    .eq('tenant_id', tenantId)
-    .single();
+    .eq('tenant_id', tenantId);
 
-  if (error || !data) {
+  if (error || !data || data.length === 0) {
     return false;
   }
 
-  // Supabase may return role as array or object
-  const role = Array.isArray(data.role) ? data.role[0] : data.role;
-  return role?.name === roleName;
+  // Check if any of the user's roles match
+  return data.some(item => {
+    const role = Array.isArray(item.role) ? item.role[0] : item.role;
+    return role?.name === roleName;
+  });
 }
 
 /**
@@ -55,7 +56,7 @@ export async function hasPermission(
   // Check if any of the user's roles have the permission
   const { data: rolePermissions, error: permError } = await supabase
     .from('role_permissions')
-    .select('permission:permissions(code)')
+    .select('permission:permissions!inner(code)')
     .in('role_id', roleIds);
 
   if (permError || !rolePermissions) {
@@ -77,7 +78,7 @@ export async function getUserRoles(userId: string, tenantId: string): Promise<st
 
   const { data, error } = await supabase
     .from('user_roles')
-    .select('role:roles(name)')
+    .select('role:roles!inner(name)')
     .eq('user_id', userId)
     .eq('tenant_id', tenantId);
 
@@ -113,7 +114,7 @@ export async function getUserPermissions(userId: string, tenantId: string): Prom
   // Get all permissions for these roles
   const { data: rolePermissions, error: permError } = await supabase
     .from('role_permissions')
-    .select('permission:permissions(code)')
+    .select('permission:permissions!inner(code)')
     .in('role_id', roleIds);
 
   if (permError || !rolePermissions) {

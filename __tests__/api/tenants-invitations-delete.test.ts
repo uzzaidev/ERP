@@ -68,10 +68,11 @@ describe('/api/tenants/invitations/[id]', () => {
           error: null,
         });
 
-      mockSupabase.update.mockReturnValueOnce({
-        eq: jest.fn().mockReturnThis(),
-        eq: jest.fn().mockResolvedValueOnce({
-          error: null,
+      // Mock the chained update.eq().eq() calls
+      const mockEqChain = jest.fn().mockResolvedValue({ error: null });
+      mockSupabase.update.mockReturnValue({
+        eq: jest.fn().mockReturnValue({
+          eq: mockEqChain,
         }),
       });
 
@@ -144,7 +145,10 @@ describe('/api/tenants/invitations/[id]', () => {
       const mockRequest = {} as any;
       const mockParams = Promise.resolve({ id: 'invitation-id' });
 
-      const mockEq = jest.fn().mockReturnThis();
+      const mockEqSecond = jest.fn().mockResolvedValue({ error: null });
+      const mockEqFirst = jest.fn().mockReturnValue({
+        eq: mockEqSecond,
+      });
       
       mockSupabase.single.mockResolvedValue({
         data: {
@@ -155,16 +159,14 @@ describe('/api/tenants/invitations/[id]', () => {
       });
 
       mockSupabase.update.mockReturnValue({
-        eq: mockEq,
+        eq: mockEqFirst,
       });
-
-      mockEq.mockResolvedValue({ error: null });
 
       await DELETE(mockRequest, { params: mockParams });
 
       expect(mockSupabase.update).toHaveBeenCalled();
-      expect(mockEq).toHaveBeenCalledWith('id', 'invitation-id');
-      expect(mockEq).toHaveBeenCalledWith('tenant_id', 'test-tenant-id');
+      expect(mockEqFirst).toHaveBeenCalledWith('id', 'invitation-id');
+      expect(mockEqSecond).toHaveBeenCalledWith('tenant_id', 'test-tenant-id');
     });
   });
 });

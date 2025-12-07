@@ -17,6 +17,16 @@ const nextConfig: NextConfig = {
         resend: 'commonjs resend',
       });
     }
+
+    // Suppress Edge Runtime warnings for Supabase packages
+    // These packages use Node.js APIs but are only used in Node.js runtime contexts
+    // (middleware, API routes, server components), not in Edge Runtime
+    config.ignoreWarnings = config.ignoreWarnings || [];
+    config.ignoreWarnings.push({
+      module: /@supabase\/(realtime-js|supabase-js)/,
+      message: /A Node\.js API is used/,
+    });
+
     return config;
   },
 };

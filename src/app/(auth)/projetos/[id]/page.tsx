@@ -12,11 +12,15 @@ import {
   AlertCircle,
   User,
   UserPlus,
-  X
+  X,
+  LayoutList,
+  GanttChartIcon
 } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { AddProjectMemberModal } from "@/components/projects/AddProjectMemberModal";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { GanttChart } from "@/components/charts/GanttChart";
 
 interface ProjectMember {
   id: string;
@@ -63,9 +67,13 @@ interface Task {
   status: string;
   priority: string;
   assignee: {
+    id: string;
     full_name: string;
   } | null;
   estimated_hours: number;
+  completed_hours: number;
+  started_at: string | null;
+  due_date: string | null;
 }
 
 export default function ProjetoDetailPage() {
@@ -331,98 +339,124 @@ export default function ProjetoDetailPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main Content - Left Side */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Project Details */}
-          <div className="rounded-xl border border-slate-700/50 bg-slate-900/30 p-6">
-            <h2 className="text-lg font-semibold text-white mb-4">Detalhes do Projeto</h2>
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-xs text-slate-400 mb-1">Data de Início</p>
-                  <div className="flex items-center gap-2 text-sm text-slate-200">
-                    <Calendar className="h-4 w-4 text-slate-400" />
-                    {formatDate(project.start_date)}
+          {/* Tabs for different views */}
+          <Tabs defaultValue="overview" className="w-full">
+            <TabsList className="grid w-full grid-cols-2 bg-slate-800/50">
+              <TabsTrigger value="overview" className="flex items-center gap-2">
+                <LayoutList className="h-4 w-4" />
+                Visão Geral
+              </TabsTrigger>
+              <TabsTrigger value="timeline" className="flex items-center gap-2">
+                <GanttChartIcon className="h-4 w-4" />
+                Timeline
+              </TabsTrigger>
+            </TabsList>
+
+            {/* Overview Tab */}
+            <TabsContent value="overview" className="space-y-6 mt-6">
+              {/* Project Details */}
+              <div className="rounded-xl border border-slate-700/50 bg-slate-900/30 p-6">
+                <h2 className="text-lg font-semibold text-white mb-4">Detalhes do Projeto</h2>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-xs text-slate-400 mb-1">Data de Início</p>
+                      <div className="flex items-center gap-2 text-sm text-slate-200">
+                        <Calendar className="h-4 w-4 text-slate-400" />
+                        {formatDate(project.start_date)}
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-xs text-slate-400 mb-1">Data de Término</p>
+                      <div className="flex items-center gap-2 text-sm text-slate-200">
+                        <Calendar className="h-4 w-4 text-slate-400" />
+                        {formatDate(project.end_date)}
+                      </div>
+                    </div>
                   </div>
-                </div>
-                <div>
-                  <p className="text-xs text-slate-400 mb-1">Data de Término</p>
-                  <div className="flex items-center gap-2 text-sm text-slate-200">
-                    <Calendar className="h-4 w-4 text-slate-400" />
-                    {formatDate(project.end_date)}
+
+                  {project.client_name && (
+                    <div className="border-t border-slate-700/50 pt-4">
+                      <p className="text-xs text-slate-400 mb-2">Cliente</p>
+                      <div className="space-y-1">
+                        <p className="text-sm text-slate-200 font-medium">{project.client_name}</p>
+                        {project.client_contact && (
+                          <p className="text-xs text-slate-400">{project.client_contact}</p>
+                        )}
+                        {project.client_email && (
+                          <p className="text-xs text-slate-400">{project.client_email}</p>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Budget Progress */}
+                  <div className="border-t border-slate-700/50 pt-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-xs text-slate-400">Progresso do Orçamento</p>
+                      <span className="text-xs text-slate-300">{budgetUsed.toFixed(1)}%</span>
+                    </div>
+                    <div className="h-2 w-full overflow-hidden rounded-full bg-slate-700">
+                      <div
+                        className={`h-full transition-all ${
+                          budgetUsed > 90 ? 'bg-red-500' : budgetUsed > 70 ? 'bg-yellow-500' : 'bg-emerald-500'
+                        }`}
+                        style={{ width: `${Math.min(budgetUsed, 100)}%` }}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
 
-              {project.client_name && (
-                <div className="border-t border-slate-700/50 pt-4">
-                  <p className="text-xs text-slate-400 mb-2">Cliente</p>
-                  <div className="space-y-1">
-                    <p className="text-sm text-slate-200 font-medium">{project.client_name}</p>
-                    {project.client_contact && (
-                      <p className="text-xs text-slate-400">{project.client_contact}</p>
-                    )}
-                    {project.client_email && (
-                      <p className="text-xs text-slate-400">{project.client_email}</p>
-                    )}
-                  </div>
+              {/* Tasks List */}
+              <div className="rounded-xl border border-slate-700/50 bg-slate-900/30 p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-lg font-semibold text-white">Tarefas do Projeto</h2>
+                  <Link
+                    href={`/kanban?project=${id}`}
+                    className="text-sm text-emerald-500 hover:text-emerald-400"
+                  >
+                    Ver todas →
+                  </Link>
                 </div>
-              )}
-
-              {/* Budget Progress */}
-              <div className="border-t border-slate-700/50 pt-4">
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-xs text-slate-400">Progresso do Orçamento</p>
-                  <span className="text-xs text-slate-300">{budgetUsed.toFixed(1)}%</span>
-                </div>
-                <div className="h-2 w-full overflow-hidden rounded-full bg-slate-700">
-                  <div
-                    className={`h-full transition-all ${
-                      budgetUsed > 90 ? 'bg-red-500' : budgetUsed > 70 ? 'bg-yellow-500' : 'bg-emerald-500'
-                    }`}
-                    style={{ width: `${Math.min(budgetUsed, 100)}%` }}
-                  />
+                <div className="space-y-2">
+                  {tasks.slice(0, 10).map((task) => (
+                    <div
+                      key={task.id}
+                      className="flex items-center justify-between p-3 rounded-lg border border-slate-700/30 hover:bg-slate-800/50 transition-colors"
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="text-xs text-slate-500 font-mono">{task.code}</span>
+                        <span className="text-sm text-slate-200">{task.title}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {task.assignee && (
+                          <span className="text-xs text-slate-400">{task.assignee.full_name}</span>
+                        )}
+                        <span className={`text-xs ${getPriorityColor(task.priority)}`}>
+                          {task.status}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                  {tasks.length === 0 && (
+                    <div className="text-center py-8 text-slate-400 text-sm">
+                      Nenhuma tarefa neste projeto ainda
+                    </div>
+                  )}
                 </div>
               </div>
-            </div>
-          </div>
+            </TabsContent>
 
-          {/* Tasks List */}
-          <div className="rounded-xl border border-slate-700/50 bg-slate-900/30 p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-white">Tarefas do Projeto</h2>
-              <Link
-                href={`/kanban?project=${id}`}
-                className="text-sm text-emerald-500 hover:text-emerald-400"
-              >
-                Ver todas →
-              </Link>
-            </div>
-            <div className="space-y-2">
-              {tasks.slice(0, 10).map((task) => (
-                <div
-                  key={task.id}
-                  className="flex items-center justify-between p-3 rounded-lg border border-slate-700/30 hover:bg-slate-800/50 transition-colors"
-                >
-                  <div className="flex items-center gap-3">
-                    <span className="text-xs text-slate-500 font-mono">{task.code}</span>
-                    <span className="text-sm text-slate-200">{task.title}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {task.assignee && (
-                      <span className="text-xs text-slate-400">{task.assignee.full_name}</span>
-                    )}
-                    <span className={`text-xs ${getPriorityColor(task.priority)}`}>
-                      {task.status}
-                    </span>
-                  </div>
-                </div>
-              ))}
-              {tasks.length === 0 && (
-                <div className="text-center py-8 text-slate-400 text-sm">
-                  Nenhuma tarefa neste projeto ainda
-                </div>
-              )}
-            </div>
-          </div>
+            {/* Timeline Tab */}
+            <TabsContent value="timeline" className="mt-6">
+              <GanttChart
+                tasks={tasks}
+                projectStartDate={project.start_date}
+                projectEndDate={project.end_date}
+              />
+            </TabsContent>
+          </Tabs>
         </div>
 
         {/* Sidebar - Right Side */}

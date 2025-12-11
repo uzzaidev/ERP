@@ -37,16 +37,11 @@ export async function middleware(request: NextRequest) {
       .from('users')
       .select('id, tenant_id, is_active')
       .eq('id', session.user.id)
-      .single();
+      .maybeSingle();
 
-    if (userError) {
-      console.error('Error fetching user in middleware:', userError);
-      // Em caso de erro, permite acesso (evita loop)
-      return NextResponse.next();
-    }
-
-    // Se usuário não tem tenant_id OU não está ativo, redireciona para setup-tenant
-    if (!user.tenant_id || !user.is_active) {
+    // Se usuário não existe na tabela users OU não tem tenant_id OU não está ativo
+    // Redireciona para setup-tenant
+    if (!user || !user.tenant_id || !user.is_active) {
       // Não redireciona se já está na página de setup-tenant
       if (!pathname.startsWith('/setup-tenant')) {
         const redirectUrl = new URL('/setup-tenant', request.url);

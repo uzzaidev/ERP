@@ -35,17 +35,40 @@ export default function SetupTenantPage() {
       }
 
       // Buscar dados do usuário na tabela users
-      const { data: userData, error: fetchUserError } = await supabase
+      let userData = null;
+      const { data: existingUser, error: fetchUserError } = await supabase
         .from('users')
         .select('id, email, full_name, tenant_id, is_active')
         .eq('id', user.id)
-        .single();
+        .maybeSingle();
 
-      if (fetchUserError) {
-        console.error('Error fetching user:', fetchUserError);
-        setError("Erro ao buscar dados do usuário");
-        setLoading(false);
-        return;
+      if (existingUser) {
+        userData = existingUser;
+      } else {
+        // Usuário não existe na tabela users (email confirmation bloqueou o INSERT)
+        // Criar o registro agora
+        console.log('Creating user record during setup...');
+        const { data: newUser, error: createUserError } = await supabase
+          .from('users')
+          .insert({
+            id: user.id,
+            email: user.email || '',
+            full_name: user.user_metadata?.name || user.email?.split('@')[0] || 'Usuário',
+            tenant_id: null,
+            is_active: false,
+            email_verified: user.email_confirmed_at ? true : false,
+          })
+          .select('id, email, full_name, tenant_id, is_active')
+          .single();
+
+        if (createUserError) {
+          console.error('Error creating user record:', createUserError);
+          setError("Erro ao criar registro do usuário: " + createUserError.message);
+          setLoading(false);
+          return;
+        }
+
+        userData = newUser;
       }
 
       // Caso especial: usuário tem tenant mas está inativo
@@ -194,15 +217,33 @@ export default function SetupTenantPage() {
           return;
         }
 
-        // Verificar se tenant existe
-        const { data: tenant, error: tenantError } = await supabase
+        // Verificar se tenant existe (buscar por slug ou ID)
+        let tenant = null;
+
+        // Tentar por slug primeiro
+        const { data: tenantBySlug } = await supabase
           .from('tenants')
           .select('id, name, slug, status')
           .eq('slug', tenantSlug)
-          .single();
+          .maybeSingle();
 
-        if (tenantError || !tenant) {
-          setError("Empresa não encontrada. Verifique o código.");
+        if (tenantBySlug) {
+          tenant = tenantBySlug;
+        } else {
+          // Tentar por ID (caso usuário tenha passado UUID)
+          const { data: tenantById } = await supabase
+            .from('tenants')
+            .select('id, name, slug, status')
+            .eq('id', tenantSlug)
+            .maybeSingle();
+
+          if (tenantById) {
+            tenant = tenantById;
+          }
+        }
+
+        if (!tenant) {
+          setError("Empresa não encontrada. Verifique o código/ID.");
           setLoading(false);
           return;
         }
@@ -365,7 +406,7 @@ export default function SetupTenantPage() {
               <>
                 <div className="space-y-2">
                   <label htmlFor="tenantSlug" className="text-sm font-medium text-slate-300">
-                    Código da Empresa *
+                    Código/ID da Empresa *
                   </label>
                   <div className="relative">
                     <Key className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500" />
@@ -373,14 +414,14 @@ export default function SetupTenantPage() {
                       id="tenantSlug"
                       type="text"
                       value={tenantSlug}
-                      onChange={(e) => setTenantSlug(e.target.value.toLowerCase())}
+                      onChange={(e) => setTenantSlug(e.target.value.trim())}
                       required={mode === 'join'}
                       disabled={loading || success}
-                      className="w-full rounded-lg border border-slate-700 bg-slate-900 py-3 pl-12 pr-4 text-white placeholder:text-slate-500 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 disabled:opacity-50 font-mono"
-                      placeholder="codigo-da-empresa"
+                      className="w-full rounded-lg border border-slate-700 bg-slate-900 py-3 pl-12 pr-4 text-white placeholder:text-slate-500 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 disabled:opacity-50 font-mono text-sm"
+                      placeholder="codigo-empresa ou UUID"
                     />
                   </div>
-                  <p className="text-xs text-slate-500">Peça o código ao administrador da empresa</p>
+                  <p className="text-xs text-slate-500">Aceita tanto o slug (ex: minha-empresa) quanto o ID (UUID)</p>
                 </div>
 
                 <div className="space-y-2">

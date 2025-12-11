@@ -1,41 +1,25 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
-import { UserPlus, Mail, Lock, User, AlertCircle, CheckCircle, Building2, Key } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { UserPlus, Mail, Lock, User, AlertCircle, CheckCircle } from "lucide-react";
+import { useState } from "react";
 import { signUp } from "@/lib/supabase/auth";
 
 export default function RegistroForm() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [tenantMode, setTenantMode] = useState<'create' | 'join'>('create');
-  const [companyName, setCompanyName] = useState("");
-  const [tenantSlug, setTenantSlug] = useState("");
-  const [accessMessage, setAccessMessage] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [isPending, setIsPending] = useState(false);
-
-  // Auto-fill tenant slug from URL parameter
-  useEffect(() => {
-    const tenantParam = searchParams.get('tenant');
-    if (tenantParam) {
-      setTenantSlug(tenantParam);
-      setTenantMode('join');
-    }
-  }, [searchParams]);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError("");
     setSuccess(false);
     setLoading(true);
-    setIsPending(false);
 
     if (password.length < 6) {
       setError("A senha deve ter no mínimo 6 caracteres");
@@ -43,27 +27,11 @@ export default function RegistroForm() {
       return;
     }
 
-    if (tenantMode === 'create' && !companyName.trim()) {
-      setError("Por favor, informe o nome da empresa");
-      setLoading(false);
-      return;
-    }
-
-    if (tenantMode === 'join' && !tenantSlug.trim()) {
-      setError("Por favor, informe o código da empresa");
-      setLoading(false);
-      return;
-    }
-
     try {
-      const { data, error: authError, mode } = await signUp({
+      const { data, error: authError } = await signUp({
         email,
         password,
         name,
-        tenantMode,
-        companyName: tenantMode === 'create' ? companyName : undefined,
-        tenantSlug: tenantMode === 'join' ? tenantSlug : undefined,
-        accessMessage: tenantMode === 'join' ? accessMessage : undefined,
       });
 
       if (authError) {
@@ -78,18 +46,9 @@ export default function RegistroForm() {
 
       if (data) {
         setSuccess(true);
-
-        // Se foi solicitação de acesso, mostrar mensagem diferente
-        if (mode === 'join' && 'pending' in data && data.pending) {
-          setIsPending(true);
-          setTimeout(() => {
-            router.push("/login?message=Sua solicitação foi enviada! Aguarde a aprovação do administrador.");
-          }, 3000);
-        } else {
-          setTimeout(() => {
-            router.push("/login");
-          }, 2000);
-        }
+        setTimeout(() => {
+          router.push("/login?message=Conta criada! Confirme seu email e faça login.");
+        }, 2000);
       }
     } catch {
       setError("Erro ao criar conta. Tente novamente.");
@@ -126,15 +85,12 @@ export default function RegistroForm() {
             <div className="mb-5 rounded-lg bg-emerald-500/10 border border-emerald-500/50 p-4 flex items-start gap-3">
               <CheckCircle className="h-5 w-5 text-emerald-400 flex-shrink-0 mt-0.5" />
               <p className="text-sm text-emerald-400">
-                {isPending
-                  ? "Solicitação enviada! Aguarde aprovação do administrador."
-                  : "Conta criada com sucesso! Redirecionando..."}
+                Conta criada com sucesso! Verifique seu email para confirmar.
               </p>
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Dados pessoais */}
             <div className="space-y-2">
               <label htmlFor="name" className="text-sm font-medium text-slate-300">
                 Nome Completo
@@ -193,113 +149,11 @@ export default function RegistroForm() {
               </div>
             </div>
 
-            {/* Modo de vinculação ao tenant */}
-            <div className="space-y-3 pt-2">
-              <label className="text-sm font-medium text-slate-300">
-                Você deseja:
-              </label>
-
-              <div className="space-y-3">
-                <label className={`flex items-start gap-3 p-4 rounded-lg border cursor-pointer transition-all ${tenantMode === 'create' ? 'border-emerald-500 bg-emerald-500/10' : 'border-slate-700 bg-slate-900/50 hover:border-slate-600'}`}>
-                  <input
-                    type="radio"
-                    name="tenantMode"
-                    value="create"
-                    checked={tenantMode === 'create'}
-                    onChange={(e) => setTenantMode(e.target.value as 'create' | 'join')}
-                    disabled={loading || success}
-                    className="mt-0.5"
-                  />
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <Building2 className="h-4 w-4 text-emerald-400" />
-                      <span className="font-medium text-white">Criar nova empresa</span>
-                    </div>
-                    <p className="text-xs text-slate-400">Você será o administrador</p>
-                  </div>
-                </label>
-
-                <label className={`flex items-start gap-3 p-4 rounded-lg border cursor-pointer transition-all ${tenantMode === 'join' ? 'border-emerald-500 bg-emerald-500/10' : 'border-slate-700 bg-slate-900/50 hover:border-slate-600'}`}>
-                  <input
-                    type="radio"
-                    name="tenantMode"
-                    value="join"
-                    checked={tenantMode === 'join'}
-                    onChange={(e) => setTenantMode(e.target.value as 'create' | 'join')}
-                    disabled={loading || success}
-                    className="mt-0.5"
-                  />
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <Key className="h-4 w-4 text-blue-400" />
-                      <span className="font-medium text-white">Solicitar acesso a uma empresa</span>
-                    </div>
-                    <p className="text-xs text-slate-400">Aguardará aprovação do admin</p>
-                  </div>
-                </label>
-              </div>
+            <div className="pt-2">
+              <p className="text-xs text-slate-500 mb-4">
+                Após criar sua conta, você poderá criar uma nova empresa ou solicitar acesso a uma empresa existente.
+              </p>
             </div>
-
-            {/* Campos condicionais baseados no modo */}
-            {tenantMode === 'create' && (
-              <div className="space-y-2">
-                <label htmlFor="companyName" className="text-sm font-medium text-slate-300">
-                  Nome da Empresa
-                </label>
-                <div className="relative">
-                  <Building2 className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500" />
-                  <input
-                    id="companyName"
-                    type="text"
-                    value={companyName}
-                    onChange={(e) => setCompanyName(e.target.value)}
-                    required={tenantMode === 'create'}
-                    disabled={loading || success}
-                    className="w-full rounded-lg border border-slate-700 bg-slate-900 py-3 pl-11 pr-4 text-white placeholder:text-slate-500 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
-                    placeholder="Minha Empresa Ltda"
-                  />
-                </div>
-              </div>
-            )}
-
-            {tenantMode === 'join' && (
-              <>
-                <div className="space-y-2">
-                  <label htmlFor="tenantSlug" className="text-sm font-medium text-slate-300">
-                    Código da Empresa
-                  </label>
-                  <div className="relative">
-                    <Key className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500" />
-                    <input
-                      id="tenantSlug"
-                      type="text"
-                      value={tenantSlug}
-                      onChange={(e) => setTenantSlug(e.target.value.toLowerCase())}
-                      required={tenantMode === 'join'}
-                      disabled={loading || success}
-                      className="w-full rounded-lg border border-slate-700 bg-slate-900 py-3 pl-11 pr-4 text-white placeholder:text-slate-500 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 disabled:opacity-50 disabled:cursor-not-allowed font-mono"
-                      placeholder="codigo-da-empresa"
-                    />
-                  </div>
-                  <p className="text-xs text-slate-500">Peça o código ao administrador da empresa</p>
-                </div>
-
-                <div className="space-y-2">
-                  <label htmlFor="accessMessage" className="text-sm font-medium text-slate-300">
-                    Mensagem (Opcional)
-                  </label>
-                  <textarea
-                    id="accessMessage"
-                    value={accessMessage}
-                    onChange={(e) => setAccessMessage(e.target.value)}
-                    disabled={loading || success}
-                    rows={3}
-                    className="w-full rounded-lg border border-slate-700 bg-slate-900 py-3 px-4 text-white placeholder:text-slate-500 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 disabled:opacity-50 disabled:cursor-not-allowed resize-none"
-                    placeholder="Por que você quer acessar esta empresa?"
-                  />
-                </div>
-              </>
-            )}
 
             <button
               type="submit"

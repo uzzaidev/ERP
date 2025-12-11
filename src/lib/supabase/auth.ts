@@ -4,16 +4,6 @@ export interface SignUpData {
   email: string;
   password: string;
   name: string;
-
-  // Tenant setup
-  tenantMode: 'create' | 'join';
-
-  // Se criar novo tenant
-  companyName?: string;
-
-  // Se solicitar acesso a tenant existente
-  tenantSlug?: string;
-  accessMessage?: string;
 }
 
 export interface SignInData {
@@ -23,15 +13,13 @@ export interface SignInData {
 
 /**
  * Registra novo usuário no Supabase Auth
- * Opções:
- * 1. Criar novo tenant (tenantMode: 'create')
- * 2. Solicitar acesso a tenant existente (tenantMode: 'join')
+ * Apenas cria a conta - tenant setup é feito depois no /setup-tenant
  */
 export async function signUp(data: SignUpData) {
   const supabase = createClient();
-  const { email, password, name, tenantMode, companyName, tenantSlug, accessMessage } = data;
+  const { email, password, name } = data;
 
-  // 1. Criar usuário no Auth
+  // Criar usuário no Auth
   const { data: authData, error: authError } = await supabase.auth.signUp({
     email,
     password,
@@ -43,143 +31,32 @@ export async function signUp(data: SignUpData) {
   });
 
   if (authError) {
-    return { data: null, error: authError, mode: null };
+    return { data: null, error: authError };
   }
 
   if (!authData.user) {
-    return { data: null, error: new Error('User creation failed'), mode: null };
+    return { data: null, error: new Error('Falha ao criar usuário') };
   }
 
-  try {
-    if (tenantMode === 'create') {
-      // Modo 1: Criar novo tenant
-      const tenantSlugGenerated = companyName
-        ?.toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/(^-|-$)/g, '') || `empresa-${Date.now()}`;
+  // Criar registro na tabela users (sem tenant)
+  // IMPORTANTE: Isso só funciona se o usuário tiver sessão ativa
+  // Se email confirmation estiver habilitado, isso pode falhar
+  // Nesse caso, o registro em 'users' será criado no /setup-tenant
+  const { error: userError } = await supabase.from('users').insert({
+    id: authData.user.id,
+    tenant_id: null, // Sem tenant até setup
+    email,
+    full_name: name,
+    is_active: false, // Inativo até vincular a um tenant
+    email_verified: false,
+  });
 
-      // Criar tenant
-      const { data: tenant, error: tenantError } = await supabase
-        .from('tenants')
-        .insert({
-          name: companyName || name,
-          slug: tenantSlugGenerated,
-          plan: 'trial',
-          status: 'active',
-          max_users: 5,
-          max_projects: 10,
-          storage_limit_mb: 1000,
-        })
-        .select()
-        .single();
-
-      if (tenantError) {
-        console.error('Error creating tenant:', tenantError);
-        return { data: null, error: tenantError, mode: 'create' };
-      }
-
-      // Criar usuário vinculado ao tenant como admin
-      const { error: userError } = await supabase.from('users').insert({
-        id: authData.user.id,
-        tenant_id: tenant.id,
-        email,
-        full_name: name,
-        is_active: true,
-        email_verified: false,
-      });
-
-      if (userError) {
-        console.error('Error creating user record:', userError);
-        return { data: null, error: userError, mode: 'create' };
-      }
-
-      // Atribuir role de admin ao primeiro usuário
-      const { data: adminRole } = await supabase
-        .from('roles')
-        .select('id')
-        .eq('name', 'admin')
-        .single();
-
-      if (adminRole) {
-        await supabase.from('user_roles').insert({
-          user_id: authData.user.id,
-          role_id: adminRole.id,
-          tenant_id: tenant.id,
-          assigned_by: authData.user.id, // Self-assigned
-        });
-      }
-
-      return { data: { ...authData, tenant }, error: null, mode: 'create' };
-
-    } else {
-      // Modo 2: Solicitar acesso a tenant existente
-
-      // Verificar se tenant existe
-      const { data: tenant, error: tenantError } = await supabase
-        .from('tenants')
-        .select('id, name, slug, status')
-        .eq('slug', tenantSlug)
-        .single();
-
-      if (tenantError || !tenant) {
-        return {
-          data: null,
-          error: new Error('Empresa não encontrada. Verifique o código/slug.'),
-          mode: 'join'
-        };
-      }
-
-      if (tenant.status !== 'active') {
-        return {
-          data: null,
-          error: new Error('Esta empresa não está aceitando novos membros.'),
-          mode: 'join'
-        };
-      }
-
-      // Criar usuário SEM tenant (ficará NULL até aprovação)
-      const { error: userError } = await supabase.from('users').insert({
-        id: authData.user.id,
-        tenant_id: null, // Sem tenant até aprovação
-        email,
-        full_name: name,
-        is_active: false, // Inativo até aprovação
-        email_verified: false,
-      });
-
-      if (userError) {
-        console.error('Error creating user record:', userError);
-        return { data: null, error: userError, mode: 'join' };
-      }
-
-      // Criar solicitação de acesso
-      const { error: requestError } = await supabase
-        .from('tenant_access_requests')
-        .insert({
-          user_id: authData.user.id,
-          email,
-          full_name: name,
-          tenant_id: tenant.id,
-          tenant_slug: tenant.slug,
-          status: 'pending',
-          message: accessMessage,
-        });
-
-      if (requestError) {
-        console.error('Error creating access request:', requestError);
-        return { data: null, error: requestError, mode: 'join' };
-      }
-
-      return { data: { ...authData, tenant, pending: true }, error: null, mode: 'join' };
-    }
-  } catch (err) {
-    console.error('Signup error:', err);
-    return {
-      data: null,
-      error: err instanceof Error ? err : new Error('Erro ao criar conta'),
-      mode: tenantMode
-    };
+  // Se falhar (RLS blocking), não é problema - será criado no setup-tenant
+  if (userError) {
+    console.log('User record creation deferred to setup-tenant:', userError.message);
   }
+
+  return { data: authData, error: null };
 }
 
 /**

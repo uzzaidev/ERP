@@ -69,11 +69,11 @@ SELECT
         ELSE cmd
     END as operacao,
     CASE
-        WHEN qual IS NOT NULL THEN 'USING: ' || pg_get_expr(qual, 'public.tenants'::regclass)
+        WHEN qual IS NOT NULL THEN 'USING: ' || qual
         ELSE 'N/A'
     END as using_clause,
     CASE
-        WHEN with_check IS NOT NULL THEN 'WITH CHECK: ' || pg_get_expr(with_check, 'public.tenants'::regclass)
+        WHEN with_check IS NOT NULL THEN 'WITH CHECK: ' || with_check
         ELSE 'N/A'
     END as with_check_clause
 FROM pg_policies

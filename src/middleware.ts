@@ -13,7 +13,7 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Rotas públicas que não precisam de auth
-  const publicRoutes = ['/', '/login', '/registro', '/setup-tenant', '/accept-invitation'];
+  const publicRoutes = ['/', '/login', '/registro', '/setup-tenant', '/accept-invitation', '/esqueci-senha', '/redefinir-senha'];
   const isPublicRoute = publicRoutes.some(route => pathname === route || pathname.startsWith(route));
 
   if (isPublicRoute) {
@@ -33,15 +33,16 @@ export async function middleware(request: NextRequest) {
     }
 
     // Verificar se usuário tem tenant_id
+    // IMPORTANTE: Usar maybeSingle() para não dar erro se usuário não existir
     const { data: user, error: userError } = await supabase
       .from('users')
       .select('id, tenant_id, is_active')
       .eq('id', session.user.id)
       .maybeSingle();
 
-    // Se usuário não existe na tabela users OU não tem tenant_id OU não está ativo
+    // Se erro ao buscar OU usuário não existe na tabela users OU não tem tenant_id OU não está ativo
     // Redireciona para setup-tenant
-    if (!user || !user.tenant_id || !user.is_active) {
+    if (userError || !user || !user.tenant_id || !user.is_active) {
       // Não redireciona se já está na página de setup-tenant
       if (!pathname.startsWith('/setup-tenant')) {
         const redirectUrl = new URL('/setup-tenant', request.url);

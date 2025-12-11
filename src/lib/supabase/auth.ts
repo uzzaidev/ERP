@@ -101,12 +101,13 @@ export async function getSession() {
 export async function getCurrentUser() {
   const supabase = createClient();
   const { data: { user }, error } = await supabase.auth.getUser();
-  
+
   if (error || !user) {
     return { user: null, error };
   }
 
   // Buscar dados completos da tabela users com tenant
+  // IMPORTANTE: Usar maybeSingle() para não dar erro se usuário não existir na tabela users
   const { data: userData, error: userError } = await supabase
     .from('users')
     .select(`
@@ -122,7 +123,7 @@ export async function getCurrentUser() {
       )
     `)
     .eq('id', user.id)
-    .single();
+    .maybeSingle();
 
   return { user: userData, error: userError };
 }
@@ -144,7 +145,19 @@ export async function updatePassword(newPassword: string) {
 export async function resetPassword(email: string) {
   const supabase = createClient();
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${window.location.origin}/auth/callback`,
+    redirectTo: `${window.location.origin}/redefinir-senha`,
+  });
+  return { error };
+}
+
+/**
+ * Reenvia email de confirmação para usuários não confirmados
+ */
+export async function resendConfirmationEmail(email: string) {
+  const supabase = createClient();
+  const { error } = await supabase.auth.resend({
+    type: 'signup',
+    email,
   });
   return { error };
 }

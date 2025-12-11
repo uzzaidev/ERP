@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { LogIn, Mail, Lock, AlertCircle } from "lucide-react";
+import { LogIn, Mail, Lock, AlertCircle, CheckCircle } from "lucide-react";
 import { useState } from "react";
-import { signIn } from "@/lib/supabase/auth";
+import { signIn, resendConfirmationEmail } from "@/lib/supabase/auth";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -12,19 +12,30 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showResendEmail, setShowResendEmail] = useState(false);
+  const [resendLoading, setResendLoading] = useState(false);
+  const [resendSuccess, setResendSuccess] = useState(false);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError("");
+    setShowResendEmail(false);
+    setResendSuccess(false);
     setLoading(true);
 
     try {
       const { data, error: authError } = await signIn({ email, password });
 
       if (authError) {
-        setError(authError.message === "Invalid login credentials" 
-          ? "Email ou senha incorretos" 
-          : authError.message);
+        // Detectar se o email não foi confirmado
+        if (authError.message.includes("Email not confirmed")) {
+          setError("Email ainda não confirmado. Por favor, verifique sua caixa de entrada.");
+          setShowResendEmail(true);
+        } else if (authError.message === "Invalid login credentials") {
+          setError("Email ou senha incorretos");
+        } else {
+          setError(authError.message);
+        }
         setLoading(false);
         return;
       }
@@ -36,6 +47,27 @@ export default function LoginPage() {
     } catch {
       setError("Erro ao fazer login. Tente novamente.");
       setLoading(false);
+    }
+  };
+
+  const handleResendEmail = async () => {
+    setResendLoading(true);
+    setResendSuccess(false);
+    setError("");
+
+    try {
+      const { error: resendError } = await resendConfirmationEmail(email);
+
+      if (resendError) {
+        setError(`Erro ao reenviar email: ${resendError.message}`);
+      } else {
+        setResendSuccess(true);
+        setError("");
+      }
+    } catch {
+      setError("Erro ao reenviar email. Tente novamente.");
+    } finally {
+      setResendLoading(false);
     }
   };
 
@@ -66,6 +98,31 @@ export default function LoginPage() {
             </div>
           )}
 
+          {resendSuccess && (
+            <div className="mb-5 rounded-lg bg-emerald-500/10 border border-emerald-500/50 p-4 flex items-start gap-3">
+              <CheckCircle className="h-5 w-5 text-emerald-400 flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-emerald-400">
+                Email de confirmação reenviado! Verifique sua caixa de entrada.
+              </p>
+            </div>
+          )}
+
+          {showResendEmail && !resendSuccess && (
+            <div className="mb-5 rounded-lg bg-blue-500/10 border border-blue-500/50 p-4">
+              <p className="text-sm text-blue-400 mb-3">
+                Não recebeu o email de confirmação?
+              </p>
+              <button
+                type="button"
+                onClick={handleResendEmail}
+                disabled={resendLoading}
+                className="w-full rounded-lg bg-blue-600 hover:bg-blue-700 py-2.5 px-4 text-sm font-medium text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {resendLoading ? "Enviando..." : "Reenviar email de confirmação"}
+              </button>
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-2">
               <label htmlFor="email" className="text-sm font-medium text-slate-300">
@@ -87,9 +144,17 @@ export default function LoginPage() {
             </div>
 
             <div className="space-y-2">
-              <label htmlFor="password" className="text-sm font-medium text-slate-300">
-                Senha
-              </label>
+              <div className="flex items-center justify-between">
+                <label htmlFor="password" className="text-sm font-medium text-slate-300">
+                  Senha
+                </label>
+                <Link
+                  href="/esqueci-senha"
+                  className="text-xs text-emerald-400 hover:text-emerald-300 transition-colors"
+                >
+                  Esqueci a senha
+                </Link>
+              </div>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500" />
                 <input

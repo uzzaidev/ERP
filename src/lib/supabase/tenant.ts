@@ -40,6 +40,7 @@ export async function getTenantContext(): Promise<TenantContext> {
   }
 
   // Fetch user's tenant_id from users table
+  // IMPORTANTE: Usar maybeSingle() para evitar erro "cannot coerce to single JSON object"
   const { data: userData, error: userError } = await supabase
     .from('users')
     .select(`
@@ -51,10 +52,15 @@ export async function getTenantContext(): Promise<TenantContext> {
       tenant:tenants(id, name, slug, plan, status, max_users, max_projects)
     `)
     .eq('id', user.id)
-    .single();
+    .maybeSingle();
 
-  if (userError || !userData) {
-    throw new Error('User not found in database');
+  if (userError) {
+    console.error('Error fetching user data:', userError);
+    throw new Error(`Erro ao buscar dados: ${userError.message}`);
+  }
+
+  if (!userData) {
+    throw new Error('User not found in database - please complete registration at /setup-tenant');
   }
 
   // Usuário sem tenant ou inativo = precisa passar por /setup-tenant
@@ -124,9 +130,14 @@ export async function checkTenantLimits(tenantId: string): Promise<{
     .from('tenants')
     .select('max_users, max_projects, status')
     .eq('id', tenantId)
-    .single();
+    .maybeSingle();
 
-  if (tenantError || !tenant) {
+  if (tenantError) {
+    console.error('Error fetching tenant:', tenantError);
+    throw new Error(`Error fetching tenant: ${tenantError.message}`);
+  }
+
+  if (!tenant) {
     throw new Error('Tenant not found');
   }
 
@@ -139,18 +150,22 @@ export async function checkTenantLimits(tenantId: string): Promise<{
     .from('tenant_usage_stats')
     .select('*')
     .eq('tenant_id', tenantId)
-    .single();
+    .maybeSingle();
 
-  if (usageError || !usage) {
+  if (usageError) {
+    console.error('Error fetching tenant usage:', usageError);
+  }
+
+  if (!usage) {
     // Initialize usage stats if not exists
     return {
       canAddUser: true,
       canAddProject: true,
-      currentUsage: { 
-        users_count: 0, 
-        projects_count: 0, 
-        tasks_count: 0, 
-        storage_used_mb: 0 
+      currentUsage: {
+        users_count: 0,
+        projects_count: 0,
+        tasks_count: 0,
+        storage_used_mb: 0
       },
     };
   }

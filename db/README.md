@@ -109,10 +109,20 @@ bank_accounts ← transactions → chart_of_accounts
 4. **Relacionamentos**: Todas as foreign keys têm ON DELETE CASCADE ou SET NULL apropriados
 5. **Indexes**: Indexes otimizados já criados para queries comuns
 
-## 🔄 Migrações Futuras
+## 🔄 Migrações e Correções
+
+### Scripts Aplicados
+
+- **`12_fix_tenant_creation_rls.sql`** - ✅ Correção de RLS para permitir criação de tenants
+  - Adiciona policy INSERT para tabela `tenants`
+  - Permite que usuários autenticados criem empresas durante o registro
+  - Mantém segurança e isolamento entre tenants
+  - **OBRIGATÓRIO**: Aplique este script para corrigir problema de registro
+
+### Migrações Futuras
 
 Para adicionar novas tabelas ou modificar existentes, crie novos arquivos:
-- `05_nome_do_modulo.sql`
+- `XX_nome_do_modulo.sql` (onde XX é o próximo número)
 - `migration_YYYY_MM_DD_descricao.sql`
 
 ## 🧪 Testes
